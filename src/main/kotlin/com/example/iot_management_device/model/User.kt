@@ -16,4 +16,11 @@ data class User(
     val phoneNumber: String,
     @Column(nullable = false)
     val password: String,
+    @Column(nullable = false, unique = true)
+    val role: UserRole
 )
+
+enum class UserRole {
+    User,
+    Admin
+}
