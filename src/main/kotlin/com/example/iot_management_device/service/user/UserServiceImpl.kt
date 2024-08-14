@@ -22,11 +22,8 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService 
         return userRepository.findByUsername(username)
     }
 
-    override fun update(id: Long, user: User): User {
+    override fun update(id: Long?, user: User): User {
         return userRepository.save(user)
     }
 
-    override fun deleteById(id: Long) {
-        userRepository.deleteById(id)
-    }
 }

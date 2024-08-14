@@ -12,7 +12,6 @@ interface UserService {
 
     fun getUserByUsername(username:String):User
 
-    fun update(id:Long, user:User): User
+    fun update(id:Long?, user:User): User
 
-    fun deleteById(id:Long)
 }
