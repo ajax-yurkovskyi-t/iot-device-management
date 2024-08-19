@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.24"
+    kotlin("kapt") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
     id("org.springframework.boot") version "3.3.2"
     id("io.spring.dependency-management") version "1.1.6"
@@ -32,13 +33,17 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation ("org.mapstruct:mapstruct:1.6.0")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.3.2")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.h2database:h2")
-    annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor ("org.mapstruct:mapstruct-processor:1.6.0")
-    annotationProcessor ("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+    kapt("org.mapstruct:mapstruct-processor:1.6.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

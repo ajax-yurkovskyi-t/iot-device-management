@@ -1,17 +1,21 @@
 package com.example.iot_management_device.service.user
 
-import com.example.iot_management_device.model.User
+import com.example.iot_management_device.dto.user.request.UserRegistrationRequestDto
+import com.example.iot_management_device.dto.user.response.UserResponseDto
+import com.example.iot_management_device.dto.user.request.UserUpdateRequestDto
 
 
 interface UserService {
-    fun register(user:User): User
+    fun register(requestDto: UserRegistrationRequestDto): UserResponseDto
 
-    fun getUserById(id:Long): User
+    fun assignDeviceToUser(userId: Long, deviceId: Long): UserResponseDto
 
-    fun getAll(): List<User>
+    fun getUserById(id: Long): UserResponseDto
 
-    fun getUserByUsername(username:String):User
+    fun getAll(): List<UserResponseDto>
 
-    fun update(id:Long?, user:User): User
+    fun getUserByUsername(username:String): UserResponseDto
+
+    fun update(id: Long, requestDto: UserUpdateRequestDto): UserResponseDto
 
 }

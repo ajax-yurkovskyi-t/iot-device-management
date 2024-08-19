@@ -1,47 +1,62 @@
 package com.example.iot_management_device.controller
 
-
+import com.example.iot_management_device.dto.user.response.UserResponseDto
+import com.example.iot_management_device.dto.user.request.UserUpdateRequestDto
 import com.example.iot_management_device.model.User
-import com.example.iot_management_device.service.user.UserService
+import com.example.iot_management_device.service.user.UserServiceImpl
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
-
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/users")
-class UserController(private val userService: UserService) {
+@RequestMapping("/users")
+class UserController(private val userService: UserServiceImpl) {
 
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/me")
+    fun getCurrentUser(authentication: Authentication): UserResponseDto {
+        val userId = extractUserId(authentication)
+        return userService.getUserById(userId)
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/{deviceId}/assign")
+    fun assignDeviceToUser(
+        authentication: Authentication,
+        @PathVariable deviceId: Long
+    ): UserResponseDto {
+        val userId = extractUserId(authentication)
+        return userService.assignDeviceToUser(userId, deviceId)
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    fun getUserById(@PathVariable(name = "id") id:Long): User {
-        return userService.getUserById(id)
-    }
+    fun getUserById(@PathVariable id: Long): UserResponseDto =
+        userService.getUserById(id)
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun register(@Valid @RequestBody user: User): User =
-        userService.register(user)
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping()
+    fun update(@Valid @RequestBody requestDto: UserUpdateRequestDto): UserResponseDto =
+        userService.update(requestDto.id ,requestDto)
 
-
-    @PutMapping("/update")
-    @ResponseStatus(HttpStatus.OK)
-    fun update(
-       @Valid @RequestBody requestDto: User
-    ): User {
-        return userService.update(requestDto.id ,requestDto);
-    }
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    fun getUserByUsername(
-        @RequestParam username: String
-    ): User {
-        return userService.getUserByUsername(username)
-    }
+    fun getUserByUsername(@RequestParam username: String): UserResponseDto =
+        userService.getUserByUsername(username)
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
-    @ResponseStatus(HttpStatus.OK)
-    fun getAll() : List<User> {
-        return userService.getAll();
-    }
+    fun getAll(): List<UserResponseDto> =
+        userService.getAll()
+
+    private fun extractUserId(authentication: Authentication): Long =
+        (authentication.principal as? User)?.id ?: throw IllegalArgumentException("User ID cannot be null")
 }
