@@ -48,7 +48,6 @@ class DeviceServiceImplTest {
         )
 
         deviceUpdateDto = DeviceUpdateRequestDto(
-            id = 1L,
             name = "New Name",
             description = "New Description",
             type = "New Type",

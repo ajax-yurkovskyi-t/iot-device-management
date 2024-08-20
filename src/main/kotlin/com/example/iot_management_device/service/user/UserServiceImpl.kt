@@ -19,7 +19,7 @@ class UserServiceImpl(
     private val userMapper: UserMapper,
     private val passwordEncoder: PasswordEncoder,
     private val roleRepository: RoleRepository,
-    private val deviceRepository: DeviceRepository
+    private val deviceRepository: DeviceRepository,
 ) : UserService {
 
     override fun register(requestDto: UserRegistrationRequestDto): UserResponseDto {

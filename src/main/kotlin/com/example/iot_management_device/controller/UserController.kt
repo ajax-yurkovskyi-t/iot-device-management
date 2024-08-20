@@ -3,7 +3,7 @@ package com.example.iot_management_device.controller
 import com.example.iot_management_device.dto.user.response.UserResponseDto
 import com.example.iot_management_device.dto.user.request.UserUpdateRequestDto
 import com.example.iot_management_device.model.User
-import com.example.iot_management_device.service.user.UserServiceImpl
+import com.example.iot_management_device.service.user.UserService
 import jakarta.validation.Valid
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val userService: UserServiceImpl) {
+class UserController(private val userService: UserService) {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
@@ -43,9 +43,11 @@ class UserController(private val userService: UserServiceImpl) {
         userService.getUserById(id)
 
     @PreAuthorize("hasRole('USER')")
-    @PutMapping()
-    fun update(@Valid @RequestBody requestDto: UserUpdateRequestDto): UserResponseDto =
-        userService.update(requestDto.id ,requestDto)
+    @PutMapping("{id}")
+    fun update(
+        @PathVariable id: Long,
+        @Valid @RequestBody requestDto: UserUpdateRequestDto): UserResponseDto =
+        userService.update(id, requestDto)
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
@@ -53,7 +55,7 @@ class UserController(private val userService: UserServiceImpl) {
         userService.getUserByUsername(username)
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all")
+    @GetMapping
     fun getAll(): List<UserResponseDto> =
         userService.getAll()
 

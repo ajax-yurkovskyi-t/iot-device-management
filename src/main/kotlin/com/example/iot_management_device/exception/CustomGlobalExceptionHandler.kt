@@ -48,6 +48,10 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
         return handleException(HttpStatus.FORBIDDEN, ex)
     }
 
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityNotFoundException(ex: EntityNotFoundException): ResponseEntity<Any> {
+        return handleException(HttpStatus.FORBIDDEN, ex)
+    }
 
     private fun handleException(status: HttpStatus, ex: Exception): ResponseEntity<Any> {
         val body = LinkedHashMap<String, Any>().apply {

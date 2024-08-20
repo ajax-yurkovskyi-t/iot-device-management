@@ -134,6 +134,7 @@ class UserServiceImplTest {
         verify { userRepository.findById(userId) }
         verify { userMapper.toDto(userWithId) }
     }
+
     @Test
     fun `should throw exception when user not found by id`() {
         // Given
@@ -162,7 +163,7 @@ class UserServiceImplTest {
             phoneNumber = "0987654321",
             userPassword = "encodedPassword",
             roles = mutableSetOf(),
-            devices = mutableListOf<Device>()
+            devices = mutableListOf()
         )
         val userResponseDto2 = UserResponseDto(
             id = 2L,
@@ -223,7 +224,6 @@ class UserServiceImplTest {
             devices = mutableListOf()
         )
         val updatedUserDto = UserUpdateRequestDto(
-            id = userId,
             name = "John Smith",
             email = "john.smith@example.com",
             phoneNumber = "0987654321",

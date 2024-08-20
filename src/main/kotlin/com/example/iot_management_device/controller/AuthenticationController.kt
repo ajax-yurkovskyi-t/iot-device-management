@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-
 @RestController
 @RequestMapping("/auth")
 class AuthenticationController(
@@ -25,12 +24,10 @@ class AuthenticationController(
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    @Throws(RegistrationException::class)
     fun register(@RequestBody @Valid requestDto: UserRegistrationRequestDto): UserResponseDto =
         userService.register(requestDto)
 
     @PostMapping("/login")
-    @Throws(AuthenticationException::class)
     fun login(@RequestBody @Valid requestDto: UserLoginRequestDto): UserLoginResponseDto =
         authenticationService.authenticate(requestDto)
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class DeviceServiceImpl(
     private val deviceRepository: DeviceRepository,
-    private val deviceMapper: DeviceMapper
+    private val deviceMapper: DeviceMapper,
 ) : DeviceService {
     override fun create(requestDto: DeviceRequestDto): DeviceResponseDto {
         val device: Device = deviceMapper.toEntity(requestDto)
@@ -38,7 +38,7 @@ class DeviceServiceImpl(
             name = requestDto.name,
             description = requestDto.description,
             type = requestDto.type,
-            statusType = requestDto.statusType
+            statusType = requestDto.statusType,
         )
 
         return deviceMapper.toDto(deviceRepository.save(updatedDevice))

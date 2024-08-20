@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/device")
+@RequestMapping("/devices")
 class DeviceController(private val deviceService: DeviceService) {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -32,14 +32,15 @@ class DeviceController(private val deviceService: DeviceService) {
         deviceService.create(requestDto)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/update")
+    @PutMapping("{id}")
     fun update(
+        @PathVariable id: Long,
         @Valid @RequestBody requestDto: DeviceUpdateRequestDto
     ): DeviceResponseDto =
-        deviceService.update(requestDto.id ,requestDto)
+        deviceService.update(id, requestDto)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/all")
-    fun getAll() : List<DeviceResponseDto> =
+    @GetMapping
+    fun getAll(): List<DeviceResponseDto> =
         deviceService.getAll()
 }

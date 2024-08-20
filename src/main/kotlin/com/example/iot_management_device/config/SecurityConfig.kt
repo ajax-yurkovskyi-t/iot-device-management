@@ -26,7 +26,6 @@ class SecurityConfig(
     @Bean
     fun getPasswordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
-
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
@@ -48,7 +47,6 @@ class SecurityConfig(
     }
 
     @Bean
-    @Throws(Exception::class)
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager =
         authenticationConfiguration.authenticationManager
 }
