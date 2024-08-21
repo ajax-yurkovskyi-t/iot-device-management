@@ -1,6 +1,6 @@
 package com.example.iot_management_device.service.device
 
-import com.example.iot_management_device.dto.device.request.DeviceRequestDto
+import com.example.iot_management_device.dto.device.request.DeviceCreateRequestDto
 import com.example.iot_management_device.dto.device.response.DeviceResponseDto
 import com.example.iot_management_device.dto.device.request.DeviceUpdateRequestDto
 import com.example.iot_management_device.exception.EntityNotFoundException
@@ -30,7 +30,7 @@ class DeviceServiceImplTest {
     @InjectMockKs
     lateinit var deviceService: DeviceServiceImpl
 
-    private lateinit var deviceRequestDto: DeviceRequestDto
+    private lateinit var deviceRequestDto: DeviceCreateRequestDto
     private lateinit var deviceUpdateDto: DeviceUpdateRequestDto
     private lateinit var device: Device
     private lateinit var savedDevice: Device
@@ -40,37 +40,11 @@ class DeviceServiceImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        deviceRequestDto = DeviceRequestDto(
-            name = "Device1",
-            description = "A test device",
-            type = "Sensor",
-            statusType = DeviceStatusType.ONLINE
-        )
-
-        deviceUpdateDto = DeviceUpdateRequestDto(
-            name = "New Name",
-            description = "New Description",
-            type = "New Type",
-            statusType = DeviceStatusType.ONLINE
-        )
-
-        device = Device(
-            id = null,
-            name = "Device1",
-            description = "A test device",
-            type = "Sensor",
-            statusType = DeviceStatusType.ONLINE,
-            user = null,
-        )
-
-        savedDevice = device.copy(id = 1L)
-
-        deviceResponseDto = DeviceResponseDto(
-            name = "Device1",
-            description = "A test device",
-            type = "Sensor",
-            statusType = DeviceStatusType.ONLINE
-        )
+        deviceRequestDto = DeviceFixture.createDeviceCreateRequestDto()
+        deviceUpdateDto = DeviceFixture.createDeviceUpdateRequestDto()
+        device = DeviceFixture.createDevice()
+        savedDevice = DeviceFixture.createSavedDevice()
+        deviceResponseDto = DeviceFixture.createDeviceResponseDto()
     }
 
     @Test

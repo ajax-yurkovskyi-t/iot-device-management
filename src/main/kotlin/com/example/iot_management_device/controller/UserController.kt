@@ -55,7 +55,7 @@ class UserController(private val userService: UserService) {
         userService.getUserByUsername(username)
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
+    @GetMapping("/all")
     fun getAll(): List<UserResponseDto> =
         userService.getAll()
 

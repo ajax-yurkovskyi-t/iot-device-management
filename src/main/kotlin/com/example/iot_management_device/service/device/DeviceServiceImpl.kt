@@ -1,6 +1,6 @@
 package com.example.iot_management_device.service.device
 
-import com.example.iot_management_device.dto.device.request.DeviceRequestDto
+import com.example.iot_management_device.dto.device.request.DeviceCreateRequestDto
 import com.example.iot_management_device.dto.device.response.DeviceResponseDto
 import com.example.iot_management_device.dto.device.request.DeviceUpdateRequestDto
 import com.example.iot_management_device.exception.EntityNotFoundException
@@ -14,7 +14,7 @@ class DeviceServiceImpl(
     private val deviceRepository: DeviceRepository,
     private val deviceMapper: DeviceMapper,
 ) : DeviceService {
-    override fun create(requestDto: DeviceRequestDto): DeviceResponseDto {
+    override fun create(requestDto: DeviceCreateRequestDto): DeviceResponseDto {
         val device: Device = deviceMapper.toEntity(requestDto)
         return deviceMapper.toDto(deviceRepository.save(device))
     }

@@ -1,11 +1,11 @@
 package com.example.iot_management_device.service.device
 
-import com.example.iot_management_device.dto.device.request.DeviceRequestDto
+import com.example.iot_management_device.dto.device.request.DeviceCreateRequestDto
 import com.example.iot_management_device.dto.device.response.DeviceResponseDto
 import com.example.iot_management_device.dto.device.request.DeviceUpdateRequestDto
 
 interface DeviceService {
-    fun create(device: DeviceRequestDto): DeviceResponseDto
+    fun create(device: DeviceCreateRequestDto): DeviceResponseDto
 
     fun getById(deviceId: Long): DeviceResponseDto
 

@@ -57,37 +57,12 @@ class UserServiceImplTest {
 
         role = Role(id = 1L, roleName = Role.RoleName.USER)
 
-        // Initialize user first
-        user = User(
-            id = null,
-            name = "John Doe",
-            email = "john.doe@example.com",
-            phoneNumber = "1234567890",
-            userPassword = "encodedPassword",
-            roles = mutableSetOf(role),
-            devices = mutableListOf()
-        )
-
-        // Initialize device with user
-        device = Device(
-            id = 1L,
-            name = "Device1",
-            description = "A test device",
-            type = "Sensor",
-            statusType = DeviceStatusType.ONLINE,
-            user = user
-        )
+        role = UserFixture.createRole()
+        user = UserFixture.createUser()
+        device = UserFixture.createDevice(user)
         devices = listOf(device)
-
-        // Update user with devices
         user = user.copy(devices = devices.toMutableList())
-        userResponseDto = UserResponseDto(
-            id = 1L,
-            username = "John Doe",
-            email = "john.doe@example.com",
-            phoneNumber = "1234567890",
-            devices = devices.map { device -> DeviceResponseDto(device.name, device.description, device.type, device.statusType) }
-        )
+        userResponseDto = UserFixture.createUserResponseDto(devices)
     }
 
     @Test

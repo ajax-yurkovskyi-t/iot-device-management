@@ -30,11 +30,11 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
         return ResponseEntity(body, headers, status)
     }
 
-    private fun getErrorMessage(e: ObjectError): String {
-        return if (e is FieldError) {
-            "${e.field} ${e.defaultMessage}"
+    private fun getErrorMessage(objectError: ObjectError): String {
+        return if (objectError is FieldError) {
+            "${objectError.field} ${objectError.defaultMessage}"
         } else {
-            e.defaultMessage ?: "Unknown error"
+            objectError.defaultMessage ?: "Unknown error"
         }
     }
 

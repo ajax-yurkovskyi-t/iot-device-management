@@ -3,7 +3,7 @@ package com.example.iot_management_device.dto.device.request
 import com.example.iot_management_device.model.DeviceStatusType
 import jakarta.validation.constraints.NotBlank
 
-data class DeviceRequestDto(
+data class DeviceCreateRequestDto(
     @field:NotBlank(message = "Device name must not be blank.")
     val name: String,
 

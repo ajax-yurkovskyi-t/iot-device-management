@@ -1,6 +1,6 @@
 package com.example.iot_management_device.controller
 
-import com.example.iot_management_device.dto.device.request.DeviceRequestDto
+import com.example.iot_management_device.dto.device.request.DeviceCreateRequestDto
 import com.example.iot_management_device.dto.device.response.DeviceResponseDto
 import com.example.iot_management_device.dto.device.request.DeviceUpdateRequestDto
 import com.example.iot_management_device.service.device.DeviceService
@@ -28,7 +28,7 @@ class DeviceController(private val deviceService: DeviceService) {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@Valid @RequestBody requestDto: DeviceRequestDto): DeviceResponseDto =
+    fun create(@Valid @RequestBody requestDto: DeviceCreateRequestDto): DeviceResponseDto =
         deviceService.create(requestDto)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
