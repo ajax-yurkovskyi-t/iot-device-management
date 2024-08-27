@@ -58,10 +58,9 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
         }
     }
 
-    private fun findAnnotationInClass(beanClass: Class<*>, method: Method): MethodAttemptLimiter? {
-        return beanClass.methods.find { it.name == method.name && it.parameterTypes.contentEquals(method.parameterTypes) }
+    private fun findAnnotationInClass(beanClass: Class<*>, method: Method): MethodAttemptLimiter? =
+        beanClass.methods.find { it.name == method.name && it.parameterTypes.contentEquals(method.parameterTypes) }
             ?.getAnnotation(MethodAttemptLimiter::class.java)
-    }
 
     companion object {
         private val log = LoggerFactory.getLogger(MethodAttemptLimiterBeanPostProcessor::class.java)

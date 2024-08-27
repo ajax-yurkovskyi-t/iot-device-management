@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class AuthenticationServiceImpl(
     private val jwtUtil: JwtUtil,
-    private val authenticationManager: AuthenticationManager
+    private val authenticationManager: AuthenticationManager,
 ) : AuthenticationService {
 
     @MethodAttemptLimiter(maxAttempts = 3, lockoutDuration = 600)

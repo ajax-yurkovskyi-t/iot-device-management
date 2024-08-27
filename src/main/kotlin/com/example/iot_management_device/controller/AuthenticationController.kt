@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/auth")
 class AuthenticationController(
     private val userService: UserService,
-    private val authenticationService: AuthenticationService
+    private val authenticationService: AuthenticationService,
 ) {
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
