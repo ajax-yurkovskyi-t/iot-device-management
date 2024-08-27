@@ -7,19 +7,18 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
-import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
-    private val beanMap = ConcurrentHashMap<String, Any>()
-    private val attemptMap = ConcurrentHashMap<String, MethodAttempt>()
+    private val beanMap = HashMap<String, Any>()
+    private val attemptMap = HashMap<String, MethodAttempt>()
 
     override fun postProcessBeforeInitialization(bean: Any, beanName: String): Any? {
         val beanClass = bean.javaClass
         beanClass.methods.forEach { method ->
             if (method.isAnnotationPresent(MethodAttemptLimiter::class.java)) {
                 beanMap[beanName] = bean
-                log.info("Method ${method.name} in Bean $beanName is annotated with @LoginAttemptLimiter")
+                log.info("Method ${method.name} in Bean $beanName is annotated with @MethodAttemptLimiter")
             }
         }
         return bean
@@ -31,7 +30,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
 
         return Proxy.newProxyInstance(
             originalBeanClass.classLoader,
-            getAllInterfaces(originalBeanClass).toTypedArray()
+            originalBeanClass.interfaces,
         ) { _, method, args ->
             val annotation = findAnnotationInClass(originalBeanClass, method)
             val user = SecurityContextHolder.getContext().authentication?.name
@@ -42,7 +41,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
                         maxAttempts,
                         lockoutDuration
                     )
-                }
+                } ?: throw IllegalStateException("Missing limiting annotation for method: ${method.name}")
             }
             val methodName = method.name
             if (attempt.isLockedOut()) {
@@ -62,15 +61,6 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
     private fun findAnnotationInClass(beanClass: Class<*>, method: Method): MethodAttemptLimiter? {
         return beanClass.methods.find { it.name == method.name && it.parameterTypes.contentEquals(method.parameterTypes) }
             ?.getAnnotation(MethodAttemptLimiter::class.java)
-    }
-
-    private fun getAllInterfaces(clazz: Class<*>): Set<Class<*>> {
-        val interfaces = mutableSetOf<Class<*>>()
-        clazz.interfaces.forEach { interfaces.add(it) }
-        clazz.superclass?.let {
-            interfaces.addAll(getAllInterfaces(it))
-        }
-        return interfaces
     }
 
     companion object {
