@@ -53,6 +53,11 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
         return handleException(HttpStatus.FORBIDDEN, ex)
     }
 
+    @ExceptionHandler(AccessAttemptException::class)
+    fun handleEntityNotFoundException(ex: AccessAttemptException): ResponseEntity<Any> {
+        return handleException(HttpStatus.FORBIDDEN, ex)
+    }
+
     private fun handleException(status: HttpStatus, ex: Exception): ResponseEntity<Any> {
         val body = LinkedHashMap<String, Any>().apply {
             put("timestamp", LocalDateTime.now())
