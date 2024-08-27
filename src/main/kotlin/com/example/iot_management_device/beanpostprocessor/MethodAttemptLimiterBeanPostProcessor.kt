@@ -7,11 +7,12 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
     private val beanMap = HashMap<String, Any>()
-    private val attemptMap = HashMap<String, MethodAttempt>()
+    private val attemptMap = ConcurrentHashMap<String, MethodAttempt>()
 
     override fun postProcessBeforeInitialization(bean: Any, beanName: String): Any? {
         val beanClass = bean.javaClass
@@ -39,7 +40,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
                 annotation?.run {
                     MethodAttempt(
                         maxAttempts,
-                        lockoutDuration
+                        lockoutDurationMillis
                     )
                 } ?: throw IllegalStateException("Missing limiting annotation for method: ${method.name}")
             }
@@ -51,7 +52,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
             attempt.incrementAttempts()
             if (attempt.hasExceededLimit()) {
                 attempt.lockOut()
-                throw AccessAttemptException(ATTEMPT_LIMIT_MESSAGE.format(methodName, attempt.lockoutDuration / 1000))
+                throw AccessAttemptException(ATTEMPT_LIMIT_MESSAGE.format(methodName, attempt.lockoutDurationMillis / 1000))
             }
 
             method.invoke(originalBean, *(args ?: emptyArray()))

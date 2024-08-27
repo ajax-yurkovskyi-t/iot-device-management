@@ -1,28 +1,31 @@
 package com.example.iot_management_device.beanpostprocessor
 
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+
 data class MethodAttempt(
     val maxAttempts: Int,
-    val lockoutDuration: Long,
-    var attempts: Int = 0,
-    var lockoutEndTime: Long = 0,
+    val lockoutDurationMillis: Long,
+    val attempts: AtomicInteger = AtomicInteger(0),
+    val lockoutEndTimeMillis: AtomicLong = AtomicLong(0),
 ) {
     fun incrementAttempts() {
-        attempts++
+        attempts.incrementAndGet()
     }
 
     fun hasExceededLimit() =
-        attempts > maxAttempts
+        attempts.get() > maxAttempts
 
     fun isLockedOut() =
-        lockoutEndTime > System.currentTimeMillis()
+        lockoutEndTimeMillis.get() > System.currentTimeMillis()
 
     fun lockOut() {
-        lockoutEndTime = System.currentTimeMillis() + lockoutDuration
-        attempts = 0
+        lockoutEndTimeMillis.set(System.currentTimeMillis() + lockoutDurationMillis)
+        attempts.set(0)
     }
 
     fun getRemainingLockoutTime(): Long {
-        val remainingTime = lockoutEndTime - System.currentTimeMillis()
+        val remainingTime = lockoutEndTimeMillis.get() - System.currentTimeMillis()
         return (remainingTime / 1000)
     }
 }

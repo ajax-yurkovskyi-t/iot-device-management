@@ -55,7 +55,7 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(AccessAttemptException::class)
     fun handleEntityNotFoundException(ex: AccessAttemptException): ResponseEntity<Any> {
-        return handleException(HttpStatus.FORBIDDEN, ex)
+        return handleException(HttpStatus.TOO_MANY_REQUESTS, ex)
     }
 
     private fun handleException(status: HttpStatus, ex: Exception): ResponseEntity<Any> {
