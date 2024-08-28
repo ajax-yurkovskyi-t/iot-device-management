@@ -53,6 +53,11 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
         return handleException(HttpStatus.FORBIDDEN, ex)
     }
 
+    @ExceptionHandler(AttemptLimitReachedException::class)
+    fun handleAttemptLimitReachedException(ex: AttemptLimitReachedException): ResponseEntity<Any> {
+        return handleException(HttpStatus.TOO_MANY_REQUESTS, ex)
+    }
+
     private fun handleException(status: HttpStatus, ex: Exception): ResponseEntity<Any> {
         val body = LinkedHashMap<String, Any>().apply {
             put("timestamp", LocalDateTime.now())
