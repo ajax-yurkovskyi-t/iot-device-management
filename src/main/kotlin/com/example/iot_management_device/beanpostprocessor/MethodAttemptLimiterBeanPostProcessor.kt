@@ -1,16 +1,19 @@
 package com.example.iot_management_device.beanpostprocessor
 
 import com.example.iot_management_device.exception.AccessAttemptException
+import com.example.iot_management_device.model.User
+import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
-class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
+class MethodAttemptLimiterBeanPostProcessor(private val request: HttpServletRequest) : BeanPostProcessor {
     private val beanMap = HashMap<String, Any>()
     private val attemptMap = ConcurrentHashMap<String, MethodAttempt>()
 
@@ -33,9 +36,10 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
             originalBeanClass.classLoader,
             originalBeanClass.interfaces,
         ) { _, method, args ->
-            val annotation = findAnnotationInClass(originalBeanClass, method)
-            val user = SecurityContextHolder.getContext().authentication?.name
-            val key = "${beanName}_${method.name}_$user"
+
+            val annotation =
+                findAnnotationInClass(originalBeanClass, method)
+            val key = generateAttemptKey(beanName, method)
             val attempt = attemptMap.getOrPut(key) {
                 annotation?.run {
                     MethodAttempt(
@@ -59,9 +63,20 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
         }
     }
 
-    private fun findAnnotationInClass(beanClass: Class<*>, method: Method): MethodAttemptLimiter? =
+    private fun findAnnotationInClass(beanClass: Class<*>, method: Method) =
         beanClass.methods.find { it.name == method.name && it.parameterTypes.contentEquals(method.parameterTypes) }
             ?.getAnnotation(MethodAttemptLimiter::class.java)
+
+    private fun generateAttemptKey(beanName: String, method: Method): String {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val userEmail = (authentication?.principal as? User)?.email
+        val identifier = userEmail ?: getClientIP()
+
+        return "${beanName}_${method.name}_$identifier"
+    }
+
+    private fun getClientIP(): String =
+        (SecurityContextHolder.getContext().authentication.details as WebAuthenticationDetails).remoteAddress
 
     companion object {
         private val log = LoggerFactory.getLogger(MethodAttemptLimiterBeanPostProcessor::class.java)
