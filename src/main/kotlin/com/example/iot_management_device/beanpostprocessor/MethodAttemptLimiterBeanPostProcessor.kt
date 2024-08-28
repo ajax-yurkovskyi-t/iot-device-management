@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
-class MethodAttemptLimiterBeanPostProcessor(private val request: HttpServletRequest) : BeanPostProcessor {
+class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
     private val beanMap = HashMap<String, Any>()
     private val attemptMap = ConcurrentHashMap<String, MethodAttempt>()
 
