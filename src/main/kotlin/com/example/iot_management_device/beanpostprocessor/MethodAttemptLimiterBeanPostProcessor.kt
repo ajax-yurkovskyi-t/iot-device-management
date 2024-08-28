@@ -1,8 +1,7 @@
 package com.example.iot_management_device.beanpostprocessor
 
-import com.example.iot_management_device.exception.AccessAttemptException
+import com.example.iot_management_device.exception.AttemptLimitReachedException
 import com.example.iot_management_device.model.User
-import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.security.core.context.SecurityContextHolder
@@ -51,12 +50,12 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
             val methodName = method.name
             if (attempt.isLockedOut()) {
                 val remainingSeconds = attempt.getRemainingLockoutTime()
-                throw AccessAttemptException(ATTEMPT_LIMIT_MESSAGE.format(methodName, remainingSeconds))
+                throw AttemptLimitReachedException(ATTEMPT_LIMIT_MESSAGE.format(methodName, remainingSeconds))
             }
             attempt.incrementAttempts()
             if (attempt.hasExceededLimit()) {
                 attempt.lockOut()
-                throw AccessAttemptException(ATTEMPT_LIMIT_MESSAGE.format(methodName, attempt.lockoutDurationMillis / 1000))
+                throw AttemptLimitReachedException(ATTEMPT_LIMIT_MESSAGE.format(methodName, attempt.lockoutDurationMillis / 1000))
             }
 
             method.invoke(originalBean, *(args ?: emptyArray()))
@@ -69,8 +68,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
 
     private fun generateAttemptKey(beanName: String, method: Method): String {
         val authentication = SecurityContextHolder.getContext().authentication
-        val userEmail = (authentication?.principal as? User)?.email
-        val identifier = userEmail ?: getClientIP()
+        val identifier = (authentication?.principal as? User)?.email ?: getClientIP()
 
         return "${beanName}_${method.name}_$identifier"
     }
