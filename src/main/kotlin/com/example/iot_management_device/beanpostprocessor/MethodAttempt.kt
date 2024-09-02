@@ -27,6 +27,6 @@ data class MethodAttempt(
 
     fun getRemainingLockoutTime(): Long {
         val remainingTime = lockoutEndTimeMillis.get() - System.currentTimeMillis()
-        return (remainingTime / TimeUnit.SECONDS.toMillis(1))
+        return TimeUnit.MILLISECONDS.toSeconds(remainingTime)
     }
 }

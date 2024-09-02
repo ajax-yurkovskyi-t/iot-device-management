@@ -60,7 +60,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
                 throw AttemptLimitReachedException(
                     ATTEMPT_LIMIT_MESSAGE.format(
                         methodName,
-                        attempt.lockoutDurationMillis / TimeUnit.SECONDS.toMillis(1)
+                        TimeUnit.MILLISECONDS.toSeconds(attempt.lockoutDurationMillis)
                     )
                 )
             }
