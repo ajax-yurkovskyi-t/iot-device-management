@@ -17,7 +17,7 @@ class AuthenticationServiceImpl(
     private val authenticationManager: AuthenticationManager,
 ) : AuthenticationService {
 
-    @MethodAttemptLimiter(maxAttempts = 3, lockoutDuration = 600)
+    @MethodAttemptLimiter(maxAttempts = 3, lockoutDurationMillis = 600)
     override fun authenticate(requestDto: UserLoginRequestDto): UserLoginResponseDto {
         return try {
             val authentication: Authentication = authenticationManager.authenticate(
