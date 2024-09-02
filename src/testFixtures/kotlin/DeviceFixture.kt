@@ -1,8 +1,8 @@
-import com.example.iot_management_device.dto.device.request.DeviceCreateRequestDto
-import com.example.iot_management_device.dto.device.request.DeviceUpdateRequestDto
-import com.example.iot_management_device.dto.device.response.DeviceResponseDto
-import com.example.iot_management_device.model.Device
-import com.example.iot_management_device.model.DeviceStatusType
+import com.example.iotManagementDevice.dto.device.request.DeviceCreateRequestDto
+import com.example.iotManagementDevice.dto.device.request.DeviceUpdateRequestDto
+import com.example.iotManagementDevice.dto.device.response.DeviceResponseDto
+import com.example.iotManagementDevice.model.Device
+import com.example.iotManagementDevice.model.DeviceStatusType
 
 object DeviceFixture {
 
