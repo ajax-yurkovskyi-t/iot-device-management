@@ -1,5 +1,6 @@
 package com.example.iot_management_device.beanpostprocessor
 
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
@@ -26,6 +27,6 @@ data class MethodAttempt(
 
     fun getRemainingLockoutTime(): Long {
         val remainingTime = lockoutEndTimeMillis.get() - System.currentTimeMillis()
-        return (remainingTime / 1000)
+        return TimeUnit.MILLISECONDS.toSeconds(remainingTime)
     }
 }

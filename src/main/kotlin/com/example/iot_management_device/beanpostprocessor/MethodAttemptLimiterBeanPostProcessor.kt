@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 @Component
 class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
@@ -20,6 +21,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
         val beanClass = bean.javaClass
         beanClass.methods.forEach { method ->
             if (method.isAnnotationPresent(MethodAttemptLimiter::class.java)) {
+                validateAnnotationFields(method.getAnnotation(MethodAttemptLimiter::class.java))
                 beanMap[beanName] = bean
                 log.info("Method ${method.name} in Bean $beanName is annotated with @MethodAttemptLimiter")
             }
@@ -45,7 +47,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
                         maxAttempts,
                         lockoutDurationMillis
                     )
-                } ?: throw IllegalStateException("Missing limiting annotation for method: ${method.name}")
+                } ?: error("Missing limiting annotation for method: ${method.name}")
             }
             val methodName = method.name
             if (attempt.isLockedOut()) {
@@ -55,10 +57,24 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
             attempt.incrementAttempts()
             if (attempt.hasExceededLimit()) {
                 attempt.lockOut()
-                throw AttemptLimitReachedException(ATTEMPT_LIMIT_MESSAGE.format(methodName, attempt.lockoutDurationMillis / 1000))
+                throw AttemptLimitReachedException(
+                    ATTEMPT_LIMIT_MESSAGE.format(
+                        methodName,
+                        TimeUnit.MILLISECONDS.toSeconds(attempt.lockoutDurationMillis)
+                    )
+                )
             }
 
             method.invoke(originalBean, *(args ?: emptyArray()))
+        }
+    }
+
+    private fun validateAnnotationFields(annotation: MethodAttemptLimiter) {
+        require(annotation.maxAttempts >= 0) {
+            "maxAttempts cannot be negative: ${annotation.maxAttempts}"
+        }
+        require(annotation.lockoutDurationMillis >= 0) {
+            "lockoutDurationMillis cannot be negative: ${annotation.lockoutDurationMillis}"
         }
     }
 
