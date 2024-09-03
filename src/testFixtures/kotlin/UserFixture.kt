@@ -1,9 +1,9 @@
-import com.example.iotManagementDevice.dto.device.response.DeviceResponseDto
-import com.example.iotManagementDevice.dto.user.response.UserResponseDto
-import com.example.iotManagementDevice.model.Device
-import com.example.iotManagementDevice.model.DeviceStatusType
-import com.example.iotManagementDevice.model.Role
-import com.example.iotManagementDevice.model.User
+import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
+import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
+import com.example.iotmanagementdevice.model.Device
+import com.example.iotmanagementdevice.model.DeviceStatusType
+import com.example.iotmanagementdevice.model.Role
+import com.example.iotmanagementdevice.model.User
 
 object UserFixture {
 
