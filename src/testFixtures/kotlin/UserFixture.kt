@@ -1,11 +1,9 @@
-import com.example.iot_management_device.dto.device.response.DeviceResponseDto
-import com.example.iot_management_device.dto.user.request.UserRegistrationRequestDto
-import com.example.iot_management_device.dto.user.request.UserUpdateRequestDto
-import com.example.iot_management_device.dto.user.response.UserResponseDto
-import com.example.iot_management_device.model.Device
-import com.example.iot_management_device.model.DeviceStatusType
-import com.example.iot_management_device.model.Role
-import com.example.iot_management_device.model.User
+import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
+import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
+import com.example.iotmanagementdevice.model.Device
+import com.example.iotmanagementdevice.model.DeviceStatusType
+import com.example.iotmanagementdevice.model.Role
+import com.example.iotmanagementdevice.model.User
 
 object UserFixture {
 
