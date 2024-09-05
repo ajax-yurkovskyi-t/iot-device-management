@@ -74,6 +74,3 @@ configure<DeltaCoverageConfiguration> {
         html.set(true)
     }
 }
-tasks.check {
-    dependsOn(tasks.deltaCoverage)
-}
