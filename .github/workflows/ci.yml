@@ -1,4 +1,4 @@
-name: Kotlin CI with Gradle
+name: Build
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'corretto'
           cache: gradle
 
       - name: Run gradle build
