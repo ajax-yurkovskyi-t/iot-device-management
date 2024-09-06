@@ -23,10 +23,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Run gradle build
-        run: ./gradlew build
+        run: ./gradlew build --parallel
 
       - name: Run Delta Coverage check
         if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
