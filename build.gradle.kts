@@ -1,3 +1,5 @@
+import io.github.surpsg.deltacoverage.gradle.DeltaCoverageConfiguration
+
 plugins {
     kotlin("jvm") version "1.9.23"
     kotlin("kapt") version "1.9.23"
@@ -7,6 +9,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
     `java-test-fixtures`
+    jacoco
+    id("io.github.surpsg.delta-coverage") version "2.4.0"
 }
 
 group = "com.example"
@@ -57,4 +61,17 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+configure<DeltaCoverageConfiguration> {
+    val targetBranch = project.properties["diffBase"]?.toString() ?: "refs/remotes/origin/main"
+    diffSource.byGit {
+        compareWith(targetBranch)
+    }
+
+    violationRules.failIfCoverageLessThan(0.6)
+    reports {
+        html = true
+        markdown = true
+    }
 }
