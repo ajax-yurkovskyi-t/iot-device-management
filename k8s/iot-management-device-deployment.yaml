@@ -35,17 +35,17 @@ spec:
             - name: MONGODB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: iot-management-device-configmap
+                  name: mongo-configmap
                   key: host
             - name: MONGODB_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: iot-management-device-configmap
+                  name: mongo-configmap
                   key: port
             - name: MONGODB_DB
               valueFrom:
                 configMapKeyRef:
-                  name: iot-management-device-configmap
+                  name: mongo-configmap
                   key: db_name
 ---
 apiVersion: v1

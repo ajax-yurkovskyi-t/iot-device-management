@@ -37,12 +37,12 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: host
-                  name: iot-management-device-configmap
+                  name: mongo-configmap
             - name: MONGO_PORT
               valueFrom:
                 configMapKeyRef:
                   key: port
-                  name: iot-management-device-configmap
+                  name: mongo-configmap
             - name: ME_CONFIG_MONGODB_URL
               value: mongodb://$(ME_CONFIG_BASICAUTH_USERNAME):$(ME_CONFIG_BASICAUTH_PASSWORD)@$(MONGO_HOST):$(MONGO_PORT)
 ---
