@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-management-device-deployment
+  labels:
+    app: iot-management-device
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: iot-management-device
+  template:
+    metadata:
+      labels:
+        app: iot-management-device
+    spec:
+      containers:
+        - name: iot-management-device
+          image: app
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-root-username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-root-password
+            - name: MONGODB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-configmap
+                  key: host
+            - name: MONGODB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-configmap
+                  key: port
+            - name: MONGODB_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-configmap
+                  key: db_name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iot-management-device-service
+spec:
+  selector:
+    app: iot-management-device
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
