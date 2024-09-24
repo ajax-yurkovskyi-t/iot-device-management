@@ -4,7 +4,7 @@ import com.example.iotmanagementdevice.beanpostprocessor.MethodAttemptLimiter
 import com.example.iotmanagementdevice.dto.user.request.UserLoginRequestDto
 import com.example.iotmanagementdevice.dto.user.response.UserLoginResponseDto
 import com.example.iotmanagementdevice.exception.AuthenticationException
-import com.example.iotmanagementdevice.model.User
+import com.example.iotmanagementdevice.model.MongoUser
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -27,8 +27,8 @@ class AuthenticationServiceImpl(
                 )
             )
 
-            val user = authentication.principal as User
-            val token = jwtUtil.generateToken(user.email)
+            val mongoUser = authentication.principal as MongoUser
+            val token = jwtUtil.generateToken(mongoUser.email)
             UserLoginResponseDto(token)
         } catch (ex: BadCredentialsException) {
             throw AuthenticationException(LOGIN_ERROR_MESSAGE, ex)

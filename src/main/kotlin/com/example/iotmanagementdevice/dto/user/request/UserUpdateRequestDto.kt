@@ -15,5 +15,5 @@ data class UserUpdateRequestDto(
     val phoneNumber: String,
 
     @field:NotBlank(message = "Password must not be blank.")
-    val userPassword: String
+    var userPassword: String
 )

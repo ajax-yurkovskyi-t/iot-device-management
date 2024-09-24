@@ -1,65 +1,63 @@
 package com.example.iotmanagementdevice.service.user
 
+import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
-import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
+import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.exception.EntityNotFoundException
+import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.mapper.UserMapper
-import com.example.iotmanagementdevice.model.Role
-import com.example.iotmanagementdevice.repository.DeviceRepository
+import com.example.iotmanagementdevice.model.MongoRole
 import com.example.iotmanagementdevice.repository.RoleRepository
 import com.example.iotmanagementdevice.repository.UserRepository
-import jakarta.transaction.Transactional
+import org.bson.types.ObjectId
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class UserServiceImpl(
-    private val userRepository: UserRepository,
     private val userMapper: UserMapper,
+    private val deviceMapper: DeviceMapper,
     private val passwordEncoder: PasswordEncoder,
     private val roleRepository: RoleRepository,
-    private val deviceRepository: DeviceRepository,
+    private val userRepository: UserRepository
 ) : UserService {
 
     override fun register(requestDto: UserRegistrationRequestDto): UserResponseDto {
         requestDto.userPassword = passwordEncoder.encode(requestDto.userPassword)
-        val userRole = roleRepository.findByRoleName(Role.RoleName.USER)
+        val userMongoRole = roleRepository.findByRoleName(MongoRole.RoleName.USER)
         val user = userMapper.toEntity(requestDto)
-        user.roles?.add(userRole)
+        userMongoRole?.let { user.roles?.add(it) }
         return userMapper.toDto(userRepository.save(user))
     }
 
-    @Transactional
-    override fun assignDeviceToUser(userId: Long, deviceId: Long): UserResponseDto {
-        val device = deviceRepository.findById(deviceId)
-            .orElseThrow { IllegalArgumentException("Device with id $deviceId not found") }
-
-        val user = userRepository.findById(userId)
-            .orElseThrow { IllegalArgumentException("User with id $userId not found") }
-
-        val updatedDevice = device.copy(user = user)
-        user.devices?.add(device)
-        deviceRepository.save(updatedDevice)
-        return userMapper.toDto(userRepository.save(user))
+    override fun assignDeviceToUser(userId: String, deviceId: String): Boolean {
+        return userRepository.assignDeviceToUser(ObjectId(userId), ObjectId(deviceId))
     }
 
-    override fun getUserById(id: Long): UserResponseDto =
-        userMapper.toDto(userRepository.findById(id)
-            .orElseThrow { EntityNotFoundException("User with id $id not found") })
+    override fun getUserById(id: String): UserResponseDto {
+        return userMapper.toDto(
+            userRepository.findById(ObjectId(id))
+                ?: throw EntityNotFoundException("User with id $id not found")
+        )
+    }
 
+    override fun getDevicesByUserId(userId: String): List<DeviceResponseDto>? {
+        return userRepository.findDevicesByUserId(ObjectId(userId))
+            ?.map { deviceMapper.toDto(it) }
+    }
 
-    override fun getAll(): List<UserResponseDto> =
-        userRepository.findAll().map { userMapper.toDto(it) }
+    override fun getAll(): List<UserResponseDto> {
+        return userRepository.findAll().map { userMapper.toDto(it) }
+    }
 
-    override fun getUserByUsername(username: String): UserResponseDto =
-        userMapper.toDto(userRepository.findByName(username))
+    override fun getUserByUsername(username: String): UserResponseDto {
+        return userMapper.toDto(userRepository.findByUserName(username))
+    }
 
-
-    override fun update(id: Long, requestDto: UserUpdateRequestDto): UserResponseDto {
-        val existingUser = userRepository.findById(id).orElseThrow {
-            EntityNotFoundException("User with id $id not found")
-        }
+    override fun update(id: String, requestDto: UserUpdateRequestDto): UserResponseDto {
+        val existingUser = userRepository.findById(ObjectId(id))
+            ?: throw EntityNotFoundException("User with id $id not found")
 
         val updatedUserEntity = existingUser.copy(
             name = requestDto.name,

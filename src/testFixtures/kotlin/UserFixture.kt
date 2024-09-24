@@ -1,15 +1,16 @@
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
-import com.example.iotmanagementdevice.model.Device
 import com.example.iotmanagementdevice.model.DeviceStatusType
-import com.example.iotmanagementdevice.model.Role
-import com.example.iotmanagementdevice.model.User
+import com.example.iotmanagementdevice.model.MongoDevice
+import com.example.iotmanagementdevice.model.MongoRole
+import com.example.iotmanagementdevice.model.MongoUser
+import org.bson.types.ObjectId
 
 object UserFixture {
 
-    fun createUser(): User {
-        return User(
-            id = null,
+    fun createUser(): MongoUser {
+        return MongoUser(
+            id = ObjectId(),
             name = "John Doe",
             email = "john.doe@example.com",
             phoneNumber = "1234567890",
@@ -19,30 +20,38 @@ object UserFixture {
         )
     }
 
-    fun createRole(): Role {
-        return Role(id = 1L, roleName = Role.RoleName.USER)
+    fun createRole(): MongoRole {
+        return MongoRole(id = ObjectId(), roleName = MongoRole.RoleName.USER)
     }
 
-    fun createDevice(user: User): Device {
-        return Device(
-            id = 1L,
+    fun createDevice(): MongoDevice {
+        return MongoDevice(
+            id = ObjectId(),
             name = "Device1",
             description = "A test device",
             type = "Sensor",
             statusType = DeviceStatusType.ONLINE,
-            user = user
+            userId = ObjectId()
         )
     }
 
-    fun createUserResponseDto(devices: List<Device>): UserResponseDto {
+    fun createUserResponseDto(devices: List<MongoDevice>): UserResponseDto {
         return UserResponseDto(
-            id = 1L,
-            username = "John Doe",
+            name = "John Doe",
             email = "john.doe@example.com",
             phoneNumber = "1234567890",
             devices = devices.map { device ->
                 DeviceResponseDto(device.name, device.description, device.type, device.statusType)
             }
+        )
+    }
+
+    fun createDeviceResponseDto(device: MongoDevice): DeviceResponseDto {
+        return DeviceResponseDto(
+            name = device.name,
+            description = device.description,
+            type = device.type,
+            statusType = device.statusType
         )
     }
 }

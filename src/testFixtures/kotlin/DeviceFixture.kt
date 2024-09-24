@@ -1,8 +1,9 @@
 import com.example.iotmanagementdevice.dto.device.request.DeviceCreateRequestDto
 import com.example.iotmanagementdevice.dto.device.request.DeviceUpdateRequestDto
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
-import com.example.iotmanagementdevice.model.Device
 import com.example.iotmanagementdevice.model.DeviceStatusType
+import com.example.iotmanagementdevice.model.MongoDevice
+import org.bson.types.ObjectId
 
 object DeviceFixture {
 
@@ -24,19 +25,19 @@ object DeviceFixture {
         )
     }
 
-    fun createDevice(): Device {
-        return Device(
-            id = null,
+    fun createDevice(): MongoDevice {
+        return MongoDevice(
+            id = ObjectId(),
             name = "Device1",
             description = "A test device",
             type = "Sensor",
             statusType = DeviceStatusType.ONLINE,
-            user = null
+            userId = null
         )
     }
 
-    fun createSavedDevice(): Device {
-        return createDevice().copy(id = 1L)
+    fun createSavedDevice(): MongoDevice {
+        return createDevice().copy(id = ObjectId())
     }
 
     fun createDeviceResponseDto(): DeviceResponseDto {

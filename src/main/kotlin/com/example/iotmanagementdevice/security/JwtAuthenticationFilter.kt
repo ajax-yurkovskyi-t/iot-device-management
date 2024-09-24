@@ -15,10 +15,11 @@ import java.io.IOException
 @Component
 class JwtAuthenticationFilter(
     private val jwtUtil: JwtUtil,
-    private val userDetailsService: UserDetailsService) : OncePerRequestFilter() {
+    private val userDetailsService: UserDetailsService
+) : OncePerRequestFilter() {
 
     @Throws(ServletException::class, IOException::class)
-    override fun doFilterInternal(
+    public override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
@@ -28,7 +29,9 @@ class JwtAuthenticationFilter(
                 val username = jwtUtil.getEmail(token)
                 val userDetails = userDetailsService.loadUserByUsername(username)
                 val authentication = UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.authorities
+                    userDetails,
+                    null,
+                    userDetails.authorities
                 )
                 SecurityContextHolder.getContext().authentication = authentication
             }

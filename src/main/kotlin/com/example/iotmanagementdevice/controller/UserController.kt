@@ -1,10 +1,12 @@
 package com.example.iotmanagementdevice.controller
 
-import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
+import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
-import com.example.iotmanagementdevice.model.User
+import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
+import com.example.iotmanagementdevice.model.MongoUser
 import com.example.iotmanagementdevice.service.user.UserService
 import jakarta.validation.Valid
+import org.bson.types.ObjectId
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,29 +26,39 @@ class UserController(private val userService: UserService) {
     @GetMapping("/me")
     fun getCurrentUser(authentication: Authentication): UserResponseDto {
         val userId = extractUserId(authentication)
-        return userService.getUserById(userId)
+        return userService.getUserById(userId.toString())
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/{deviceId}/assign")
     fun assignDeviceToUser(
         authentication: Authentication,
-        @PathVariable deviceId: Long
-    ): UserResponseDto {
+        @PathVariable deviceId: String
+    ): Boolean {
         val userId = extractUserId(authentication)
-        return userService.assignDeviceToUser(userId, deviceId)
+        return userService.assignDeviceToUser(userId.toString(), deviceId)
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/devices")
+    fun getUserDevices(
+        authentication: Authentication
+    ): List<DeviceResponseDto>? {
+        val userId = extractUserId(authentication)
+        return userService.getDevicesByUserId(userId.toString())
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: Long): UserResponseDto =
+    fun getUserById(@PathVariable id: String): UserResponseDto =
         userService.getUserById(id)
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     fun update(
-        @PathVariable id: Long,
-        @Valid @RequestBody requestDto: UserUpdateRequestDto): UserResponseDto =
+        @PathVariable id: String,
+        @Valid @RequestBody requestDto: UserUpdateRequestDto
+    ): UserResponseDto =
         userService.update(id, requestDto)
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -59,6 +71,6 @@ class UserController(private val userService: UserService) {
     fun getAll(): List<UserResponseDto> =
         userService.getAll()
 
-    private fun extractUserId(authentication: Authentication): Long =
-        (authentication.principal as? User)?.id ?: throw IllegalArgumentException("User ID cannot be null")
+    private fun extractUserId(authentication: Authentication): ObjectId =
+        (authentication.principal as? MongoUser)?.id ?: throw IllegalArgumentException("User ID cannot be null")
 }
