@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.beanpostprocessor
 
 import com.example.iotmanagementdevice.exception.AttemptLimitReachedException
-import com.example.iotmanagementdevice.model.User
+import com.example.iotmanagementdevice.model.MongoUser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.security.core.context.SecurityContextHolder
@@ -84,7 +84,7 @@ class MethodAttemptLimiterBeanPostProcessor : BeanPostProcessor {
 
     private fun generateAttemptKey(beanName: String, method: Method): String {
         val authentication = SecurityContextHolder.getContext().authentication
-        val identifier = (authentication?.principal as? User)?.email ?: getClientIP()
+        val identifier = (authentication?.principal as? MongoUser)?.email ?: getClientIP()
 
         return "${beanName}_${method.name}_$identifier"
     }
