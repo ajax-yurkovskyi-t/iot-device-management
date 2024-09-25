@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.aggregate
 import org.springframework.data.mongodb.core.aggregation.Aggregation.match
 import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation
 import org.springframework.data.mongodb.core.aggregation.AggregationPipeline
+import org.springframework.data.mongodb.core.aggregation.Fields
 import org.springframework.data.mongodb.core.aggregation.LookupOperation
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
@@ -56,7 +57,7 @@ class UserQueryRepository(private val mongoTemplate: MongoTemplate) :
         mongoTemplate.save(user)
 
     override fun deleteById(id: ObjectId) {
-        val query = Query(where("_id").isEqualTo(id))
+        val query = Query(where(Fields.UNDERSCORE_ID).isEqualTo(id))
         mongoTemplate.remove(query, MongoUser::class.java)
     }
 
@@ -72,16 +73,16 @@ class UserQueryRepository(private val mongoTemplate: MongoTemplate) :
 
     private fun getDevicesLookUpAggregationPipeline(userId: ObjectId): AggregationPipeline {
         val lookupOperation = LookupOperation.newLookup()
-            .from("device")
+            .from(MongoDevice.COLLECTION_NAME)
             .localField("devices")
             .foreignField("_id")
             .`as`("devices")
 
         return AggregationPipeline.of(
-            match(where("_id").isEqualTo(userId)),
+            match(where(Fields.UNDERSCORE_ID).isEqualTo(userId)),
             lookupOperation
         )
     }
 }
 
-internal data class DeviceProjectionResult(val devices: List<MongoDevice>?)
+internal data class DeviceProjectionResult(val devices: List<MongoDevice>)

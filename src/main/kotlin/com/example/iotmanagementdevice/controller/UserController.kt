@@ -43,7 +43,7 @@ class UserController(private val userService: UserService) {
     @GetMapping("/devices")
     fun getUserDevices(
         authentication: Authentication
-    ): List<DeviceResponseDto>? {
+    ): List<DeviceResponseDto> {
         val userId = extractUserId(authentication)
         return userService.getDevicesByUserId(userId.toString())
     }

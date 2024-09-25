@@ -12,7 +12,7 @@ interface UserService {
 
     fun getUserById(id: String): UserResponseDto
 
-    fun getDevicesByUserId(userId: String): List<DeviceResponseDto>?
+    fun getDevicesByUserId(userId: String): List<DeviceResponseDto>
 
     fun getAll(): List<UserResponseDto>
 

@@ -42,9 +42,9 @@ class UserServiceImpl(
         )
     }
 
-    override fun getDevicesByUserId(userId: String): List<DeviceResponseDto>? {
+    override fun getDevicesByUserId(userId: String): List<DeviceResponseDto> {
         return userRepository.findDevicesByUserId(ObjectId(userId))
-            ?.map { deviceMapper.toDto(it) }
+            .map { deviceMapper.toDto(it) }
     }
 
     override fun getAll(): List<UserResponseDto> {

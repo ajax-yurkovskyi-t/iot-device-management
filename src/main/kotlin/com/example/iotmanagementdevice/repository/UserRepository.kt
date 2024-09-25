@@ -19,5 +19,5 @@ interface UserRepository {
 
     fun findByUserEmail(email: String): MongoUser?
 
-    fun findDevicesByUserId(userId: ObjectId): List<MongoDevice>?
+    fun findDevicesByUserId(userId: ObjectId): List<MongoDevice>
 }

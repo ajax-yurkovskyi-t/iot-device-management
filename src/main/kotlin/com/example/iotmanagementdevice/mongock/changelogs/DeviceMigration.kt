@@ -32,5 +32,9 @@ class DeviceMigration {
         if (indexOps.indexInfo.any { it.name == "name_index" }) {
             indexOps.dropIndex("name_index")
         }
+
+        if (mongoTemplate.collectionExists(MongoDevice.COLLECTION_NAME)) {
+            mongoTemplate.dropCollection(MongoDevice.COLLECTION_NAME)
+        }
     }
 }
