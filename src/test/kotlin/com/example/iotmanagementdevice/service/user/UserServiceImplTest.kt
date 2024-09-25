@@ -9,7 +9,6 @@ import com.example.iotmanagementdevice.mapper.UserMapper
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.model.MongoRole
 import com.example.iotmanagementdevice.model.MongoUser
-import com.example.iotmanagementdevice.repository.DeviceRepository
 import com.example.iotmanagementdevice.repository.RoleRepository
 import com.example.iotmanagementdevice.repository.UserRepository
 import io.mockk.MockKAnnotations
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.security.crypto.password.PasswordEncoder
+import kotlin.test.assertNull
 
 class UserServiceImplTest {
 
@@ -41,9 +41,6 @@ class UserServiceImplTest {
 
     @MockK
     private lateinit var roleRepository: RoleRepository
-
-    @MockK
-    private lateinit var deviceRepository: DeviceRepository
 
     @InjectMockKs
     lateinit var userService: UserServiceImpl
@@ -89,27 +86,56 @@ class UserServiceImplTest {
     }
 
     @Test
-    fun `should assign device to user successfully`() {
+    fun `should register a new user with null roles`() {
         // Given
-        val userId = ObjectId().toString()
-        val deviceId = ObjectId().toString()
+        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
+        val encodedPassword = "encodedPassword"
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = null)
 
-        val user = UserFixture.createUser().copy(id = ObjectId(userId), devices = mutableListOf())
-        val device = UserFixture.createDevice().copy(id = ObjectId(deviceId), userId = null)
-
-        // Mock repository behavior
-        every { userRepository.findById(ObjectId(userId)) } returns user
-        every { deviceRepository.findById(ObjectId(deviceId)) } returns device
-        every { userRepository.assignDeviceToUser(ObjectId(userId), ObjectId(deviceId)) } returns true
+        // Stubbing
+        every { passwordEncoder.encode(any()) } returns encodedPassword
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns mongoRole
+        every { userMapper.toEntity(requestDto) } returns savedUser
+        every { userRepository.save(savedUser) } returns savedUser
+        every { userMapper.toDto(savedUser) } returns userResponseDto
 
         // When
-        val result = userService.assignDeviceToUser(userId, deviceId)
+        val result = userService.register(requestDto)
 
         // Then
-        assertTrue(result)
-        verify {
-            userRepository.assignDeviceToUser(ObjectId(userId), ObjectId(deviceId))
-        }
+        assertEquals(userResponseDto, result)
+        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
+        verify { userMapper.toEntity(requestDto) }
+        verify { userRepository.save(savedUser) }
+        verify { userMapper.toDto(savedUser) }
+
+        // Verify that the role was not added to the user
+        assertNull(savedUser.roles, "Expected user roles to be null since role was not found")
+    }
+
+    @Test
+    fun `should register a new user without a role`() {
+        // Given
+        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
+        val encodedPassword = "encodedPassword"
+        val savedUser = mongoUser.copy(id = ObjectId())
+
+        // Stubbing
+        every { passwordEncoder.encode(any()) } returns encodedPassword
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns null // No role found
+        every { userMapper.toEntity(requestDto) } returns mongoUser.copy(devices = mutableListOf())
+        every { userRepository.save(mongoUser) } returns savedUser
+        every { userMapper.toDto(savedUser) } returns userResponseDto
+
+        // When
+        val result = userService.register(requestDto)
+
+        // Then
+        assertEquals(userResponseDto, result)
+        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
+        verify { userMapper.toEntity(requestDto) }
+        verify { userRepository.save(mongoUser) }
+        verify { userMapper.toDto(savedUser) }
     }
 
     @Test
@@ -278,7 +304,6 @@ class UserServiceImplTest {
         verify { userMapper.toDto(updatedUser) }
     }
 
-
     @Test
     fun `should throw exception when updating user with non-existent id`() {
         // Given
@@ -297,28 +322,19 @@ class UserServiceImplTest {
     }
 
     @Test
-    fun `should register a new user without a role`() {
+    fun `should assign a device to a user successfully`() {
         // Given
-        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
-        val encodedPassword = "encodedPassword"
-        val savedUser = mongoUser.copy(id = ObjectId())
+        val userObjectId = ObjectId()
+        val deviceObjectId = ObjectId()
 
         // Stubbing
-        every { passwordEncoder.encode(any()) } returns encodedPassword
-        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns null // No role found
-        every { userMapper.toEntity(requestDto) } returns mongoUser.copy(devices = mutableListOf())
-        every { userRepository.save(mongoUser) } returns savedUser
-        every { userMapper.toDto(savedUser) } returns userResponseDto
+        every { userRepository.assignDeviceToUser(userObjectId, deviceObjectId) } returns true
 
         // When
-        val result = userService.register(requestDto)
+        val result = userService.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString())
 
         // Then
-        assertEquals(userResponseDto, result)
-        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
-        verify { userMapper.toEntity(requestDto) }
-        verify { userRepository.save(mongoUser) }
-        verify { userMapper.toDto(savedUser) }
+        assertTrue(result, "Expected the device to be assigned to the user successfully")
+        verify { userRepository.assignDeviceToUser(userObjectId, deviceObjectId) }
     }
 }
-

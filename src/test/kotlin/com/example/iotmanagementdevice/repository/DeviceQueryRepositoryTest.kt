@@ -14,7 +14,7 @@ class DeviceQueryRepositoryTest : AbstractMongoTest {
     private lateinit var deviceQueryRepository: DeviceQueryRepository
 
     @Test
-    fun `given a device when saved then it can be found by id`() {
+    fun `should find device by id when saved`() {
         // Given
         val device = DeviceFixture.createDevice()
         deviceQueryRepository.save(device)
@@ -27,7 +27,7 @@ class DeviceQueryRepositoryTest : AbstractMongoTest {
     }
 
     @Test
-    fun `given multiple devices when saved then all can be found`() {
+    fun `should find all devices when multiple devices are saved`() {
         // Given
         val device1 = DeviceFixture.createDevice()
             .copy(name = "Device1", description = "First test device", type = "TypeB")
@@ -40,15 +40,14 @@ class DeviceQueryRepositoryTest : AbstractMongoTest {
         val devices = deviceQueryRepository.findAll()
 
         // Then
-        val expectedRoles = listOf(device1, device2)
-        assertTrue(devices.containsAll(expectedRoles), "Expected devices not found in the repository")
+        val expectedDevices = listOf(device1, device2)
+        assertTrue(devices.containsAll(expectedDevices), "Expected devices not found in the repository")
     }
 
     @Test
-    fun `given a device when deleted then it cannot be found`() {
+    fun `should not find device when deleted`() {
         // Given
         val device = DeviceFixture.createDevice()
-
         deviceQueryRepository.save(device)
 
         // When

@@ -16,7 +16,7 @@ class RoleQueryRepositoryTest : AbstractMongoTest {
     private lateinit var roleQueryRepository: RoleQueryRepository
 
     @Test
-    fun `given a role when saved then it can be found by id`() {
+    fun `should find role by id when saved`() {
         // Given
         val role = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
         roleQueryRepository.save(role)
@@ -29,22 +29,23 @@ class RoleQueryRepositoryTest : AbstractMongoTest {
     }
 
     @Test
-    fun `given multiple roles when saved then all can be found`() {
+    fun `should find all roles when multiple roles are saved`() {
         // Given
         val roleAdmin = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
         val roleUser = MongoRole(ObjectId(), MongoRole.RoleName.USER)
         roleQueryRepository.save(roleAdmin)
         roleQueryRepository.save(roleUser)
+
         // When
         val roles = roleQueryRepository.findAll()
 
         // Then
         val expectedRoles = listOf(roleAdmin, roleUser)
-        assertTrue(roles.containsAll(expectedRoles), "Expected users not found in the repository")
+        assertTrue(roles.containsAll(expectedRoles), "Expected roles not found in the repository")
     }
 
     @Test
-    fun `given a role when deleted then it cannot be found`() {
+    fun `should not find role when deleted`() {
         // Given
         val role = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
         roleQueryRepository.save(role)
@@ -58,7 +59,7 @@ class RoleQueryRepositoryTest : AbstractMongoTest {
     }
 
     @Test
-    fun `given a role when saved then it can be found by role name`() {
+    fun `should find role by role name when saved`() {
         // Given
         val role = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
         roleQueryRepository.save(role)

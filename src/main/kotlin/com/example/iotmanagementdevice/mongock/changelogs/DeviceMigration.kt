@@ -1,11 +1,9 @@
 package com.example.iotmanagementdevice.mongock.changelogs
 
-import com.example.iotmanagementdevice.model.DeviceStatusType
 import com.example.iotmanagementdevice.model.MongoDevice
 import io.mongock.api.annotations.ChangeUnit
 import io.mongock.api.annotations.Execution
 import io.mongock.api.annotations.RollbackExecution
-import org.bson.types.ObjectId
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.index.Index
