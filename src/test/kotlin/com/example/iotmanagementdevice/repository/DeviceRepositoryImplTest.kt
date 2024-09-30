@@ -5,22 +5,20 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class DeviceQueryRepositoryTest : AbstractMongoTest {
+class DeviceRepositoryImplTest : AbstractMongoTest {
 
     @Autowired
-    private lateinit var deviceQueryRepository: DeviceQueryRepository
+    private lateinit var deviceRepositoryImpl: DeviceRepositoryImpl
 
     @Test
     fun `should find device by id when saved`() {
         // Given
         val device = DeviceFixture.createDevice()
-        deviceQueryRepository.save(device)
+        deviceRepositoryImpl.save(device)
 
         // When
-        val foundDevice = deviceQueryRepository.findById(device.id!!)
+        val foundDevice = deviceRepositoryImpl.findById(device.id!!.toString())
 
         // Then
         assertEquals(device, foundDevice)
@@ -33,11 +31,11 @@ class DeviceQueryRepositoryTest : AbstractMongoTest {
             .copy(name = "Device1", description = "First test device", type = "TypeB")
         val device2 = DeviceFixture.createDevice()
             .copy(name = "Device2", description = "Second test device", type = "TypeC")
-        deviceQueryRepository.save(device1)
-        deviceQueryRepository.save(device2)
+        deviceRepositoryImpl.save(device1)
+        deviceRepositoryImpl.save(device2)
 
         // When
-        val devices = deviceQueryRepository.findAll()
+        val devices = deviceRepositoryImpl.findAll()
 
         // Then
         val expectedDevices = listOf(device1, device2)
@@ -48,11 +46,11 @@ class DeviceQueryRepositoryTest : AbstractMongoTest {
     fun `should not find device when deleted`() {
         // Given
         val device = DeviceFixture.createDevice()
-        deviceQueryRepository.save(device)
+        deviceRepositoryImpl.save(device)
 
         // When
-        deviceQueryRepository.deleteById(device.id!!)
-        val foundDevice = deviceQueryRepository.findById(device.id!!)
+        deviceRepositoryImpl.deleteById(device.id!!.toString())
+        val foundDevice = deviceRepositoryImpl.findById(device.id!!.toString())
 
         // Then
         Assertions.assertNull(foundDevice)

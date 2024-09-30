@@ -65,13 +65,19 @@ class UserServiceImplTest {
         // Given
         val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
         val encodedPassword = "encodedPassword"
-        val savedUser = mongoUser.copy(id = ObjectId())
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = mutableSetOf(mongoRole))
 
         // Stubbing
         every { passwordEncoder.encode(any()) } returns encodedPassword
         every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns mongoRole
-        every { userMapper.toEntity(requestDto) } returns mongoUser.copy(devices = mutableListOf())
-        every { userRepository.save(mongoUser) } returns savedUser
+        every { userMapper.toEntity(requestDto) } returns
+            mongoUser.copy(roles = mutableSetOf()) // Make sure roles are empty initially
+        every {
+            userRepository.save(
+                mongoUser.copy
+                    (roles = mutableSetOf(mongoRole))
+            )
+        } returns savedUser // Save user with role
         every { userMapper.toDto(savedUser) } returns userResponseDto
 
         // When
@@ -81,7 +87,7 @@ class UserServiceImplTest {
         assertEquals(userResponseDto, result)
         verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
         verify { userMapper.toEntity(requestDto) }
-        verify { userRepository.save(mongoUser) }
+        verify { userRepository.save(mongoUser.copy(roles = mutableSetOf(mongoRole))) } // Verify save includes role
         verify { userMapper.toDto(savedUser) }
     }
 
@@ -90,11 +96,41 @@ class UserServiceImplTest {
         // Given
         val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
         val encodedPassword = "encodedPassword"
-        val savedUser = mongoUser.copy(id = ObjectId(), roles = null)
+        val userMongoRole = mongoRole // Assume this is a valid MongoRole
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = null) // Initially null roles
 
         // Stubbing
         every { passwordEncoder.encode(any()) } returns encodedPassword
-        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns mongoRole
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns userMongoRole // Role found
+        every { userMapper.toEntity(requestDto) } returns savedUser
+        every { userRepository.save(savedUser.copy(roles = setOf(userMongoRole))) } returns
+            savedUser.copy(roles = setOf(userMongoRole)) // Save with role
+        every { userMapper.toDto(savedUser.copy(roles = setOf(userMongoRole))) } returns userResponseDto
+
+        // When
+        val result = userService.register(requestDto)
+
+        // Then
+        assertEquals(userResponseDto, result)
+        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
+        verify { userMapper.toEntity(requestDto) }
+        verify { userRepository.save(savedUser.copy(roles = setOf(userMongoRole))) } // Verify save is called with roles
+        verify { userMapper.toDto(savedUser.copy(roles = setOf(userMongoRole))) }
+
+        // Verify that the role was added to the user
+        assertNull(savedUser.roles, "Expected user roles to contain the found role")
+    }
+
+    @Test
+    fun `should register a new user without a role`() {
+        // Given
+        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
+        val encodedPassword = "encodedPassword"
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = emptySet()) // Ensure roles are empty
+
+        // Stubbing
+        every { passwordEncoder.encode(any()) } returns encodedPassword
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns null
         every { userMapper.toEntity(requestDto) } returns savedUser
         every { userRepository.save(savedUser) } returns savedUser
         every { userMapper.toDto(savedUser) } returns userResponseDto
@@ -108,40 +144,12 @@ class UserServiceImplTest {
         verify { userMapper.toEntity(requestDto) }
         verify { userRepository.save(savedUser) }
         verify { userMapper.toDto(savedUser) }
-
-        // Verify that the role was not added to the user
-        assertNull(savedUser.roles, "Expected user roles to be null since role was not found")
-    }
-
-    @Test
-    fun `should register a new user without a role`() {
-        // Given
-        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
-        val encodedPassword = "encodedPassword"
-        val savedUser = mongoUser.copy(id = ObjectId())
-
-        // Stubbing
-        every { passwordEncoder.encode(any()) } returns encodedPassword
-        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns null // No role found
-        every { userMapper.toEntity(requestDto) } returns mongoUser.copy(devices = mutableListOf())
-        every { userRepository.save(mongoUser) } returns savedUser
-        every { userMapper.toDto(savedUser) } returns userResponseDto
-
-        // When
-        val result = userService.register(requestDto)
-
-        // Then
-        assertEquals(userResponseDto, result)
-        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
-        verify { userMapper.toEntity(requestDto) }
-        verify { userRepository.save(mongoUser) }
-        verify { userMapper.toDto(savedUser) }
     }
 
     @Test
     fun `should return devices by userId`() {
         // Given
-        val userId = ObjectId().toString()
+        val userId = ObjectId()
         val deviceId1 = ObjectId()
         val deviceId2 = ObjectId()
 
@@ -155,16 +163,16 @@ class UserServiceImplTest {
         val deviceResponseDtoList = listOf(deviceResponseDto1, deviceResponseDto2)
 
         // Stubbing
-        every { userRepository.findDevicesByUserId(ObjectId(userId)) } returns deviceList
+        every { userRepository.findDevicesByUserId(userId.toString()) } returns deviceList
         every { deviceMapper.toDto(mongoDevice1) } returns deviceResponseDto1
         every { deviceMapper.toDto(mongoDevice2) } returns deviceResponseDto2
 
         // When
-        val result = userService.getDevicesByUserId(userId)
+        val result = userService.getDevicesByUserId(userId.toString())
 
         // Then
         assertEquals(deviceResponseDtoList, result)
-        verify { userRepository.findDevicesByUserId(ObjectId(userId)) }
+        verify { userRepository.findDevicesByUserId(userId.toString()) }
         verify { deviceMapper.toDto(mongoDevice1) }
         verify { deviceMapper.toDto(mongoDevice2) }
     }
@@ -176,7 +184,7 @@ class UserServiceImplTest {
         val userWithId = mongoUser.copy(id = userId, devices = mutableListOf(ObjectId())) // Use device IDs
 
         // Stubbing
-        every { userRepository.findById(userId) } returns userWithId
+        every { userRepository.findById(userId.toString()) } returns userWithId
         every { userMapper.toDto(userWithId) } returns userResponseDto
 
         // When
@@ -184,7 +192,7 @@ class UserServiceImplTest {
 
         // Then
         assertEquals(userResponseDto, result)
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findById(userId.toString()) }
         verify { userMapper.toDto(userWithId) }
     }
 
@@ -194,7 +202,7 @@ class UserServiceImplTest {
         val userId = ObjectId()
 
         // Stubbing
-        every { userRepository.findById(userId) } returns null
+        every { userRepository.findById(userId.toString()) } returns null
 
         // When
         val exception = assertThrows<EntityNotFoundException> {
@@ -203,7 +211,7 @@ class UserServiceImplTest {
 
         // Then
         assertEquals("User with id $userId not found", exception.message)
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findById(userId.toString()) }
     }
 
     @Test
@@ -288,7 +296,7 @@ class UserServiceImplTest {
         )
 
         // Stubbing
-        every { userRepository.findById(userId) } returns existingMongoUser
+        every { userRepository.findById(userId.toString()) } returns existingMongoUser
         every { passwordEncoder.encode(updatedUserDto.userPassword) } returns encodedNewPassword
         every { userRepository.save(any()) } returns updatedUser
         every { userMapper.toDto(updatedUser) } returns updatedUserResponseDto
@@ -298,7 +306,7 @@ class UserServiceImplTest {
 
         // Then
         assertEquals(updatedUserResponseDto, result)
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findById(userId.toString()) }
         verify { passwordEncoder.encode(updatedUserDto.userPassword) }
         verify { userRepository.save(any()) }
         verify { userMapper.toDto(updatedUser) }
@@ -309,7 +317,7 @@ class UserServiceImplTest {
         // Given
         val userId = ObjectId()
         val requestDto = UserUpdateRequestDto("Updated Name", "updated@example.com", "1234567890", "newPassword")
-        every { userRepository.findById(userId) } returns null // Simulate user not found
+        every { userRepository.findById(userId.toString()) } returns null // Simulate user not found
 
         // When
         val exception = assertThrows<EntityNotFoundException> {
@@ -318,7 +326,7 @@ class UserServiceImplTest {
 
         // Then
         assertEquals("User with id $userId not found", exception.message)
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findById(userId.toString()) }
     }
 
     @Test
@@ -328,13 +336,13 @@ class UserServiceImplTest {
         val deviceObjectId = ObjectId()
 
         // Stubbing
-        every { userRepository.assignDeviceToUser(userObjectId, deviceObjectId) } returns true
+        every { userRepository.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString()) } returns true
 
         // When
         val result = userService.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString())
 
         // Then
         assertTrue(result, "Expected the device to be assigned to the user successfully")
-        verify { userRepository.assignDeviceToUser(userObjectId, deviceObjectId) }
+        verify { userRepository.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString()) }
     }
 }

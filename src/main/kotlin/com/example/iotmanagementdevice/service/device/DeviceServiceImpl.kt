@@ -7,7 +7,6 @@ import com.example.iotmanagementdevice.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.repository.DeviceRepository
-import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,7 +21,7 @@ class DeviceServiceImpl(
 
     override fun getById(deviceId: String): DeviceResponseDto {
         return deviceMapper.toDto(
-            deviceRepository.findById(ObjectId(deviceId))
+            deviceRepository.findById(deviceId)
                 ?: throw EntityNotFoundException("Device with id $deviceId not found")
         )
     }
@@ -33,7 +32,7 @@ class DeviceServiceImpl(
 
     override fun update(id: String, requestDto: DeviceUpdateRequestDto): DeviceResponseDto {
         val existingDevice =
-            deviceRepository.findById(ObjectId(id)) ?: throw EntityNotFoundException("Device with id $id not found")
+            deviceRepository.findById(id) ?: throw EntityNotFoundException("Device with id $id not found")
 
         val updatedDevice = existingDevice.copy(
             name = requestDto.name,
@@ -46,6 +45,6 @@ class DeviceServiceImpl(
     }
 
     override fun deleteById(id: String) {
-        return deviceRepository.deleteById(ObjectId(id))
+        return deviceRepository.deleteById(id)
     }
 }

@@ -1,7 +1,6 @@
 package com.example.iotmanagementdevice.repository
 
 import com.example.iotmanagementdevice.model.MongoRole
-import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Fields
 import org.springframework.data.mongodb.core.query.Criteria
@@ -10,8 +9,8 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.stereotype.Repository
 
 @Repository
-class RoleQueryRepository(private val mongoTemplate: MongoTemplate) : RoleRepository {
-    override fun findRoleById(roleId: ObjectId): MongoRole? {
+class RoleRepositoryImpl(private val mongoTemplate: MongoTemplate) : RoleRepository {
+    override fun findRoleById(roleId: String): MongoRole? {
         val query = Query(Criteria.where(Fields.UNDERSCORE_ID).isEqualTo(roleId))
         return mongoTemplate.findOne(query, MongoRole::class.java)
     }
@@ -22,7 +21,7 @@ class RoleQueryRepository(private val mongoTemplate: MongoTemplate) : RoleReposi
     override fun save(role: MongoRole): MongoRole =
         mongoTemplate.save(role)
 
-    override fun deleteById(roleId: ObjectId) {
+    override fun deleteById(roleId: String) {
         val query = Query(Criteria.where(Fields.UNDERSCORE_ID).isEqualTo(roleId))
         mongoTemplate.remove(query, MongoRole::class.java)
     }

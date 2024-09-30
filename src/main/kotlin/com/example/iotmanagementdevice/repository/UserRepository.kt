@@ -2,22 +2,21 @@ package com.example.iotmanagementdevice.repository
 
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.model.MongoUser
-import org.bson.types.ObjectId
 
 interface UserRepository {
-    fun findById(id: ObjectId): MongoUser?
+    fun findById(id: String): MongoUser?
 
     fun findAll(): List<MongoUser>
 
-    fun assignDeviceToUser(userId: ObjectId, deviceId: ObjectId): Boolean
+    fun assignDeviceToUser(userId: String, deviceId: String): Boolean
 
     fun save(user: MongoUser): MongoUser?
 
-    fun deleteById(id: ObjectId)
+    fun deleteById(id: String)
 
     fun findByUserName(username: String): MongoUser?
 
     fun findByUserEmail(email: String): MongoUser?
 
-    fun findDevicesByUserId(userId: ObjectId): List<MongoDevice>
+    fun findDevicesByUserId(userId: String): List<MongoDevice>
 }

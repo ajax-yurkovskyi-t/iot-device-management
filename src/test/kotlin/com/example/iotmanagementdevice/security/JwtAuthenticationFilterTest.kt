@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.jvm.isAccessible
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -53,7 +55,7 @@ class JwtAuthenticationFilterTest {
         every { filterChain.doFilter(request, response) } just Runs
 
         // WHEN
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain)
+        invokeDoFilterInternal()
 
         // THEN
         verify { filterChain.doFilter(request, response) }
@@ -67,7 +69,7 @@ class JwtAuthenticationFilterTest {
         every { filterChain.doFilter(request, response) } just Runs
 
         // WHEN
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain)
+        invokeDoFilterInternal()
 
         // THEN
         assertNull(SecurityContextHolder.getContext().authentication)
@@ -85,7 +87,7 @@ class JwtAuthenticationFilterTest {
         every { filterChain.doFilter(request, response) } just Runs
 
         // WHEN
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain)
+        invokeDoFilterInternal()
 
         // THEN
         assertNotNull(SecurityContextHolder.getContext().authentication)
@@ -100,11 +102,17 @@ class JwtAuthenticationFilterTest {
         every { filterChain.doFilter(request, response) } just Runs
 
         // WHEN
-        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain)
+        invokeDoFilterInternal()
 
         // THEN
         assertNull(SecurityContextHolder.getContext().authentication)
         verify { filterChain.doFilter(request, response) }
+    }
+
+    private fun invokeDoFilterInternal() {
+        val method = JwtAuthenticationFilter::class.declaredFunctions.find { it.name == "doFilterInternal" }
+        method?.isAccessible = true
+        method?.call(jwtAuthenticationFilter, request, response, filterChain)
     }
 
     companion object {

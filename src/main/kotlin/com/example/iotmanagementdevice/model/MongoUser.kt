@@ -4,7 +4,6 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 @TypeAlias("User")
@@ -16,10 +15,10 @@ data class MongoUser(
     val email: String?,
     val phoneNumber: String?,
     val userPassword: String?,
-    val roles: MutableSet<MongoRole>?,
-    val devices: MutableList<ObjectId>?,
+    val roles: Set<MongoRole>?,
+    val devices: List<ObjectId>?,
 ) : UserDetails {
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority>? {
+    override fun getAuthorities(): Set<MongoRole>? {
         return roles
     }
 

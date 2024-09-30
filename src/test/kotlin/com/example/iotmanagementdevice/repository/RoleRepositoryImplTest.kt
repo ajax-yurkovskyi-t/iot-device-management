@@ -7,22 +7,20 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class RoleQueryRepositoryTest : AbstractMongoTest {
+class RoleRepositoryImplTest : AbstractMongoTest {
 
     @Autowired
-    private lateinit var roleQueryRepository: RoleQueryRepository
+    private lateinit var roleRepositoryImpl: RoleRepositoryImpl
 
     @Test
     fun `should find role by id when saved`() {
         // Given
         val role = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
-        roleQueryRepository.save(role)
+        roleRepositoryImpl.save(role)
 
         // When
-        val foundRole = roleQueryRepository.findRoleById(role.id!!)
+        val foundRole = roleRepositoryImpl.findRoleById(role.id!!.toString())
 
         // Then
         assertEquals(role, foundRole)
@@ -33,11 +31,11 @@ class RoleQueryRepositoryTest : AbstractMongoTest {
         // Given
         val roleAdmin = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
         val roleUser = MongoRole(ObjectId(), MongoRole.RoleName.USER)
-        roleQueryRepository.save(roleAdmin)
-        roleQueryRepository.save(roleUser)
+        roleRepositoryImpl.save(roleAdmin)
+        roleRepositoryImpl.save(roleUser)
 
         // When
-        val roles = roleQueryRepository.findAll()
+        val roles = roleRepositoryImpl.findAll()
 
         // Then
         val expectedRoles = listOf(roleAdmin, roleUser)
@@ -48,11 +46,11 @@ class RoleQueryRepositoryTest : AbstractMongoTest {
     fun `should not find role when deleted`() {
         // Given
         val role = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
-        roleQueryRepository.save(role)
+        roleRepositoryImpl.save(role)
 
         // When
-        roleQueryRepository.deleteById(role.id!!)
-        val foundRole = roleQueryRepository.findRoleById(role.id!!)
+        roleRepositoryImpl.deleteById(role.id!!.toString())
+        val foundRole = roleRepositoryImpl.findRoleById(role.id!!.toString())
 
         // Then
         assertNull(foundRole)
@@ -62,10 +60,10 @@ class RoleQueryRepositoryTest : AbstractMongoTest {
     fun `should find role by role name when saved`() {
         // Given
         val role = MongoRole(ObjectId(), MongoRole.RoleName.ADMIN)
-        roleQueryRepository.save(role)
+        roleRepositoryImpl.save(role)
 
         // When
-        val foundRole = roleQueryRepository.findByRoleName(MongoRole.RoleName.ADMIN)
+        val foundRole = roleRepositoryImpl.findByRoleName(MongoRole.RoleName.ADMIN)
 
         // Then
         assertEquals(MongoRole.RoleName.ADMIN, foundRole?.roleName)

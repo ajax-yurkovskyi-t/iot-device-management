@@ -17,33 +17,33 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.stereotype.Repository
 
 @Repository
-class UserQueryRepository(private val mongoTemplate: MongoTemplate) :
+class UserRepositoryImpl(private val mongoTemplate: MongoTemplate) :
     UserRepository {
-    override fun findById(id: ObjectId): MongoUser? {
-        val query = Query(where("_id").isEqualTo(id))
+    override fun findById(id: String): MongoUser? {
+        val query = Query(where(Fields.UNDERSCORE_ID).isEqualTo(id))
         return mongoTemplate.findOne(query, MongoUser::class.java)
     }
 
     override fun findAll(): List<MongoUser> =
         mongoTemplate.findAll(MongoUser::class.java)
 
-    override fun assignDeviceToUser(userId: ObjectId, deviceId: ObjectId): Boolean {
+    override fun assignDeviceToUser(userId: String, deviceId: String): Boolean {
         val userUpdateResult = mongoTemplate.updateFirst(
-            Query(where("_id").isEqualTo(userId)),
-            Update().addToSet("devices", deviceId),
+            Query(where(Fields.UNDERSCORE_ID).isEqualTo(userId)),
+            Update().addToSet(MongoUser::devices.name, ObjectId(deviceId)),
             MongoUser::class.java
         )
 
         val deviceUpdateResult = mongoTemplate.updateFirst(
-            Query(where("_id").isEqualTo(deviceId)),
-            Update().set("userId", userId),
+            Query(where(Fields.UNDERSCORE_ID).isEqualTo(deviceId)),
+            Update().set(MongoDevice::userId.name, ObjectId(userId)),
             MongoDevice::class.java
         )
 
         return userUpdateResult.modifiedCount > 0 && deviceUpdateResult.modifiedCount > 0
     }
 
-    override fun findDevicesByUserId(userId: ObjectId): List<MongoDevice> {
+    override fun findDevicesByUserId(userId: String): List<MongoDevice> {
         val pipelineStages = getDevicesLookUpAggregationPipeline(userId).operations
         val aggregationResults =
             mongoTemplate.aggregate<DeviceProjectionResult>(
@@ -56,7 +56,7 @@ class UserQueryRepository(private val mongoTemplate: MongoTemplate) :
     override fun save(user: MongoUser): MongoUser =
         mongoTemplate.save(user)
 
-    override fun deleteById(id: ObjectId) {
+    override fun deleteById(id: String) {
         val query = Query(where(Fields.UNDERSCORE_ID).isEqualTo(id))
         mongoTemplate.remove(query, MongoUser::class.java)
     }
@@ -71,10 +71,10 @@ class UserQueryRepository(private val mongoTemplate: MongoTemplate) :
         return mongoTemplate.findOne(query, MongoUser::class.java)
     }
 
-    private fun getDevicesLookUpAggregationPipeline(userId: ObjectId): AggregationPipeline {
+    private fun getDevicesLookUpAggregationPipeline(userId: String): AggregationPipeline {
         val lookupOperation = LookupOperation.newLookup()
             .from(MongoDevice.COLLECTION_NAME)
-            .localField("devices")
+            .localField(MongoUser::devices.name)
             .foreignField("_id")
             .`as`("devices")
 

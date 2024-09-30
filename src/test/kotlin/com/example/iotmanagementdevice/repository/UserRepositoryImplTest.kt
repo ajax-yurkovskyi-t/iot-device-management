@@ -9,16 +9,14 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class UserQueryRepositoryTest : AbstractMongoTest {
+class UserRepositoryImplTest : AbstractMongoTest {
 
     @Autowired
-    private lateinit var userQueryRepository: UserQueryRepository
+    private lateinit var userRepositoryImpl: UserRepositoryImpl
 
     @Autowired
-    private lateinit var deviceQueryRepository: DeviceQueryRepository
+    private lateinit var deviceRepositoryImpl: DeviceRepositoryImpl
 
     @Test
     fun `should find user by id when saved`() {
@@ -26,8 +24,8 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         val user = UserFixture.createUser()
 
         // When
-        userQueryRepository.save(user)
-        val foundUser = userQueryRepository.findById(user.id!!)
+        userRepositoryImpl.save(user)
+        val foundUser = userRepositoryImpl.findById(user.id!!.toString())
 
         // Then
         assertEquals(user, foundUser)
@@ -37,20 +35,20 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should return devices when queried by userId`() {
         // Given
         val user = UserFixture.createUser()
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         val device1 = UserFixture.createDevice().copy(name = "Device1")
         val device2 = UserFixture.createDevice().copy(name = "Device2")
 
-        deviceQueryRepository.save(device1)
-        deviceQueryRepository.save(device2)
+        deviceRepositoryImpl.save(device1)
+        deviceRepositoryImpl.save(device2)
 
         // Assign devices to user
-        userQueryRepository.assignDeviceToUser(user.id!!, device1.id!!)
-        userQueryRepository.assignDeviceToUser(user.id!!, device2.id!!)
+        userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), device1.id!!.toString())
+        userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), device2.id!!.toString())
 
         // When
-        val devices = userQueryRepository.findDevicesByUserId(user.id!!)
+        val devices = userRepositoryImpl.findDevicesByUserId(user.id!!.toString())
 
         // Then
         assertEquals(2, devices.size)
@@ -64,10 +62,10 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should return empty list of devices when no devices assigned to user`() {
         // Given
         val user = UserFixture.createUser()
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         // When
-        val devices = userQueryRepository.findDevicesByUserId(user.id!!)
+        val devices = userRepositoryImpl.findDevicesByUserId(user.id!!.toString())
 
         // Then
         assertTrue(devices.isEmpty(), "Expected no devices for the user")
@@ -80,7 +78,7 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         val deviceId = UserFixture.createDevice().id!!
 
         // When
-        val result = userQueryRepository.assignDeviceToUser(userId, deviceId)
+        val result = userRepositoryImpl.assignDeviceToUser(userId.toString(), deviceId.toString())
 
         // Then
         assertFalse(result, "Expected false when assigning device to non-existent user")
@@ -91,11 +89,11 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         // Given
         val user1 = UserFixture.createUser().copy(name = "User1", email = "user1@example.com")
         val user2 = UserFixture.createUser().copy(name = "User2", email = "user2@example.com")
-        userQueryRepository.save(user1)
-        userQueryRepository.save(user2)
+        userRepositoryImpl.save(user1)
+        userRepositoryImpl.save(user2)
 
         // When
-        val users = userQueryRepository.findAll()
+        val users = userRepositoryImpl.findAll()
 
         // Then
         val expectedUsers = listOf(user1, user2)
@@ -108,14 +106,14 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         val user = UserFixture.createUser()
         val device = UserFixture.createDevice()
 
-        userQueryRepository.save(user)
-        deviceQueryRepository.save(device)
+        userRepositoryImpl.save(user)
+        deviceRepositoryImpl.save(device)
 
         // When
-        userQueryRepository.assignDeviceToUser(user.id!!, device.id!!)
+        userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), device.id!!.toString())
 
         // Then
-        val updatedDevice = deviceQueryRepository.findById(device.id!!)
+        val updatedDevice = deviceRepositoryImpl.findById(device.id!!.toString())
         assertEquals(user.id, updatedDevice?.userId)
     }
 
@@ -123,7 +121,7 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should reflect the user update after being updated`() {
         // Given
         val user = UserFixture.createUser()
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         val updatedUserDto = UserUpdateRequestDto(
             name = "Updated Name",
@@ -140,10 +138,10 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         )
 
         // When
-        userQueryRepository.save(updatedUser)
+        userRepositoryImpl.save(updatedUser)
 
         // Then
-        val foundUser = userQueryRepository.findById(user.id!!)
+        val foundUser = userRepositoryImpl.findById(user.id!!.toString())
         assertEquals(updatedUserDto.name, foundUser?.name)
         assertEquals(updatedUserDto.email, foundUser?.email)
         assertEquals(updatedUserDto.phoneNumber, foundUser?.phoneNumber)
@@ -154,11 +152,11 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should not find a user after it is deleted`() {
         // Given
         val user = UserFixture.createUser()
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         // When
-        userQueryRepository.deleteById(user.id!!)
-        val foundUser = userQueryRepository.findById(user.id!!)
+        userRepositoryImpl.deleteById(user.id!!.toString())
+        val foundUser = userRepositoryImpl.findById(user.id!!.toString())
 
         // Then
         assertNull(foundUser)
@@ -168,10 +166,10 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should find user by username`() {
         // Given
         val user = UserFixture.createUser().copy(name = "findUserName")
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         // When
-        val foundUser = userQueryRepository.findByUserName(user.name!!)
+        val foundUser = userRepositoryImpl.findByUserName(user.name!!)
 
         // Then
         assertEquals(user, foundUser)
@@ -181,10 +179,10 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should find user by email`() {
         // Given
         val user = UserFixture.createUser().copy(email = "user@find.com")
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         // When
-        val foundUser = userQueryRepository.findByUserEmail(user.email!!)
+        val foundUser = userRepositoryImpl.findByUserEmail(user.email!!)
 
         // Then
         assertEquals(user, foundUser)
@@ -194,12 +192,12 @@ class UserQueryRepositoryTest : AbstractMongoTest {
     fun `should return false when assigning a non-existent device to user`() {
         // Given
         val user = UserFixture.createUser()
-        userQueryRepository.save(user)
+        userRepositoryImpl.save(user)
 
         val nonExistentDeviceId = ObjectId() // Non-existent device ID
 
         // When
-        val result = userQueryRepository.assignDeviceToUser(user.id!!, nonExistentDeviceId)
+        val result = userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), nonExistentDeviceId.toString())
 
         // Then
         assertFalse(result, "Expected false when assigning non-existent device to user")
@@ -211,10 +209,10 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         val nonExistentUserId = ObjectId()
 
         // When
-        userQueryRepository.deleteById(nonExistentUserId)
+        userRepositoryImpl.deleteById(nonExistentUserId.toString())
 
         // Then
-        val foundUser = userQueryRepository.findById(nonExistentUserId)
+        val foundUser = userRepositoryImpl.findById(nonExistentUserId.toString())
         assertNull(foundUser, "No user should be found after attempting to delete non-existent user")
     }
 
@@ -224,7 +222,7 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         val nonExistentUserId = ObjectId() // A user ID that does not exist in the database
 
         // When
-        val devices = userQueryRepository.findDevicesByUserId(nonExistentUserId)
+        val devices = userRepositoryImpl.findDevicesByUserId(nonExistentUserId.toString())
 
         // Then
         assertTrue(devices.isEmpty(), "Expected an empty list when the user does not exist")
@@ -236,7 +234,7 @@ class UserQueryRepositoryTest : AbstractMongoTest {
         val user = UserFixture.createUser().copy(devices = null) // Create a non-existent user ID
 
         // When
-        val devices = userQueryRepository.findDevicesByUserId(user.id!!)
+        val devices = userRepositoryImpl.findDevicesByUserId(user.id!!.toString())
 
         // Then
         assertTrue(devices.isEmpty(), "Expected an empty list when the user does not exist")

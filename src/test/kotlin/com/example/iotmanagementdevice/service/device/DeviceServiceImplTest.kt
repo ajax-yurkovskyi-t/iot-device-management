@@ -88,7 +88,7 @@ class DeviceServiceImplTest {
     @Test
     fun `should throw exception when device not found by id`() {
         // Given
-        val deviceId = ObjectId()
+        val deviceId = String()
 
         // Stubbing
         every { deviceRepository.findById(deviceId) } returns null
@@ -111,7 +111,7 @@ class DeviceServiceImplTest {
         val responseDto = deviceResponseDto.copy(name = "Device1", description = "A test device", type = "Sensor")
 
         // Stubbing
-        every { deviceRepository.findById(deviceId) } returns device
+        every { deviceRepository.findById(deviceId.toString()) } returns device
         every { deviceMapper.toDto(device) } returns responseDto
 
         // When
@@ -120,7 +120,7 @@ class DeviceServiceImplTest {
         // Then
         assertEquals(responseDto, result)
         verify {
-            deviceRepository.findById(deviceId)
+            deviceRepository.findById(deviceId.toString())
             deviceMapper.toDto(device)
         }
     }
@@ -128,7 +128,7 @@ class DeviceServiceImplTest {
     @Test
     fun `should throw exception when updating a non-existing device`() {
         // Given
-        val nonExistingDeviceId = ObjectId()
+        val nonExistingDeviceId = String()
 
         // Stubbing
         every { deviceRepository.findById(nonExistingDeviceId) } returns null
@@ -204,7 +204,7 @@ class DeviceServiceImplTest {
         )
 
         // Stubbing
-        every { deviceRepository.findById(deviceId) } returns existingDevice
+        every { deviceRepository.findById(deviceId.toString()) } returns existingDevice
         every { deviceRepository.save(updatedDevice) } returns updatedDevice
         every { deviceMapper.toDto(updatedDevice) } returns updatedDeviceResponseDto
 
@@ -214,7 +214,7 @@ class DeviceServiceImplTest {
         // Then
         assertEquals(updatedDeviceResponseDto, result)
         verify {
-            deviceRepository.findById(deviceId)
+            deviceRepository.findById(deviceId.toString())
             deviceRepository.save(updatedDevice)
             deviceMapper.toDto(updatedDevice)
         }
