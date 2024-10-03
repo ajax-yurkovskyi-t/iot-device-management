@@ -15,7 +15,7 @@ import org.mapstruct.NullValueCheckStrategy
     implementationPackage = "<PACKAGE_NAME>.impl"
 )
 interface DeviceMapper {
-    fun toDto(device: MongoDevice?): DeviceResponseDto
+    fun toDto(device: MongoDevice): DeviceResponseDto
 
     fun toEntity(dto: DeviceCreateRequestDto): MongoDevice
 

@@ -3,7 +3,7 @@ package com.example.iotmanagementdevice.controller
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
-import com.example.iotmanagementdevice.model.MongoUser
+import com.example.iotmanagementdevice.security.SecurityUser
 import com.example.iotmanagementdevice.service.user.UserService
 import jakarta.validation.Valid
 import org.bson.types.ObjectId
@@ -71,6 +71,10 @@ class UserController(private val userService: UserService) {
     fun getAll(): List<UserResponseDto> =
         userService.getAll()
 
-    private fun extractUserId(authentication: Authentication): ObjectId =
-        (authentication.principal as? MongoUser)?.id ?: throw IllegalArgumentException("User ID cannot be null")
+    private fun extractUserId(authentication: Authentication): ObjectId {
+        val securityUser = authentication.principal as? SecurityUser
+            ?: throw IllegalArgumentException("Authentication principal is not of type SecurityUser")
+
+        return securityUser.getId() ?: throw IllegalArgumentException("User ID cannot be null")
+    }
 }

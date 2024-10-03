@@ -11,6 +11,7 @@ class CustomUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails? {
-        return userRepository.findByUserEmail(email)
+        val mongoUser = userRepository.findByUserEmail(email)
+        return mongoUser?.let { SecurityUser(it) }
     }
 }

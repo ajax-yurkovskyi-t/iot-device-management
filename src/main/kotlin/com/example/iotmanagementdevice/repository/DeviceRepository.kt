@@ -7,7 +7,7 @@ interface DeviceRepository {
 
     fun findAll(): List<MongoDevice>
 
-    fun save(device: MongoDevice): MongoDevice?
+    fun save(device: MongoDevice): MongoDevice
 
     fun deleteById(deviceId: String)
 }

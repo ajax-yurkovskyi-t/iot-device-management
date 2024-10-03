@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 @Repository
 class UserRepositoryImpl(private val mongoTemplate: MongoTemplate) :
@@ -27,6 +28,7 @@ class UserRepositoryImpl(private val mongoTemplate: MongoTemplate) :
     override fun findAll(): List<MongoUser> =
         mongoTemplate.findAll(MongoUser::class.java)
 
+    @Transactional
     override fun assignDeviceToUser(userId: String, deviceId: String): Boolean {
         val userUpdateResult = mongoTemplate.updateFirst(
             Query(where(Fields.UNDERSCORE_ID).isEqualTo(userId)),
@@ -39,7 +41,6 @@ class UserRepositoryImpl(private val mongoTemplate: MongoTemplate) :
             Update().set(MongoDevice::userId.name, ObjectId(userId)),
             MongoDevice::class.java
         )
-
         return userUpdateResult.modifiedCount > 0 && deviceUpdateResult.modifiedCount > 0
     }
 

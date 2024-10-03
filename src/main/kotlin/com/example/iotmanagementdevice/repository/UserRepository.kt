@@ -10,7 +10,7 @@ interface UserRepository {
 
     fun assignDeviceToUser(userId: String, deviceId: String): Boolean
 
-    fun save(user: MongoUser): MongoUser?
+    fun save(user: MongoUser): MongoUser
 
     fun deleteById(id: String)
 

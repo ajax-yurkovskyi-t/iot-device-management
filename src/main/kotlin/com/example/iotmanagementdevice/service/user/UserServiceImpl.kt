@@ -52,7 +52,10 @@ class UserServiceImpl(
     }
 
     override fun getUserByUsername(username: String): UserResponseDto {
-        return userMapper.toDto(userRepository.findByUserName(username))
+        return userMapper.toDto(
+            userRepository.findByUserName(username)
+                ?: throw EntityNotFoundException("User with name $username not found")
+        )
     }
 
     override fun update(id: String, requestDto: UserUpdateRequestDto): UserResponseDto {

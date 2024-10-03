@@ -5,7 +5,6 @@ import com.example.iotmanagementdevice.dto.device.request.DeviceUpdateRequestDto
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.mapper.DeviceMapper
-import com.example.iotmanagementdevice.model.DeviceStatusType
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.repository.DeviceRepository
 import io.mockk.MockKAnnotations
@@ -151,13 +150,13 @@ class DeviceServiceImplTest {
             name = "Device2",
             description = "A test device 2",
             type = "Actuator",
-            statusType = DeviceStatusType.OFFLINE
+            statusType = MongoDevice.DeviceStatusType.OFFLINE
         )
         val responseDto2 = deviceResponseDto.copy(
             name = "Device2",
             description = "A test device 2",
             type = "Actuator",
-            statusType = DeviceStatusType.OFFLINE
+            statusType = MongoDevice.DeviceStatusType.OFFLINE
         )
         val deviceList = listOf(device, device2)
         val responseDtoList = listOf(deviceResponseDto, responseDto2)
@@ -188,7 +187,7 @@ class DeviceServiceImplTest {
             name = "Old Name",
             description = "Old Description",
             type = "Old Type",
-            statusType = DeviceStatusType.OFFLINE
+            statusType = MongoDevice.DeviceStatusType.OFFLINE
         )
         val updatedDevice = existingDevice.copy(
             name = deviceUpdateDto.name,

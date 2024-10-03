@@ -15,7 +15,7 @@ import org.mapstruct.NullValueCheckStrategy
     implementationPackage = "<PACKAGE_NAME>.impl"
 )
 interface UserMapper {
-    fun toDto(mongoUser: MongoUser?): UserResponseDto
+    fun toDto(mongoUser: MongoUser): UserResponseDto
 
     @Mapping(target = "roles", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "devices", expression = "java(new java.util.ArrayList<>())")

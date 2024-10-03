@@ -1,6 +1,6 @@
 package com.example.iotmanagementdevice.dto.device.response
 
-import com.example.iotmanagementdevice.model.DeviceStatusType
+import com.example.iotmanagementdevice.model.MongoDevice
 
 data class DeviceResponseDto(
     val name: String?,
@@ -9,5 +9,5 @@ data class DeviceResponseDto(
 
     val type: String?,
 
-    val statusType: DeviceStatusType?,
+    val statusType: MongoDevice.DeviceStatusType?,
 )

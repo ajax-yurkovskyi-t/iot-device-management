@@ -1,6 +1,5 @@
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
-import com.example.iotmanagementdevice.model.DeviceStatusType
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.model.MongoRole
 import com.example.iotmanagementdevice.model.MongoUser
@@ -30,7 +29,7 @@ object UserFixture {
             name = "Device1",
             description = "A test device",
             type = "Sensor",
-            statusType = DeviceStatusType.ONLINE,
+            statusType = MongoDevice.DeviceStatusType.ONLINE,
             userId = ObjectId()
         )
     }

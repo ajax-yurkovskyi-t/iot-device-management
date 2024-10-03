@@ -16,17 +16,12 @@ data class MongoDevice(
     val statusType: DeviceStatusType?,
     val userId: ObjectId?,
 ) {
-    override fun toString(): String {
-        return "Device(id=$id, name=$name, description=$description, " +
-            "type=$type, statusType=$statusType, userId=$userId)"
+    enum class DeviceStatusType {
+        ONLINE,
+        OFFLINE
     }
 
     companion object {
         const val COLLECTION_NAME = "device"
     }
-}
-
-enum class DeviceStatusType {
-    ONLINE,
-    OFFLINE
 }
