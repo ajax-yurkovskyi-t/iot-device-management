@@ -1,5 +1,6 @@
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
+import com.example.iotmanagementdevice.dto.device.response.DeviceStatusTypeResponse
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.model.MongoRole
 import com.example.iotmanagementdevice.model.MongoUser
@@ -40,7 +41,7 @@ object UserFixture {
             email = "john.doe@example.com",
             phoneNumber = "1234567890",
             devices = devices.map { device ->
-                DeviceResponseDto(device.name, device.description, device.type, device.statusType)
+                DeviceResponseDto(device.name, device.description, device.type, DeviceStatusTypeResponse.ONLINE)
             }
         )
     }
@@ -50,7 +51,7 @@ object UserFixture {
             name = device.name,
             description = device.description,
             type = device.type,
-            statusType = device.statusType
+            statusType = DeviceStatusTypeResponse.ONLINE
         )
     }
 }

@@ -1,27 +1,24 @@
 package com.example.iotmanagementdevice.security
 
-import com.example.iotmanagementdevice.model.MongoUser
+import com.example.iotmanagementdevice.model.MongoRole
 import org.bson.types.ObjectId
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 data class SecurityUser(
-    private val mongoUser: MongoUser
+    val id: ObjectId?,
+    private val email: String?,
+    private val userPassword: String?,
+    private val roles: Set<MongoRole>?,
 ) : UserDetails {
 
-    override fun getAuthorities(): Collection<GrantedAuthority>? {
-        return mongoUser.roles
-            ?.map { SimpleGrantedAuthority("ROLE_${it.roleName}") }
-            ?.toSet()
-    }
+    override fun getAuthorities(): Collection<GrantedAuthority>? =
+        roles?.map { SimpleGrantedAuthority("ROLE_${it.roleName}") }
 
     override fun getPassword(): String? =
-        mongoUser.userPassword
+        userPassword
 
     override fun getUsername(): String? =
-        mongoUser.email
-
-    fun getId(): ObjectId? =
-        mongoUser.id
+        email
 }

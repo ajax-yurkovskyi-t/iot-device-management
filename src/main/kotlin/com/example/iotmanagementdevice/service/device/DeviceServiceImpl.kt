@@ -34,11 +34,9 @@ class DeviceServiceImpl(
         val existingDevice =
             deviceRepository.findById(id) ?: throw EntityNotFoundException("Device with id $id not found")
 
-        val updatedDevice = existingDevice.copy(
-            name = requestDto.name,
-            description = requestDto.description,
-            type = requestDto.type,
-            statusType = requestDto.statusType,
+        val updatedDevice = deviceMapper.toEntity(requestDto).copy(
+            id = existingDevice.id,
+            userId = existingDevice.userId
         )
 
         return deviceMapper.toDto(deviceRepository.save(updatedDevice))

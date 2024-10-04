@@ -3,6 +3,7 @@ package com.example.iotmanagementdevice.service.device
 import com.example.iotmanagementdevice.dto.device.request.DeviceCreateRequestDto
 import com.example.iotmanagementdevice.dto.device.request.DeviceUpdateRequestDto
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
+import com.example.iotmanagementdevice.dto.device.response.DeviceStatusTypeResponse
 import com.example.iotmanagementdevice.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.model.MongoDevice
@@ -156,7 +157,7 @@ class DeviceServiceImplTest {
             name = "Device2",
             description = "A test device 2",
             type = "Actuator",
-            statusType = MongoDevice.DeviceStatusType.OFFLINE
+            statusType = DeviceStatusTypeResponse.OFFLINE
         )
         val deviceList = listOf(device, device2)
         val responseDtoList = listOf(deviceResponseDto, responseDto2)
@@ -193,17 +194,18 @@ class DeviceServiceImplTest {
             name = deviceUpdateDto.name,
             description = deviceUpdateDto.description,
             type = deviceUpdateDto.type,
-            statusType = deviceUpdateDto.statusType
+            statusType = MongoDevice.DeviceStatusType.ONLINE
         )
         val updatedDeviceResponseDto = deviceResponseDto.copy(
             name = deviceUpdateDto.name,
             description = deviceUpdateDto.description,
             type = deviceUpdateDto.type,
-            statusType = deviceUpdateDto.statusType
+            statusType = DeviceStatusTypeResponse.ONLINE
         )
 
         // Stubbing
         every { deviceRepository.findById(deviceId.toString()) } returns existingDevice
+        every { deviceMapper.toEntity(deviceUpdateDto) } returns updatedDevice
         every { deviceRepository.save(updatedDevice) } returns updatedDevice
         every { deviceMapper.toDto(updatedDevice) } returns updatedDeviceResponseDto
 
@@ -214,6 +216,7 @@ class DeviceServiceImplTest {
         assertEquals(updatedDeviceResponseDto, result)
         verify {
             deviceRepository.findById(deviceId.toString())
+            deviceMapper.toEntity(deviceUpdateDto)
             deviceRepository.save(updatedDevice)
             deviceMapper.toDto(updatedDevice)
         }

@@ -27,18 +27,8 @@ class UserMigration {
 
     @RollbackExecution
     fun rollbackDeviceMigration(mongoTemplate: MongoTemplate) {
-        val indexOps: IndexOperations = mongoTemplate.indexOps(MongoUser.COLLECTION_NAME)
-
-        if (indexOps.indexInfo.any { it.name == EMAIL_INDEX }) {
-            indexOps.dropIndex(EMAIL_INDEX)
-        }
-
         if (mongoTemplate.collectionExists(MongoUser.COLLECTION_NAME)) {
             mongoTemplate.dropCollection(MongoUser.COLLECTION_NAME)
         }
-    }
-
-    companion object {
-        private const val EMAIL_INDEX = "email_1"
     }
 }

@@ -75,6 +75,6 @@ class UserController(private val userService: UserService) {
         val securityUser = authentication.principal as? SecurityUser
             ?: throw IllegalArgumentException("Authentication principal is not of type SecurityUser")
 
-        return securityUser.getId() ?: throw IllegalArgumentException("User ID cannot be null")
+        return securityUser.id ?: throw IllegalArgumentException("User ID cannot be null")
     }
 }

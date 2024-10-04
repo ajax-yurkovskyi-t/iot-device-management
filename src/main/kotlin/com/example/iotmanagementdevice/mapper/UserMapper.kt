@@ -3,6 +3,7 @@ package com.example.iotmanagementdevice.mapper
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.model.MongoUser
+import com.example.iotmanagementdevice.security.SecurityUser
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -20,4 +21,6 @@ interface UserMapper {
     @Mapping(target = "roles", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "devices", expression = "java(new java.util.ArrayList<>())")
     fun toEntity(requestDto: UserRegistrationRequestDto): MongoUser
+
+    fun toSecurityUser(mongoUser: MongoUser): SecurityUser
 }
