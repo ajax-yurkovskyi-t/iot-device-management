@@ -1,9 +1,9 @@
 package com.example.iotmanagementdevice.service.device
 
+import com.example.iotmanagementdevice.dto.device.DeviceStatusType
 import com.example.iotmanagementdevice.dto.device.request.DeviceCreateRequestDto
 import com.example.iotmanagementdevice.dto.device.request.DeviceUpdateRequestDto
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
-import com.example.iotmanagementdevice.dto.device.response.DeviceStatusTypeResponse
 import com.example.iotmanagementdevice.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.model.MongoDevice
@@ -157,7 +157,7 @@ class DeviceServiceImplTest {
             name = "Device2",
             description = "A test device 2",
             type = "Actuator",
-            statusType = DeviceStatusTypeResponse.OFFLINE
+            statusType = DeviceStatusType.OFFLINE
         )
         val deviceList = listOf(device, device2)
         val responseDtoList = listOf(deviceResponseDto, responseDto2)
@@ -200,7 +200,7 @@ class DeviceServiceImplTest {
             name = deviceUpdateDto.name,
             description = deviceUpdateDto.description,
             type = deviceUpdateDto.type,
-            statusType = DeviceStatusTypeResponse.ONLINE
+            statusType = DeviceStatusType.ONLINE
         )
 
         // Stubbing

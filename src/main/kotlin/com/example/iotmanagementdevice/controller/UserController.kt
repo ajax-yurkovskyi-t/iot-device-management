@@ -6,7 +6,6 @@ import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.security.SecurityUser
 import com.example.iotmanagementdevice.service.user.UserService
 import jakarta.validation.Valid
-import org.bson.types.ObjectId
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,7 +25,7 @@ class UserController(private val userService: UserService) {
     @GetMapping("/me")
     fun getCurrentUser(authentication: Authentication): UserResponseDto {
         val userId = extractUserId(authentication)
-        return userService.getUserById(userId.toString())
+        return userService.getUserById(userId)
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -36,7 +35,7 @@ class UserController(private val userService: UserService) {
         @PathVariable deviceId: String
     ): Boolean {
         val userId = extractUserId(authentication)
-        return userService.assignDeviceToUser(userId.toString(), deviceId)
+        return userService.assignDeviceToUser(userId, deviceId)
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -45,7 +44,7 @@ class UserController(private val userService: UserService) {
         authentication: Authentication
     ): List<DeviceResponseDto> {
         val userId = extractUserId(authentication)
-        return userService.getDevicesByUserId(userId.toString())
+        return userService.getDevicesByUserId(userId)
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,7 +70,7 @@ class UserController(private val userService: UserService) {
     fun getAll(): List<UserResponseDto> =
         userService.getAll()
 
-    private fun extractUserId(authentication: Authentication): ObjectId {
+    private fun extractUserId(authentication: Authentication): String {
         val securityUser = authentication.principal as? SecurityUser
             ?: throw IllegalArgumentException("Authentication principal is not of type SecurityUser")
 

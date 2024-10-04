@@ -1,10 +1,8 @@
 import com.example.iotmanagementdevice.dto.device.request.DeviceCreateRequestDto
 import com.example.iotmanagementdevice.dto.device.request.DeviceUpdateRequestDto
-import com.example.iotmanagementdevice.dto.device.response.DeviceStatusTypeResponse
-import com.example.iotmanagementdevice.dto.device.request.DeviceStatusTypeCreateRequest
-import com.example.iotmanagementdevice.dto.device.request.DeviceStatusTypeUpdateRequest
 import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.model.MongoDevice
+import com.example.iotmanagementdevice.dto.device.DeviceStatusType
 import org.bson.types.ObjectId
 
 object DeviceFixture {
@@ -14,7 +12,7 @@ object DeviceFixture {
             name = "Device1",
             description = "A test device",
             type = "Sensor",
-            statusType = DeviceStatusTypeCreateRequest.ONLINE
+            statusType = DeviceStatusType.ONLINE
         )
     }
 
@@ -23,7 +21,7 @@ object DeviceFixture {
             name = "New Name",
             description = "New Description",
             type = "New Type",
-            statusType = DeviceStatusTypeUpdateRequest.ONLINE
+            statusType = DeviceStatusType.ONLINE
         )
     }
 
@@ -47,7 +45,7 @@ object DeviceFixture {
             name = "Device1",
             description = "A test device",
             type = "Sensor",
-            statusType = DeviceStatusTypeResponse.ONLINE
+            statusType = DeviceStatusType.ONLINE
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.example.iotmanagementdevice.dto.device.request
 
+import com.example.iotmanagementdevice.dto.device.DeviceStatusType
 import jakarta.validation.constraints.NotBlank
 
 data class DeviceCreateRequestDto(
@@ -11,10 +12,5 @@ data class DeviceCreateRequestDto(
 
     @field:NotBlank(message = "Device type must not be blank.")
     val type: String,
-    val statusType: DeviceStatusTypeCreateRequest,
+    val statusType: DeviceStatusType,
 )
-
-enum class DeviceStatusTypeCreateRequest {
-    ONLINE,
-    OFFLINE
-}

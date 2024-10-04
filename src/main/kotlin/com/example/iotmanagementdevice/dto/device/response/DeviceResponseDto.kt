@@ -1,5 +1,7 @@
 package com.example.iotmanagementdevice.dto.device.response
 
+import com.example.iotmanagementdevice.dto.device.DeviceStatusType
+
 data class DeviceResponseDto(
     val name: String?,
 
@@ -7,10 +9,5 @@ data class DeviceResponseDto(
 
     val type: String?,
 
-    val statusType: DeviceStatusTypeResponse,
+    val statusType: DeviceStatusType,
 )
-
-enum class DeviceStatusTypeResponse {
-    ONLINE,
-    OFFLINE
-}

@@ -1,13 +1,12 @@
 package com.example.iotmanagementdevice.security
 
 import com.example.iotmanagementdevice.model.MongoRole
-import org.bson.types.ObjectId
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 data class SecurityUser(
-    val id: ObjectId?,
+    val id: String?,
     private val email: String?,
     private val userPassword: String?,
     private val roles: Set<MongoRole>?,
