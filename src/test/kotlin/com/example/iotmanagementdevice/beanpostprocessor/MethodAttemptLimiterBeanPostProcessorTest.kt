@@ -2,9 +2,9 @@ package com.example.iotmanagementdevice.beanpostprocessor
 
 import com.example.iotmanagementdevice.exception.AttemptLimitReachedException
 import io.mockk.every
-import io.mockk.junit5.MockKExtension
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.SpyK
+import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -121,11 +121,11 @@ class MethodAttemptLimiterBeanPostProcessorTest {
         val proxy = processor.postProcessAfterInitialization(service, beanName) as MultiMethodServiceInterface
 
         // When
-        repeat(3) { proxy.firstMethod() }  // Within limit for firstMethod
+        repeat(3) { proxy.firstMethod() } // Within limit for firstMethod
 
         // Then
         assertThrows<AttemptLimitReachedException> {
-            proxy.firstMethod()  // Exceed limit for firstMethod
+            proxy.firstMethod() // Exceed limit for firstMethod
         }
 
         assertThrows<AttemptLimitReachedException> {
@@ -142,11 +142,11 @@ class MethodAttemptLimiterBeanPostProcessorTest {
         val proxy = processor.postProcessAfterInitialization(service, beanName) as SampleServiceInterface
 
         // When
-        repeat(3) { proxy.limitedMethod() }  // Within the limit
+        repeat(3) { proxy.limitedMethod() } // Within the limit
 
         // Then
         assertThrows<AttemptLimitReachedException> {
-            proxy.limitedMethod()  // Exceed the limit
+            proxy.limitedMethod() // Exceed the limit
         }
 
         // Sleep for 0.5 second to allow lockout to reset

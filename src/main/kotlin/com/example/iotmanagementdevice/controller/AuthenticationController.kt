@@ -1,8 +1,8 @@
 package com.example.iotmanagementdevice.controller
 
 import com.example.iotmanagementdevice.dto.user.request.UserLoginRequestDto
-import com.example.iotmanagementdevice.dto.user.response.UserLoginResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
+import com.example.iotmanagementdevice.dto.user.response.UserLoginResponseDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.security.AuthenticationService
 import com.example.iotmanagementdevice.service.user.UserService
@@ -20,6 +20,7 @@ class AuthenticationController(
     private val userService: UserService,
     private val authenticationService: AuthenticationService,
 ) {
+
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
     fun register(@RequestBody @Valid requestDto: UserRegistrationRequestDto): UserResponseDto =

@@ -1,6 +1,13 @@
 package com.example.iotmanagementdevice.repository
 
-import com.example.iotmanagementdevice.model.Device
-import org.springframework.data.jpa.repository.JpaRepository
+import com.example.iotmanagementdevice.model.MongoDevice
 
-interface DeviceRepository : JpaRepository<Device, Long>
+interface DeviceRepository {
+    fun findById(deviceId: String): MongoDevice?
+
+    fun findAll(): List<MongoDevice>
+
+    fun save(device: MongoDevice): MongoDevice
+
+    fun deleteById(deviceId: String)
+}

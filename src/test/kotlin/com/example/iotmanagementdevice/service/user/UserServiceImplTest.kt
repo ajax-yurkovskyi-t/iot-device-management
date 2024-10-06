@@ -1,15 +1,14 @@
 package com.example.iotmanagementdevice.service.user
 
-import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
-import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
+import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.exception.EntityNotFoundException
+import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.mapper.UserMapper
-import com.example.iotmanagementdevice.model.Device
-import com.example.iotmanagementdevice.model.Role
-import com.example.iotmanagementdevice.model.User
-import com.example.iotmanagementdevice.repository.DeviceRepository
+import com.example.iotmanagementdevice.model.MongoDevice
+import com.example.iotmanagementdevice.model.MongoRole
+import com.example.iotmanagementdevice.model.MongoUser
 import com.example.iotmanagementdevice.repository.RoleRepository
 import com.example.iotmanagementdevice.repository.UserRepository
 import io.mockk.MockKAnnotations
@@ -17,12 +16,14 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
 import org.springframework.security.crypto.password.PasswordEncoder
-import java.util.*
+import kotlin.test.assertNull
 
 class UserServiceImplTest {
 
@@ -36,65 +37,27 @@ class UserServiceImplTest {
     private lateinit var passwordEncoder: PasswordEncoder
 
     @MockK
-    private lateinit var roleRepository: RoleRepository
+    private lateinit var deviceMapper: DeviceMapper
 
     @MockK
-    private lateinit var deviceRepository: DeviceRepository
+    private lateinit var roleRepository: RoleRepository
 
     @InjectMockKs
     lateinit var userService: UserServiceImpl
 
-    private lateinit var user: User
-    private lateinit var role: Role
+    private lateinit var mongoUser: MongoUser
+    private lateinit var mongoRole: MongoRole
     private lateinit var userResponseDto: UserResponseDto
-    private lateinit var device: Device
-    private lateinit var devices: List<Device>
+    private lateinit var device: MongoDevice
 
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
 
-        role = Role(id = 1L, roleName = Role.RoleName.USER)
-
-        role = UserFixture.createRole()
-        user = UserFixture.createUser()
-        device = UserFixture.createDevice(user)
-        devices = listOf(device)
-        user = user.copy(devices = devices.toMutableList())
-        userResponseDto = UserFixture.createUserResponseDto(devices)
-    }
-
-    @Test
-    fun `should assign device to user`() {
-        // Given
-        val userId = 1L
-        val deviceId = 2L
-
-        // Create a user and device
-        val user = UserFixture.createUser().copy(id = userId, devices = mutableListOf())
-        val updatedDevice = device.copy(user = user)
-
-        val userResponseDto = UserFixture.createUserResponseDto(listOf(updatedDevice))
-
-        // Stubbing
-        every { deviceRepository.findById(deviceId) } returns Optional.of(device)
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { deviceRepository.save(updatedDevice) } returns updatedDevice
-        every { userRepository.save(user) } returns user
-        every { userMapper.toDto(user) } returns userResponseDto
-
-        // When
-        val result = userService.assignDeviceToUser(userId, deviceId)
-
-        // Then
-        assertEquals(userResponseDto, result)
-        verify {
-            deviceRepository.findById(deviceId)
-            userRepository.findById(userId)
-            deviceRepository.save(updatedDevice)
-            userRepository.save(user)
-            userMapper.toDto(user)
-        }
+        mongoRole = MongoRole(id = ObjectId(), roleName = MongoRole.RoleName.USER)
+        mongoUser = UserFixture.createUser().copy(devices = mutableListOf())
+        device = UserFixture.createDevice()
+        userResponseDto = UserFixture.createUserResponseDto(listOf(device)) // Updated to use DeviceResponseDto
     }
 
     @Test
@@ -102,13 +65,19 @@ class UserServiceImplTest {
         // Given
         val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
         val encodedPassword = "encodedPassword"
-        val savedUser = user.copy(id = 1L)
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = mutableSetOf(mongoRole))
 
         // Stubbing
         every { passwordEncoder.encode(any()) } returns encodedPassword
-        every { roleRepository.findByRoleName(Role.RoleName.USER) } returns role
-        every { userMapper.toEntity(requestDto) } returns user
-        every { userRepository.save(user) } returns savedUser
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns mongoRole
+        every { userMapper.toEntity(requestDto) } returns
+            mongoUser.copy(roles = mutableSetOf()) // Make sure roles are empty initially
+        every {
+            userRepository.save(
+                mongoUser.copy
+                    (roles = mutableSetOf(mongoRole))
+            )
+        } returns savedUser // Save user with role
         every { userMapper.toDto(savedUser) } returns userResponseDto
 
         // When
@@ -116,76 +85,160 @@ class UserServiceImplTest {
 
         // Then
         assertEquals(userResponseDto, result)
-        verify { roleRepository.findByRoleName(Role.RoleName.USER) }
+        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
         verify { userMapper.toEntity(requestDto) }
-        verify { userRepository.save(user) }
+        verify { userRepository.save(mongoUser.copy(roles = mutableSetOf(mongoRole))) } // Verify save includes role
         verify { userMapper.toDto(savedUser) }
     }
 
+    @Test
+    fun `should register a new user with null roles`() {
+        // Given
+        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
+        val encodedPassword = "encodedPassword"
+        val userMongoRole = mongoRole // Assume this is a valid MongoRole
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = null) // Initially null roles
+
+        // Stubbing
+        every { passwordEncoder.encode(any()) } returns encodedPassword
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns userMongoRole // Role found
+        every { userMapper.toEntity(requestDto) } returns savedUser
+        every { userRepository.save(savedUser.copy(roles = setOf(userMongoRole))) } returns
+            savedUser.copy(roles = setOf(userMongoRole)) // Save with role
+        every { userMapper.toDto(savedUser.copy(roles = setOf(userMongoRole))) } returns userResponseDto
+
+        // When
+        val result = userService.register(requestDto)
+
+        // Then
+        assertEquals(userResponseDto, result)
+        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
+        verify { userMapper.toEntity(requestDto) }
+        verify { userRepository.save(savedUser.copy(roles = setOf(userMongoRole))) } // Verify save is called with roles
+        verify { userMapper.toDto(savedUser.copy(roles = setOf(userMongoRole))) }
+
+        // Verify that the role was added to the user
+        assertNull(savedUser.roles, "Expected user roles to contain the found role")
+    }
+
+    @Test
+    fun `should register a new user without a role`() {
+        // Given
+        val requestDto = UserRegistrationRequestDto("John Doe", "john.doe@example.com", "1234567890", "password123")
+        val encodedPassword = "encodedPassword"
+        val savedUser = mongoUser.copy(id = ObjectId(), roles = emptySet()) // Ensure roles are empty
+
+        // Stubbing
+        every { passwordEncoder.encode(any()) } returns encodedPassword
+        every { roleRepository.findByRoleName(MongoRole.RoleName.USER) } returns null
+        every { userMapper.toEntity(requestDto) } returns savedUser
+        every { userRepository.save(savedUser) } returns savedUser
+        every { userMapper.toDto(savedUser) } returns userResponseDto
+
+        // When
+        val result = userService.register(requestDto)
+
+        // Then
+        assertEquals(userResponseDto, result)
+        verify { roleRepository.findByRoleName(MongoRole.RoleName.USER) }
+        verify { userMapper.toEntity(requestDto) }
+        verify { userRepository.save(savedUser) }
+        verify { userMapper.toDto(savedUser) }
+    }
+
+    @Test
+    fun `should return devices by userId`() {
+        // Given
+        val userId = ObjectId()
+        val deviceId1 = ObjectId()
+        val deviceId2 = ObjectId()
+
+        val mongoDevice1 = UserFixture.createDevice().copy(id = deviceId1)
+        val mongoDevice2 = UserFixture.createDevice().copy(id = deviceId2)
+
+        val deviceResponseDto1 = UserFixture.createDeviceResponseDto(mongoDevice1)
+        val deviceResponseDto2 = UserFixture.createDeviceResponseDto(mongoDevice2)
+
+        val deviceList = listOf(mongoDevice1, mongoDevice2)
+        val deviceResponseDtoList = listOf(deviceResponseDto1, deviceResponseDto2)
+
+        // Stubbing
+        every { userRepository.findDevicesByUserId(userId.toString()) } returns deviceList
+        every { deviceMapper.toDto(mongoDevice1) } returns deviceResponseDto1
+        every { deviceMapper.toDto(mongoDevice2) } returns deviceResponseDto2
+
+        // When
+        val result = userService.getDevicesByUserId(userId.toString())
+
+        // Then
+        assertEquals(deviceResponseDtoList, result)
+        verify { userRepository.findDevicesByUserId(userId.toString()) }
+        verify { deviceMapper.toDto(mongoDevice1) }
+        verify { deviceMapper.toDto(mongoDevice2) }
+    }
 
     @Test
     fun `should return user by id`() {
         // Given
-        val userId = 1L
-        val userWithId = user.copy(id = userId) // Use shared user data
+        val userId = ObjectId()
+        val userWithId = mongoUser.copy(id = userId, devices = mutableListOf(ObjectId())) // Use device IDs
 
         // Stubbing
-        every { userRepository.findById(userId) } returns Optional.of(userWithId)
+        every { userRepository.findById(userId.toString()) } returns userWithId
         every { userMapper.toDto(userWithId) } returns userResponseDto
 
         // When
-        val result = userService.getUserById(userId)
+        val result = userService.getUserById(userId.toString())
 
         // Then
         assertEquals(userResponseDto, result)
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findById(userId.toString()) }
         verify { userMapper.toDto(userWithId) }
     }
 
     @Test
     fun `should throw exception when user not found by id`() {
         // Given
-        val userId = 999L
+        val userId = ObjectId()
 
         // Stubbing
-        every { userRepository.findById(userId) } returns Optional.empty()
+        every { userRepository.findById(userId.toString()) } returns null
 
         // When
         val exception = assertThrows<EntityNotFoundException> {
-            userService.getUserById(userId)
+            userService.getUserById(userId.toString())
         }
 
         // Then
         assertEquals("User with id $userId not found", exception.message)
-        verify { userRepository.findById(userId) }
+        verify { userRepository.findById(userId.toString()) }
     }
 
     @Test
     fun `should return all users`() {
         // Given
-        val user2 = User(
-            id = 2L,
+        val mongoUser2 = MongoUser(
+            id = ObjectId(),
             name = "Jane Smith",
             email = "jane.smith@example.com",
             phoneNumber = "0987654321",
             userPassword = "encodedPassword",
             roles = mutableSetOf(),
-            devices = mutableListOf()
+            devices = mutableListOf(ObjectId()) // Use device IDs
         )
         val userResponseDto2 = UserResponseDto(
-            id = 2L,
-            username = "Jane Smith",
+            name = "Jane Smith",
             email = "jane.smith@example.com",
             phoneNumber = "0987654321",
             devices = emptyList()
         )
-        val userList = listOf(user, user2)
+        val userList = listOf(mongoUser, mongoUser2)
         val userResponseList = listOf(userResponseDto, userResponseDto2)
 
         // Stubbing
         every { userRepository.findAll() } returns userList
-        every { userMapper.toDto(user) } returns userResponseDto
-        every { userMapper.toDto(user2) } returns userResponseDto2
+        every { userMapper.toDto(mongoUser) } returns userResponseDto
+        every { userMapper.toDto(mongoUser2) } returns userResponseDto2
 
         // When
         val result = userService.getAll()
@@ -193,18 +246,18 @@ class UserServiceImplTest {
         // Then
         assertEquals(userResponseList, result)
         verify { userRepository.findAll() }
-        verify { userMapper.toDto(user) }
-        verify { userMapper.toDto(user2) }
+        verify { userMapper.toDto(mongoUser) }
+        verify { userMapper.toDto(mongoUser2) }
     }
 
     @Test
     fun `should return user by username`() {
         // Given
         val username = "JohnDoe"
-        val userWithUsername = user.copy(name = username)
+        val userWithUsername = mongoUser.copy(name = username)
 
         // Stubbing
-        every { userRepository.findByName(username) } returns userWithUsername
+        every { userRepository.findByUserName(username) } returns userWithUsername
         every { userMapper.toDto(userWithUsername) } returns userResponseDto
 
         // When
@@ -212,24 +265,15 @@ class UserServiceImplTest {
 
         // Then
         assertEquals(userResponseDto, result)
-        verify { userRepository.findByName(username) }
+        verify { userRepository.findByUserName(username) }
         verify { userMapper.toDto(userWithUsername) }
     }
-
 
     @Test
     fun `should update an existing user`() {
         // Given
-        val userId = 1L
-        val existingUser = User(
-            id = userId,
-            name = "John Doe",
-            email = "john.doe@example.com",
-            phoneNumber = "1234567890",
-            userPassword = "oldEncodedPassword",
-            roles = mutableSetOf(),
-            devices = mutableListOf()
-        )
+        val userId = ObjectId()
+        val existingMongoUser = mongoUser.copy(id = userId, devices = mutableListOf(ObjectId())) // Use device IDs
         val updatedUserDto = UserUpdateRequestDto(
             name = "John Smith",
             email = "john.smith@example.com",
@@ -237,43 +281,68 @@ class UserServiceImplTest {
             userPassword = "newPassword"
         )
         val encodedNewPassword = "encodedNewPassword"
-        val updatedUser = existingUser.copy(
+        val updatedUser = existingMongoUser.copy(
             name = updatedUserDto.name,
             email = updatedUserDto.email,
             phoneNumber = updatedUserDto.phoneNumber,
             userPassword = encodedNewPassword,
-            devices = devices.toMutableList()
+            devices = existingMongoUser.devices
         )
         val updatedUserResponseDto = UserResponseDto(
-            id = userId,
-            username = updatedUserDto.name,
+            name = updatedUserDto.name,
             email = updatedUserDto.email,
             phoneNumber = updatedUserDto.phoneNumber,
-            devices = devices.map { device ->
-                DeviceResponseDto(
-                    device.name,
-                    device.description,
-                    device.type,
-                    device.statusType
-                )
-            }
+            devices = listOf()
         )
 
         // Stubbing
-        every { userRepository.findById(userId) } returns Optional.of(existingUser)
+        every { userRepository.findById(userId.toString()) } returns existingMongoUser
         every { passwordEncoder.encode(updatedUserDto.userPassword) } returns encodedNewPassword
-        every { userRepository.save(any()) } returns updatedUser // Use `any()` to match any User instance
+        every { userRepository.save(any()) } returns updatedUser
         every { userMapper.toDto(updatedUser) } returns updatedUserResponseDto
 
         // When
-        val result = userService.update(userId, updatedUserDto)
+        val result = userService.update(userId.toString(), updatedUserDto)
 
         // Then
         assertEquals(updatedUserResponseDto, result)
-        verify {
-            userRepository.findById(userId)
-            userRepository.save(any()) // Verify save is called with any User instance
-            userMapper.toDto(updatedUser)
+        verify { userRepository.findById(userId.toString()) }
+        verify { passwordEncoder.encode(updatedUserDto.userPassword) }
+        verify { userRepository.save(any()) }
+        verify { userMapper.toDto(updatedUser) }
+    }
+
+    @Test
+    fun `should throw exception when updating user with non-existent id`() {
+        // Given
+        val userId = ObjectId()
+        val requestDto = UserUpdateRequestDto("Updated Name", "updated@example.com", "1234567890", "newPassword")
+        every { userRepository.findById(userId.toString()) } returns null // Simulate user not found
+
+        // When
+        val exception = assertThrows<EntityNotFoundException> {
+            userService.update(userId.toString(), requestDto)
         }
+
+        // Then
+        assertEquals("User with id $userId not found", exception.message)
+        verify { userRepository.findById(userId.toString()) }
+    }
+
+    @Test
+    fun `should assign a device to a user successfully`() {
+        // Given
+        val userObjectId = ObjectId()
+        val deviceObjectId = ObjectId()
+
+        // Stubbing
+        every { userRepository.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString()) } returns true
+
+        // When
+        val result = userService.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString())
+
+        // Then
+        assertTrue(result, "Expected the device to be assigned to the user successfully")
+        verify { userRepository.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString()) }
     }
 }

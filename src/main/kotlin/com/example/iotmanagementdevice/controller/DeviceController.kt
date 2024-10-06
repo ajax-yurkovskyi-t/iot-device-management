@@ -1,8 +1,8 @@
 package com.example.iotmanagementdevice.controller
 
 import com.example.iotmanagementdevice.dto.device.request.DeviceCreateRequestDto
-import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.dto.device.request.DeviceUpdateRequestDto
+import com.example.iotmanagementdevice.dto.device.response.DeviceResponseDto
 import com.example.iotmanagementdevice.service.device.DeviceService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -22,7 +22,7 @@ class DeviceController(private val deviceService: DeviceService) {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
-    fun getDeviceById(@PathVariable(name = "id") id:Long): DeviceResponseDto =
+    fun getDeviceById(@PathVariable(name = "id") id: String): DeviceResponseDto =
         deviceService.getById(id)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -34,7 +34,7 @@ class DeviceController(private val deviceService: DeviceService) {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("{id}")
     fun update(
-        @PathVariable id: Long,
+        @PathVariable id: String,
         @Valid @RequestBody requestDto: DeviceUpdateRequestDto
     ): DeviceResponseDto =
         deviceService.update(id, requestDto)

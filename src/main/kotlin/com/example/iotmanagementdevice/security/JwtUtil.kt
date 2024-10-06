@@ -13,7 +13,8 @@ import javax.crypto.SecretKey
 @Component
 class JwtUtil(
     @Value("\${jwt.secret}") secretString: String,
-    @Value("\${jwt.expiration}") private val expiration: Long) {
+    @Value("\${jwt.expiration}") private val expiration: Long
+) {
     private val secret: SecretKey = Keys.hmacShaKeyFor(secretString.toByteArray(StandardCharsets.UTF_8))
 
     fun generateToken(email: String?): String {
@@ -45,7 +46,6 @@ class JwtUtil(
     }
 
     private fun <T> getClaimsFromToken(token: String, claimsResolver: (Claims) -> T): T {
-
         val claims = Jwts.parser()
             .verifyWith(secret)
             .build()
