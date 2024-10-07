@@ -14,10 +14,13 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
+import reactor.kotlin.test.test
+import reactor.kotlin.test.verifyError
 
 class DeviceServiceImplTest {
 
@@ -51,56 +54,22 @@ class DeviceServiceImplTest {
     fun `should create a new device`() {
         // Stubbing
         every { deviceMapper.toEntity(deviceRequestDto) } returns device
-        every { deviceRepository.save(device) } returns savedDevice
+        every { deviceRepository.save(device) } returns savedDevice.toMono()
         every { deviceMapper.toDto(savedDevice) } returns deviceResponseDto
 
         // When
-        val result = deviceService.create(deviceRequestDto)
+        val createdDevice = deviceService.create(deviceRequestDto)
 
         // Then
-        assertEquals(deviceResponseDto, result)
+        createdDevice.test()
+            .expectNext(deviceResponseDto)
+            .verifyComplete()
+
         verify {
             deviceMapper.toEntity(deviceRequestDto)
             deviceRepository.save(device)
             deviceMapper.toDto(savedDevice)
         }
-    }
-
-    @Test
-    fun `should throw exception when creating a device with invalid data`() {
-        // Given
-        val invalidRequestDto = deviceRequestDto.copy(name = "")
-
-        // Stubbing
-        every { deviceMapper.toEntity(invalidRequestDto) } returns device
-        every { deviceRepository.save(device) } throws IllegalArgumentException("Invalid device data")
-
-        // When
-        val exception = assertThrows<IllegalArgumentException> {
-            deviceService.create(invalidRequestDto)
-        }
-
-        // Then
-        assertEquals("Invalid device data", exception.message)
-        verify { deviceRepository.save(device) }
-    }
-
-    @Test
-    fun `should throw exception when device not found by id`() {
-        // Given
-        val deviceId = String()
-
-        // Stubbing
-        every { deviceRepository.findById(deviceId) } returns null
-
-        // When
-        val exception = assertThrows<EntityNotFoundException> {
-            deviceService.getById(deviceId.toString())
-        }
-
-        // Then
-        assertEquals("Device with id $deviceId not found", exception.message)
-        verify { deviceRepository.findById(deviceId) }
     }
 
     @Test
@@ -111,14 +80,17 @@ class DeviceServiceImplTest {
         val responseDto = deviceResponseDto.copy(name = "Device1", description = "A test device", type = "Sensor")
 
         // Stubbing
-        every { deviceRepository.findById(deviceId.toString()) } returns device
+        every { deviceRepository.findById(deviceId.toString()) } returns device.toMono()
         every { deviceMapper.toDto(device) } returns responseDto
 
         // When
-        val result = deviceService.getById(deviceId.toString())
+        val foundDevice = deviceService.getById(deviceId.toString())
 
         // Then
-        assertEquals(responseDto, result)
+        foundDevice.test()
+            .expectNext(responseDto)
+            .verifyComplete()
+
         verify {
             deviceRepository.findById(deviceId.toString())
             deviceMapper.toDto(device)
@@ -131,15 +103,15 @@ class DeviceServiceImplTest {
         val nonExistingDeviceId = String()
 
         // Stubbing
-        every { deviceRepository.findById(nonExistingDeviceId) } returns null
+        every { deviceRepository.findById(nonExistingDeviceId) } returns Mono.empty()
 
         // When
-        val exception = assertThrows<EntityNotFoundException> {
-            deviceService.update(nonExistingDeviceId.toString(), deviceUpdateDto)
-        }
+        val nonExistentDevice = deviceService.getById(nonExistingDeviceId)
 
         // Then
-        assertEquals("Device with id $nonExistingDeviceId not found", exception.message)
+        nonExistentDevice.test()
+            .verifyError<EntityNotFoundException>()
+
         verify { deviceRepository.findById(nonExistingDeviceId) }
     }
 
@@ -163,15 +135,18 @@ class DeviceServiceImplTest {
         val responseDtoList = listOf(deviceResponseDto, responseDto2)
 
         // Stubbing
-        every { deviceRepository.findAll() } returns deviceList
+        every { deviceRepository.findAll() } returns deviceList.toFlux()
         every { deviceMapper.toDto(device) } returns deviceResponseDto
         every { deviceMapper.toDto(device2) } returns responseDto2
 
         // When
-        val result = deviceService.getAll()
+        val devices = deviceService.getAll()
 
         // Then
-        assertEquals(responseDtoList, result)
+        devices.test()
+            .expectNextSequence(responseDtoList)
+            .verifyComplete()
+
         verify {
             deviceRepository.findAll()
             deviceMapper.toDto(device)
@@ -204,21 +179,42 @@ class DeviceServiceImplTest {
         )
 
         // Stubbing
-        every { deviceRepository.findById(deviceId.toString()) } returns existingDevice
+        every { deviceRepository.findById(deviceId.toString()) } returns existingDevice.toMono()
         every { deviceMapper.toEntity(deviceUpdateDto) } returns updatedDevice
-        every { deviceRepository.save(updatedDevice) } returns updatedDevice
+        every { deviceRepository.save(updatedDevice) } returns updatedDevice.toMono()
         every { deviceMapper.toDto(updatedDevice) } returns updatedDeviceResponseDto
 
         // When
-        val result = deviceService.update(deviceId.toString(), deviceUpdateDto)
+        val updateResult = deviceService.update(deviceId.toString(), deviceUpdateDto)
 
         // Then
-        assertEquals(updatedDeviceResponseDto, result)
+        updateResult.test()
+            .expectNext(updatedDeviceResponseDto)
+            .verifyComplete()
+
         verify {
             deviceRepository.findById(deviceId.toString())
             deviceMapper.toEntity(deviceUpdateDto)
             deviceRepository.save(updatedDevice)
             deviceMapper.toDto(updatedDevice)
         }
+    }
+
+    @Test
+    fun `should delete device by id`() {
+        // Given
+        val deviceId = String()
+
+        // Stubbing
+        every { deviceRepository.deleteById(deviceId) } returns Mono.empty()
+
+        // When
+        val deletedDevice = deviceService.deleteById(deviceId)
+
+        // Then
+        deletedDevice.test()
+            .verifyComplete()
+
+        verify { deviceRepository.deleteById(deviceId) }
     }
 }

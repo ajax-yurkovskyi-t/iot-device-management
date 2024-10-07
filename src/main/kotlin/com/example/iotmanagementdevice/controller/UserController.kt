@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/users")
@@ -23,7 +25,7 @@ class UserController(private val userService: UserService) {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
-    fun getCurrentUser(authentication: Authentication): UserResponseDto {
+    fun getCurrentUser(authentication: Authentication): Mono<UserResponseDto> {
         val userId = extractUserId(authentication)
         return userService.getUserById(userId)
     }
@@ -33,7 +35,7 @@ class UserController(private val userService: UserService) {
     fun assignDeviceToUser(
         authentication: Authentication,
         @PathVariable deviceId: String
-    ): Boolean {
+    ): Mono<Boolean> {
         val userId = extractUserId(authentication)
         return userService.assignDeviceToUser(userId, deviceId)
     }
@@ -42,14 +44,14 @@ class UserController(private val userService: UserService) {
     @GetMapping("/devices")
     fun getUserDevices(
         authentication: Authentication
-    ): List<DeviceResponseDto> {
+    ): Flux<DeviceResponseDto> {
         val userId = extractUserId(authentication)
         return userService.getDevicesByUserId(userId)
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: String): UserResponseDto =
+    fun getUserById(@PathVariable id: String): Mono<UserResponseDto> =
         userService.getUserById(id)
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -57,17 +59,17 @@ class UserController(private val userService: UserService) {
     fun update(
         @PathVariable id: String,
         @Valid @RequestBody requestDto: UserUpdateRequestDto
-    ): UserResponseDto =
+    ): Mono<UserResponseDto> =
         userService.update(id, requestDto)
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    fun getUserByUsername(@RequestParam username: String): UserResponseDto =
+    fun getUserByUsername(@RequestParam username: String): Mono<UserResponseDto> =
         userService.getUserByUsername(username)
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
-    fun getAll(): List<UserResponseDto> =
+    fun getAll(): Flux<UserResponseDto> =
         userService.getAll()
 
     private fun extractUserId(authentication: Authentication): String {

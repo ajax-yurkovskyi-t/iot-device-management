@@ -13,7 +13,7 @@ class CustomUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails? {
-        val mongoUser = userRepository.findByUserEmail(email)
+        val mongoUser = userRepository.findByUserEmail(email).block()
         return mongoUser?.let { userMapper.toSecurityUser(it) }
     }
 }

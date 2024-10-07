@@ -7,8 +7,8 @@ import com.example.iotmanagementdevice.exception.AuthenticationException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Mono
 
 @Service
 class AuthenticationServiceImpl(
@@ -17,20 +17,20 @@ class AuthenticationServiceImpl(
 ) : AuthenticationService {
 
     @MethodAttemptLimiter(maxAttempts = 3, lockoutDurationMillis = 600)
-    override fun authenticate(requestDto: UserLoginRequestDto): UserLoginResponseDto {
-        return try {
-            val authentication: Authentication = authenticationManager.authenticate(
+    override fun authenticate(requestDto: UserLoginRequestDto): Mono<UserLoginResponseDto> {
+        return Mono.fromCallable {
+            authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(
                     requestDto.email,
                     requestDto.userPassword
                 )
             )
-
+        }.map { authentication ->
             val securityUser = authentication.principal as SecurityUser
             val token = jwtUtil.generateToken(securityUser.username)
             UserLoginResponseDto(token)
-        } catch (ex: BadCredentialsException) {
-            throw AuthenticationException(LOGIN_ERROR_MESSAGE, ex)
+        }.onErrorMap(BadCredentialsException::class.java) { ex ->
+            AuthenticationException(LOGIN_ERROR_MESSAGE, ex)
         }
     }
 

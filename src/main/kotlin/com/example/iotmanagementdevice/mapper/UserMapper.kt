@@ -4,7 +4,6 @@ import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestD
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.model.MongoUser
 import com.example.iotmanagementdevice.security.SecurityUser
-import org.bson.types.ObjectId
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -19,12 +18,8 @@ import org.mapstruct.NullValueCheckStrategy
 interface UserMapper {
     fun toDto(mongoUser: MongoUser): UserResponseDto
 
-    @Mapping(target = "roles", expression = "java(new java.util.HashSet<>())")
-    @Mapping(target = "devices", expression = "java(new java.util.ArrayList<>())")
     fun toEntity(requestDto: UserRegistrationRequestDto): MongoUser
 
-    @Mapping(source = "id", target = "id")
+    @Mapping(target = "id", expression = "java(mongoUser.getId().toString())")
     fun toSecurityUser(mongoUser: MongoUser): SecurityUser
-
-    fun map(id: ObjectId): String = id.toString()
 }
