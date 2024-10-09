@@ -17,6 +17,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -342,7 +343,7 @@ class UserServiceImplTest {
         // Then
         result.test()
             .assertNext {
-                assert(it) { "Expected the device to be assigned to the user successfully" }
+                assertTrue(it) { "Expected false when assigning a non-existent device to the user" }
             }
             .verifyComplete()
 

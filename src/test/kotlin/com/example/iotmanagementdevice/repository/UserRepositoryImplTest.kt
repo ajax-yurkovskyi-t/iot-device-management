@@ -4,6 +4,7 @@ import UserFixture
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
 import com.example.iotmanagementdevice.mapper.UserMapper
 import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.kotlin.test.test
@@ -88,7 +89,7 @@ class UserRepositoryImplTest : AbstractMongoTest {
         // Then
         result.test()
             .assertNext {
-                assert(!it) { "Expected false when assigning a device to a non-existent user" }
+                assertFalse(it) { "Expected false when assigning a device to a non-existent user" }
             }
             .verifyComplete()
     }
@@ -220,7 +221,7 @@ class UserRepositoryImplTest : AbstractMongoTest {
         // Then
         result.test()
             .assertNext {
-                assert(!it) { "Expected false when assigning a non-existent device to the user" }
+                assertFalse(it) { "Expected false when assigning a non-existent device to the user" }
             }
     }
 

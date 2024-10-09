@@ -1,11 +1,12 @@
 package com.example.iotmanagementdevice.security
 
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.server.ServerWebExchange
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.test.test
 
+@ExtendWith(MockKExtension::class)
 class JwtAuthenticationFilterTest {
 
     @MockK
@@ -38,7 +40,6 @@ class JwtAuthenticationFilterTest {
 
     @BeforeEach
     fun setup() {
-        MockKAnnotations.init(this)
         jwtAuthenticationFilter = JwtAuthenticationFilter(jwtUtil, userDetailsService)
 
         every { exchange.request } returns request
