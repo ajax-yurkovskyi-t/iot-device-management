@@ -40,7 +40,7 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
         // Then
         devices.test()
             .expectNextMatches {
-                it.contains(device1) && it.contains(device2)
+                it.containsAll(listOf(device1, device2))
             }
             .verifyComplete()
     }

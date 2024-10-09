@@ -98,6 +98,24 @@ class DeviceServiceImplTest {
     }
 
     @Test
+    fun `should throw exception when device not found by id`() {
+        // Given
+        val deviceId = ObjectId()
+
+        // Stubbing
+        every { deviceRepository.findById(deviceId.toString()) } returns Mono.empty()
+
+        // When
+        val nonExistingUser = deviceService.getById(deviceId.toString())
+
+        // Then
+        nonExistingUser.test()
+            .verifyError<EntityNotFoundException>()
+
+        verify { deviceRepository.findById(deviceId.toString()) }
+    }
+
+    @Test
     fun `should throw exception when updating a non-existing device`() {
         // Given
         val nonExistingDeviceId = String()

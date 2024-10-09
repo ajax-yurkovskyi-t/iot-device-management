@@ -2,6 +2,7 @@ package com.example.iotmanagementdevice.repository
 
 import UserFixture
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
+import com.example.iotmanagementdevice.mapper.UserMapper
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +15,9 @@ class UserRepositoryImplTest : AbstractMongoTest {
 
     @Autowired
     private lateinit var deviceRepositoryImpl: DeviceRepositoryImpl
+
+    @Autowired
+    private lateinit var userMapper: UserMapper
 
     @Test
     fun `should find user by id when saved`() {
@@ -83,7 +87,9 @@ class UserRepositoryImplTest : AbstractMongoTest {
 
         // Then
         result.test()
-            .expectNext(false)
+            .assertNext {
+                assert(!it) { "Expected false when assigning a device to a non-existent user" }
+            }
             .verifyComplete()
     }
 
@@ -101,7 +107,7 @@ class UserRepositoryImplTest : AbstractMongoTest {
         // Then
         users.test()
             .expectNextMatches {
-                it.contains(user1) && it.contains(user2)
+                it.containsAll(listOf(user1, user2))
             }
             .verifyComplete()
     }
@@ -148,13 +154,10 @@ class UserRepositoryImplTest : AbstractMongoTest {
         userRepositoryImpl.save(updatedUser).block()
 
         // Then
-        userRepositoryImpl.findById(user.id!!.toString()).test()
-            .expectNextMatches {
-                it.name == updatedUserDto.name &&
-                    it.email == updatedUserDto.email &&
-                    it.phoneNumber == updatedUserDto.phoneNumber &&
-                    it.userPassword == updatedUserDto.userPassword
-            }
+        userRepositoryImpl.findById(user.id!!.toString())
+            .map(userMapper::toUpdateRequestDto)
+            .test()
+            .expectNext(updatedUserDto)
             .verifyComplete()
     }
 
@@ -216,8 +219,9 @@ class UserRepositoryImplTest : AbstractMongoTest {
 
         // Then
         result.test()
-            .expectNext(false)
-            .verifyComplete()
+            .assertNext {
+                assert(!it) { "Expected false when assigning a non-existent device to the user" }
+            }
     }
 
     @Test

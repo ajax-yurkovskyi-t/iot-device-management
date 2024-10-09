@@ -341,7 +341,9 @@ class UserServiceImplTest {
 
         // Then
         result.test()
-            .expectNext(true)
+            .assertNext {
+                assert(it) { "Expected the device to be assigned to the user successfully" }
+            }
             .verifyComplete()
 
         verify { userRepository.assignDeviceToUser(userObjectId.toString(), deviceObjectId.toString()) }

@@ -40,7 +40,7 @@ class RoleRepositoryImplTest : AbstractMongoTest {
         // Then
         roles.test()
             .expectNextMatches {
-                it.contains(roleAdmin) && it.contains(roleUser)
+                it.containsAll(listOf(roleAdmin, roleUser))
             }
             .verifyComplete()
     }

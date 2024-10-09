@@ -40,6 +40,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.0")
     implementation("org.springframework.boot:spring-boot-starter-security:3.3.2")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive:3.3.2")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.2")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.6")

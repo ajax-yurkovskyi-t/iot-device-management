@@ -8,17 +8,17 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface UserService {
-    fun register(requestDto: UserRegistrationRequestDto): Mono<UserResponseDto> // Changed to Mono
+    fun register(requestDto: UserRegistrationRequestDto): Mono<UserResponseDto>
 
-    fun assignDeviceToUser(userId: String, deviceId: String): Mono<Boolean> // Changed to Mono
+    fun assignDeviceToUser(userId: String, deviceId: String): Mono<Boolean>
 
-    fun getUserById(id: String): Mono<UserResponseDto> // Changed to Mono
+    fun getUserById(id: String): Mono<UserResponseDto>
 
-    fun getDevicesByUserId(userId: String): Flux<DeviceResponseDto> // Changed to Flux
+    fun getDevicesByUserId(userId: String): Flux<DeviceResponseDto>
 
-    fun getAll(): Flux<UserResponseDto> // Changed to Flux
+    fun getAll(): Flux<UserResponseDto>
 
-    fun getUserByUsername(username: String): Mono<UserResponseDto> // Changed to Mono
+    fun getUserByUsername(username: String): Mono<UserResponseDto>
 
-    fun update(id: String, requestDto: UserUpdateRequestDto): Mono<UserResponseDto> // Changed to Mono
+    fun update(id: String, requestDto: UserUpdateRequestDto): Mono<UserResponseDto>
 }

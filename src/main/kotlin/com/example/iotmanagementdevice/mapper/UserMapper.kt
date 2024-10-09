@@ -1,6 +1,7 @@
 package com.example.iotmanagementdevice.mapper
 
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
+import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
 import com.example.iotmanagementdevice.model.MongoUser
 import com.example.iotmanagementdevice.security.SecurityUser
@@ -18,6 +19,9 @@ import org.mapstruct.NullValueCheckStrategy
 interface UserMapper {
     fun toDto(mongoUser: MongoUser): UserResponseDto
 
+    fun toUpdateRequestDto(mongoUser: MongoUser): UserUpdateRequestDto
+
+    @Mapping(target = "devices", expression = "java(new java.util.ArrayList<>())")
     fun toEntity(requestDto: UserRegistrationRequestDto): MongoUser
 
     @Mapping(target = "id", expression = "java(mongoUser.getId().toString())")

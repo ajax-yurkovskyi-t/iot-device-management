@@ -18,6 +18,8 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 
 @Repository
 class UserRepositoryImpl(private val mongoTemplate: ReactiveMongoTemplate) :
@@ -44,8 +46,8 @@ class UserRepositoryImpl(private val mongoTemplate: ReactiveMongoTemplate) :
             MongoDevice::class.java
         )
         return Mono.zip(userUpdateResult, deviceUpdateResult)
-            .map { tuple ->
-                tuple.t1.modifiedCount > 0 && tuple.t2.modifiedCount > 0
+            .map { (userUpdate, deviceUpdate) ->
+                userUpdate.modifiedCount > 0 && deviceUpdate.modifiedCount > 0
             }
     }
 
