@@ -11,15 +11,16 @@ import com.example.iotmanagementdevice.model.MongoRole
 import com.example.iotmanagementdevice.model.MongoUser
 import com.example.iotmanagementdevice.repository.RoleRepository
 import com.example.iotmanagementdevice.repository.UserRepository
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.security.crypto.password.PasswordEncoder
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
@@ -27,6 +28,7 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.test.test
 import reactor.kotlin.test.verifyError
 
+@ExtendWith(MockKExtension::class)
 class UserServiceImplTest {
 
     @MockK
@@ -54,8 +56,6 @@ class UserServiceImplTest {
 
     @BeforeEach
     fun setUp() {
-        MockKAnnotations.init(this)
-
         mongoRole = MongoRole(id = ObjectId(), roleName = MongoRole.RoleName.USER)
         mongoUser = UserFixture.createUser().copy(devices = mutableListOf())
         device = UserFixture.createDevice()

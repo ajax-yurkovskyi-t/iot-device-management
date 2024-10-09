@@ -8,20 +8,22 @@ import com.example.iotmanagementdevice.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.repository.DeviceRepository
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.test.test
 import reactor.kotlin.test.verifyError
 
+@ExtendWith(MockKExtension::class)
 class DeviceServiceImplTest {
 
     @MockK
@@ -41,8 +43,6 @@ class DeviceServiceImplTest {
 
     @BeforeEach
     fun setUp() {
-        MockKAnnotations.init(this)
-
         deviceRequestDto = DeviceFixture.createDeviceCreateRequestDto()
         deviceUpdateDto = DeviceFixture.createDeviceUpdateRequestDto()
         device = DeviceFixture.createDevice()
