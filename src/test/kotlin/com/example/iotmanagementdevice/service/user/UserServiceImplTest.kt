@@ -343,7 +343,7 @@ class UserServiceImplTest {
         // Then
         result.test()
             .assertNext {
-                assertTrue(it) { "Expected false when assigning a non-existent device to the user" }
+                assertTrue(it) { "Expected true when assigning device to the user" }
             }
             .verifyComplete()
 
