@@ -1,25 +1,23 @@
 package com.example.iotmanagementdevice.config
 
+import com.example.iotmanagementdevice.security.CustomUserDetailsService
 import com.example.iotmanagementdevice.security.JwtAuthenticationFilter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.Customizer
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.authentication.ReactiveAuthenticationManager
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
+import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.server.SecurityWebFilterChain
 
 @Configuration
-@EnableMethodSecurity
+@EnableWebFluxSecurity
 class SecurityConfig(
-    private val userDetailsService: UserDetailsService,
+    private val userDetailsService: CustomUserDetailsService,
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     @Value("\${spring.security.public.endpoints}") private val publicEndpoints: Array<String>
 ) {
@@ -27,27 +25,30 @@ class SecurityConfig(
     fun getPasswordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http
             .cors { it.disable() }
             .csrf { it.disable() }
-            .authorizeHttpRequests {
+            .authorizeExchange { auth ->
                 @Suppress("SpreadOperator")
-                it.requestMatchers(*publicEndpoints)
+                auth.pathMatchers(*publicEndpoints)
                     .permitAll()
-                    .anyRequest()
+                    .anyExchange()
                     .authenticated()
             }
-            .httpBasic(Customizer.withDefaults())
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .userDetailsService(userDetailsService)
+            .httpBasic { it.disable() }
+            .authenticationManager(reactiveAuthenticationManager())
+            .addFilterAt(
+                jwtAuthenticationFilter,
+                SecurityWebFiltersOrder.AUTHORIZATION
+            )
             .build()
     }
 
     @Bean
-    fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager =
-        authenticationConfiguration.authenticationManager
+    fun reactiveAuthenticationManager(): ReactiveAuthenticationManager {
+        val authenticationManager = UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService)
+        authenticationManager.setPasswordEncoder(getPasswordEncoder())
+        return authenticationManager
+    }
 }

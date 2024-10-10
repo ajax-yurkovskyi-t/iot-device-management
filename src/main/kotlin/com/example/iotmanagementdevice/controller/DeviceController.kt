@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/devices")
@@ -22,13 +24,13 @@ class DeviceController(private val deviceService: DeviceService) {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
-    fun getDeviceById(@PathVariable(name = "id") id: String): DeviceResponseDto =
+    fun getDeviceById(@PathVariable(name = "id") id: String): Mono<DeviceResponseDto> =
         deviceService.getById(id)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@Valid @RequestBody requestDto: DeviceCreateRequestDto): DeviceResponseDto =
+    fun create(@Valid @RequestBody requestDto: DeviceCreateRequestDto): Mono<DeviceResponseDto> =
         deviceService.create(requestDto)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -36,11 +38,11 @@ class DeviceController(private val deviceService: DeviceService) {
     fun update(
         @PathVariable id: String,
         @Valid @RequestBody requestDto: DeviceUpdateRequestDto
-    ): DeviceResponseDto =
+    ): Mono<DeviceResponseDto> =
         deviceService.update(id, requestDto)
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
-    fun getAll(): List<DeviceResponseDto> =
+    fun getAll(): Flux<DeviceResponseDto> =
         deviceService.getAll()
 }

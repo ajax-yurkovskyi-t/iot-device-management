@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/auth")
@@ -23,10 +24,10 @@ class AuthenticationController(
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    fun register(@RequestBody @Valid requestDto: UserRegistrationRequestDto): UserResponseDto =
+    fun register(@RequestBody @Valid requestDto: UserRegistrationRequestDto): Mono<UserResponseDto> =
         userService.register(requestDto)
 
     @PostMapping("/login")
-    fun login(@RequestBody @Valid requestDto: UserLoginRequestDto): UserLoginResponseDto =
+    fun login(@RequestBody @Valid requestDto: UserLoginRequestDto): Mono<UserLoginResponseDto> =
         authenticationService.authenticate(requestDto)
 }

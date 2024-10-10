@@ -1,13 +1,15 @@
 package com.example.iotmanagementdevice.repository
 
 import com.example.iotmanagementdevice.model.MongoDevice
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 interface DeviceRepository {
-    fun findById(deviceId: String): MongoDevice?
+    fun findById(deviceId: String): Mono<MongoDevice>
 
-    fun findAll(): List<MongoDevice>
+    fun findAll(): Flux<MongoDevice>
 
-    fun save(device: MongoDevice): MongoDevice
+    fun save(device: MongoDevice): Mono<MongoDevice>
 
-    fun deleteById(deviceId: String)
+    fun deleteById(deviceId: String): Mono<Unit>
 }

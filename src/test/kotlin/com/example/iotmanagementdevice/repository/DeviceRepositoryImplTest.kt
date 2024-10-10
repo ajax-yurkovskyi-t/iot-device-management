@@ -1,10 +1,8 @@
 package com.example.iotmanagementdevice.repository
 
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import reactor.kotlin.test.test
 
 class DeviceRepositoryImplTest : AbstractMongoTest {
 
@@ -15,13 +13,15 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
     fun `should find device by id when saved`() {
         // Given
         val device = DeviceFixture.createDevice()
-        deviceRepositoryImpl.save(device)
+        deviceRepositoryImpl.save(device).block()
 
         // When
         val foundDevice = deviceRepositoryImpl.findById(device.id!!.toString())
 
         // Then
-        assertEquals(device, foundDevice)
+        foundDevice.test()
+            .expectNext(device)
+            .verifyComplete()
     }
 
     @Test
@@ -31,28 +31,32 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
             .copy(name = "Device1", description = "First test device", type = "TypeB")
         val device2 = DeviceFixture.createDevice()
             .copy(name = "Device2", description = "Second test device", type = "TypeC")
-        deviceRepositoryImpl.save(device1)
-        deviceRepositoryImpl.save(device2)
+        deviceRepositoryImpl.save(device1).block()
+        deviceRepositoryImpl.save(device2).block()
 
         // When
-        val devices = deviceRepositoryImpl.findAll()
+        val devices = deviceRepositoryImpl.findAll().collectList()
 
         // Then
-        val expectedDevices = listOf(device1, device2)
-        assertTrue(devices.containsAll(expectedDevices), "Expected devices not found in the repository")
+        devices.test()
+            .expectNextMatches {
+                it.containsAll(listOf(device1, device2))
+            }
+            .verifyComplete()
     }
 
     @Test
     fun `should not find device when deleted`() {
         // Given
         val device = DeviceFixture.createDevice()
-        deviceRepositoryImpl.save(device)
+        deviceRepositoryImpl.save(device).block()
 
         // When
-        deviceRepositoryImpl.deleteById(device.id!!.toString())
-        val foundDevice = deviceRepositoryImpl.findById(device.id!!.toString())
+        deviceRepositoryImpl.deleteById(device.id!!.toString()).block()
 
         // Then
-        Assertions.assertNull(foundDevice)
+        deviceRepositoryImpl.findById(device.id!!.toString())
+            .test()
+            .verifyComplete()
     }
 }
