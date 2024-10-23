@@ -7,4 +7,3 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security:3.3.2")
     implementation(project(":internal-api"))
 }
-

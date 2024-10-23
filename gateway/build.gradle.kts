@@ -23,4 +23,3 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     kapt("org.mapstruct:mapstruct-processor:1.6.0")
 }
-

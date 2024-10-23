@@ -27,7 +27,7 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any>? {
         val body = LinkedHashMap<String, Any>().apply {
-            put("timestamp.proto", LocalDateTime.now())
+            put("timestamp", LocalDateTime.now())
             put("status", HttpStatus.BAD_REQUEST)
             put("errors", ex.bindingResult.allErrors.map { getErrorMessage(it) })
         }
@@ -64,7 +64,7 @@ class CustomGlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     private fun handleException(status: HttpStatus, ex: Exception): ResponseEntity<Any> {
         val body = LinkedHashMap<String, Any>().apply {
-            put("timestamp.proto", LocalDateTime.now())
+            put("timestamp", LocalDateTime.now())
             put("status", status)
             put("message", ex.message ?: "No message available")
         }

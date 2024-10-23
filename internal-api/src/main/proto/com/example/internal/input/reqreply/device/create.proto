@@ -32,4 +32,3 @@ message CreateDeviceResponse {
     string message = 100;
   }
 }
-
