@@ -12,13 +12,13 @@ import org.mapstruct.NullValueCheckStrategy
     implementationPackage = "<PACKAGE_NAME>.impl"
 )
 abstract class DeleteDeviceMapper {
-    fun successDeleteResponse(): DeleteDeviceResponse {
+    fun toSuccessDeleteResponse(): DeleteDeviceResponse {
         return DeleteDeviceResponse.newBuilder().apply {
             successBuilder
         }.build()
     }
 
-    fun failureDeleteResponse(throwable: Throwable): DeleteDeviceResponse {
+    fun toFailureDeleteDeviceResponse(throwable: Throwable): DeleteDeviceResponse {
         val message = throwable.message.orEmpty()
         return DeleteDeviceResponse.newBuilder().apply {
             failureBuilder.setMessage(message)

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class FindDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
+class GetDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
     private lateinit var deviceRepository: DeviceRepository
 
@@ -21,7 +21,7 @@ class FindDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
     private lateinit var getDeviceByIdMapper: GetDeviceByIdMapper
 
     @Autowired
-    private lateinit var deviceMapper : DeviceMapper
+    private lateinit var deviceMapper: DeviceMapper
 
     @Test
     fun `should return existing device`() {
@@ -53,6 +53,13 @@ class FindDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
         )
 
         // THEN
-        assertEquals(getDeviceByIdMapper.toErrorResponse(EntityNotFoundException("Device with id $invalidId not found")), actual)
+        assertEquals(
+            getDeviceByIdMapper.toFailureGetDeviceByIdResponse(
+                EntityNotFoundException(
+                    "Device with id $invalidId not found"
+                )
+            ),
+            actual
+        )
     }
 }

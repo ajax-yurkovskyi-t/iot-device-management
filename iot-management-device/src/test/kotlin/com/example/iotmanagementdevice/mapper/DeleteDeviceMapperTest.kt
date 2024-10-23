@@ -2,7 +2,7 @@ package com.example.iotmanagementdevice.mapper
 
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
 import com.example.iotmanagementdevice.mapper.impl.DeleteDeviceMapperImpl
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class DeleteDeviceMapperTest {
@@ -15,7 +15,7 @@ class DeleteDeviceMapperTest {
         val exception = RuntimeException(exceptionMessage)
 
         // WHEN
-        val actualResponse = deleteDeviceMapper.failureDeleteResponse(exception)
+        val actualResponse = deleteDeviceMapper.toFailureDeleteDeviceResponse(exception)
 
         // THEN
         assertEquals(exceptionMessage, actualResponse.failure.message)
@@ -25,10 +25,10 @@ class DeleteDeviceMapperTest {
     @Test
     fun `should return error response with default message when exception has no message`() {
         // GIVEN
-        val exception = NullPointerException()
+        val exception = RuntimeException()
 
         // WHEN
-        val actualResponse = deleteDeviceMapper.failureDeleteResponse(exception)
+        val actualResponse = deleteDeviceMapper.toFailureDeleteDeviceResponse(exception)
 
         // THEN
         assertEquals("", actualResponse.failure.message)

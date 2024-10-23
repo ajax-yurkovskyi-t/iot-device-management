@@ -1,8 +1,10 @@
 import com.example.core.dto.DeviceStatusType
+import com.example.core.dto.request.DeviceCreateRequestDto
+import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.internal.commonmodels.Device
-import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
+import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdRequest
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
@@ -10,6 +12,20 @@ import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRespo
 object DeviceProtoFixture {
 
     val deviceResponseDto = DeviceResponseDto(
+        name = "Device",
+        description = "A test device",
+        type = "Sensor",
+        statusType = DeviceStatusType.ONLINE
+    )
+
+    val deviceUpdateRequestDto = DeviceUpdateRequestDto(
+        name = "Device",
+        description = "A test device",
+        type = "Sensor",
+        statusType = DeviceStatusType.ONLINE
+    )
+
+    val deviceCreateRequestDto = DeviceCreateRequestDto(
         name = "Device",
         description = "A test device",
         type = "Sensor",
@@ -41,12 +57,6 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun getCreateDeviceRequest(): CreateDeviceRequest {
-        return CreateDeviceRequest.newBuilder().apply {
-
-        }.build()
-    }
-
     fun successfulGetDeviceByIdResponse(device: Device): GetDeviceByIdResponse {
         return GetDeviceByIdResponse.newBuilder().apply {
             successBuilder.device = device
@@ -68,6 +78,14 @@ object DeviceProtoFixture {
     fun failureUpdateDeviceResponse(failureMessage: String): UpdateDeviceResponse {
         return UpdateDeviceResponse.newBuilder().apply {
             failureBuilder.message = failureMessage
+        }.build()
+    }
+
+    fun successfulGetAllDevicesResponse(devices: List<Device>): GetAllDevicesResponse {
+        return GetAllDevicesResponse.newBuilder().apply {
+            devices.forEach { device ->
+                (successBuilder.addDevices(device))
+            }
         }.build()
     }
 }

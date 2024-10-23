@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 @Component
-class UpdateDeviceNatsController (
+class UpdateDeviceNatsController(
     override val connection: Connection,
     private val deviceService: DeviceService,
     private val updateDeviceMapper: UpdateDeviceMapper,
@@ -28,8 +28,7 @@ class UpdateDeviceNatsController (
         return deviceService.update(request.id, updateDeviceMapper.toDeviceUpdateRequestDto(request))
             .map { updateDeviceMapper.toUpdateDeviceResponse(it) }
             .onErrorResume { throwable ->
-                updateDeviceMapper.toErrorResponse(throwable).toMono()
+                updateDeviceMapper.toFailureUpdateDeviceResponse(throwable).toMono()
             }
-
     }
 }

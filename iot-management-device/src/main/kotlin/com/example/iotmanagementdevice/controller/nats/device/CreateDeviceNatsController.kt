@@ -5,11 +5,11 @@ import com.example.internal.NatsSubject.Device.DEVICE_QUEUE_GROUP
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController
+import com.example.iotmanagementdevice.mapper.CreateDeviceMapper
 import com.example.iotmanagementdevice.service.device.DeviceService
+import com.google.protobuf.Parser
 import io.nats.client.Connection
 import org.springframework.stereotype.Component
-import com.example.iotmanagementdevice.mapper.CreateDeviceMapper
-import com.google.protobuf.Parser
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
@@ -28,7 +28,7 @@ class CreateDeviceNatsController(
         return deviceService.create(createDeviceMapper.toDeviceCreateRequestDto(request))
             .map { createDeviceMapper.toCreateDeviceResponse(it) }
             .onErrorResume { throwable ->
-                createDeviceMapper.toErrorResponse(throwable).toMono()
+                createDeviceMapper.toFailureCreateDeviceResponse(throwable).toMono()
             }
     }
 }

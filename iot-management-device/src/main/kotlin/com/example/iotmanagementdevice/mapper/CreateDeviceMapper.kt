@@ -1,6 +1,5 @@
 package com.example.iotmanagementdevice.mapper
 
-import com.example.core.dto.DeviceStatusType
 import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
@@ -18,21 +17,14 @@ import org.mapstruct.ValueMapping
     implementationPackage = "<PACKAGE_NAME>.impl"
 )
 abstract class CreateDeviceMapper {
-    abstract fun toDeviceCreateRequestDto(request: CreateDeviceRequest) : DeviceCreateRequestDto
+    @ValueMapping(source = "UNSPECIFIED", target = "OFFLINE")
+    @ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
+    abstract fun toDeviceCreateRequestDto(request: CreateDeviceRequest): DeviceCreateRequestDto
 
-    @Mapping(target = "success", source = "deviceResponseDto")
+    @Mapping(target = "success.device", source = "deviceResponseDto")
     abstract fun toCreateDeviceResponse(deviceResponseDto: DeviceResponseDto): CreateDeviceResponse
 
-    @Mapping(target = "device", source = "deviceResponseDto")
-    abstract fun toSuccess(deviceResponseDto: DeviceResponseDto): CreateDeviceResponse.Success
-
-    @ValueMapping(source = "ONLINE", target = "ONLINE")
-    @ValueMapping(source = "OFFLINE", target = "OFFLINE")
-    @ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
-    @ValueMapping(source = "UNSPECIFIED", target = "OFFLINE")
-    abstract fun mapStatusType(statusType: CreateDeviceRequest.StatusType): DeviceStatusType
-
-    fun toErrorResponse(exception: Throwable): CreateDeviceResponse {
+    fun toFailureCreateDeviceResponse(exception: Throwable): CreateDeviceResponse {
         return CreateDeviceResponse.newBuilder().apply {
             failureBuilder.setMessage(exception.message.orEmpty())
         }.build()

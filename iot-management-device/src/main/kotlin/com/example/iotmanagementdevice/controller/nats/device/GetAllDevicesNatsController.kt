@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 @Component
-class FindAllDevicesNatsController (
+class GetAllDevicesNatsController(
     override val connection: Connection,
     private val deviceService: DeviceService,
     private val getAllDevicesMapper: GetAllDevicesMapper,
@@ -29,7 +29,7 @@ class FindAllDevicesNatsController (
             .collectList()
             .map { getAllDevicesMapper.toGetAllDevicesResponse(it) }
             .onErrorResume { throwable ->
-                getAllDevicesMapper.toErrorResponse(throwable).toMono()
+                getAllDevicesMapper.toFailureGetAllDevicesResponse(throwable).toMono()
             }
     }
 }

@@ -2,12 +2,11 @@ package com.example.iotmanagementdevice.mapper
 
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.mapper.impl.UpdateDeviceMapperImpl
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class UpdateDeviceMapperTest {
     private val updateDeviceMapper = UpdateDeviceMapperImpl()
-
 
     @Test
     fun `should return error response`() {
@@ -16,7 +15,7 @@ class UpdateDeviceMapperTest {
         val exception = RuntimeException(exceptionMessage)
 
         // WHEN
-        val actualResponse = updateDeviceMapper.toErrorResponse(exception)
+        val actualResponse = updateDeviceMapper.toFailureUpdateDeviceResponse(exception)
 
         // THEN
         assertEquals(exceptionMessage, actualResponse.failure.message)
@@ -26,10 +25,10 @@ class UpdateDeviceMapperTest {
     @Test
     fun `should return error response with default message when exception has no message`() {
         // GIVEN
-        val exception = NullPointerException()
+        val exception = RuntimeException()
 
         // WHEN
-        val actualResponse = updateDeviceMapper.toErrorResponse(exception)
+        val actualResponse = updateDeviceMapper.toFailureUpdateDeviceResponse(exception)
 
         // THEN
         assertEquals("", actualResponse.failure.message)

@@ -14,8 +14,8 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 @Component
-class DeleteDeviceNatsController
-    (override val connection: Connection,
+class DeleteDeviceNatsController(
+    override val connection: Connection,
     private val deviceService: DeviceService,
     private val deleteDeviceMapper: DeleteDeviceMapper,
 ) : NatsController<DeleteDeviceRequest, DeleteDeviceResponse> {
@@ -26,9 +26,9 @@ class DeleteDeviceNatsController
 
     override fun handle(request: DeleteDeviceRequest): Mono<DeleteDeviceResponse> {
         return deviceService.deleteById(request.id)
-            .thenReturn(deleteDeviceMapper.successDeleteResponse())
+            .thenReturn(deleteDeviceMapper.toSuccessDeleteResponse())
             .onErrorResume {
-                deleteDeviceMapper.failureDeleteResponse(it).toMono()
+                deleteDeviceMapper.toFailureDeleteDeviceResponse(it).toMono()
             }
     }
 }

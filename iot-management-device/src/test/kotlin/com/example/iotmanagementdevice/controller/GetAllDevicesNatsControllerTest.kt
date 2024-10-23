@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class FindAllDevicesNatsControllerTest : AbstractNatsControllerTest() {
+class GetAllDevicesNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
     private lateinit var deviceRepository: DeviceRepository
 

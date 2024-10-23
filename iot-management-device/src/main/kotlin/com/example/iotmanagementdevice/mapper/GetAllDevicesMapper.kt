@@ -5,9 +5,7 @@ import com.example.internal.commonmodels.Device
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
-import org.springframework.stereotype.Component
 
 @Mapper(
     componentModel = "spring",
@@ -16,11 +14,6 @@ import org.springframework.stereotype.Component
     implementationPackage = "<PACKAGE_NAME>.impl"
 )
 abstract class GetAllDevicesMapper {
-
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "description", source = "description")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "statusType", source = "statusType")
     abstract fun toProtoDevice(deviceResponseDto: DeviceResponseDto): Device
 
     fun toGetAllDevicesResponse(deviceResponseDtoList: List<DeviceResponseDto>): GetAllDevicesResponse {
@@ -35,7 +28,7 @@ abstract class GetAllDevicesMapper {
             .build()
     }
 
-    fun toErrorResponse(throwable: Throwable): GetAllDevicesResponse {
+    fun toFailureGetAllDevicesResponse(throwable: Throwable): GetAllDevicesResponse {
         return GetAllDevicesResponse.newBuilder().apply {
             failureBuilder.message = throwable.message.orEmpty()
         }.build()

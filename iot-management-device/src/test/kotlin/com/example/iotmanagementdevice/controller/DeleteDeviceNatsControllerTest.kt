@@ -30,6 +30,6 @@ class DeleteDeviceNatsControllerTest : AbstractNatsControllerTest() {
         )
 
         // THEN
-        assertEquals(deleteDeviceMapper.successDeleteResponse(), actual)
+        assertEquals(deleteDeviceMapper.toSuccessDeleteResponse(), actual)
     }
 }

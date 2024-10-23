@@ -5,9 +5,7 @@ import com.example.internal.commonmodels.Device
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
-import org.mapstruct.ValueMapping
 
 @Mapper(
     componentModel = "spring",
@@ -16,12 +14,6 @@ import org.mapstruct.ValueMapping
     uses = [EnumMapper::class]
 )
 abstract class GetAllDevicesMapper {
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "description", source = "description")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "statusType", source = "statusType")
-    abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
-
     abstract fun toDeviceResponseDtoList(devicesList: List<Device>): List<DeviceResponseDto>
 
     fun toDto(response: GetAllDevicesResponse): List<DeviceResponseDto> {

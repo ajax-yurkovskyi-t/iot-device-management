@@ -8,7 +8,7 @@ import com.example.core.exception.EntityNotFoundException
 import com.example.gateway.mapper.impl.GetDeviceByIdMapperImpl
 import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -64,7 +64,6 @@ class GetDeviceByIdMapperTest {
             failureBuilder.message = failureMessage
         }.build()
 
-
         // WHEN & THEN
         val exception = assertThrows<EntityNotFoundException> {
             getDeviceByIdMapper.toDto(getDeviceResponse)
@@ -72,6 +71,4 @@ class GetDeviceByIdMapperTest {
 
         assertEquals(failureMessage, exception.message)
     }
-
-
 }

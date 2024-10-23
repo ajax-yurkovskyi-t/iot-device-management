@@ -6,9 +6,7 @@ import com.example.internal.commonmodels.Device
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
-import org.mapstruct.ValueMapping
 
 @Mapper(
     componentModel = "spring",
@@ -18,20 +16,7 @@ import org.mapstruct.ValueMapping
     uses = [EnumMapper::class]
 )
 abstract class GetDeviceByIdMapper {
-
-//    @Mapping(target = "name", source = "success.device.name")
-//    @Mapping(target = "description", source = "success.device.description")
-//    @Mapping(target = "type", source = "success.device.type")
-//    @Mapping(target = "statusType", source = "success.device.statusType")
-//    abstract fun toSuccess(response: GetDeviceByIdResponse): DeviceResponseDto
-
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "description", source = "description")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "statusType", source = "statusType")
-    abstract fun toSuccess(device: Device): DeviceResponseDto
-
-    abstract fun toDeviceResponseDto(devicesList: Device): DeviceResponseDto
+    abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
 
     fun toDto(response: GetDeviceByIdResponse): DeviceResponseDto {
         return when (response.responseCase!!) {
@@ -49,4 +34,3 @@ abstract class GetDeviceByIdMapper {
         }
     }
 }
-

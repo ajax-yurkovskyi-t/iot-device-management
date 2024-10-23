@@ -16,7 +16,7 @@ abstract class DeleteDeviceMapper {
         when (response.responseCase!!) {
             DeleteDeviceResponse.ResponseCase.SUCCESS -> Unit
             DeleteDeviceResponse.ResponseCase.FAILURE -> error(message)
-            DeleteDeviceResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException()
+            DeleteDeviceResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException("No response case set")
         }
     }
 }

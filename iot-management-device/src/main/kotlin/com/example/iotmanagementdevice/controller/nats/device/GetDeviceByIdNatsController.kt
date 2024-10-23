@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 @Component
-class FindDeviceByIdNatsController(
+class GetDeviceByIdNatsController(
     override val connection: Connection,
     private val deviceService: DeviceService,
     private val getDeviceByIdMapper: GetDeviceByIdMapper,
@@ -28,7 +28,7 @@ class FindDeviceByIdNatsController(
         return deviceService.getById(request.id)
             .map { getDeviceByIdMapper.toGetDeviceByIdResponse(it) }
             .onErrorResume { throwable ->
-                getDeviceByIdMapper.toErrorResponse(throwable).toMono()
+                getDeviceByIdMapper.toFailureGetDeviceByIdResponse(throwable).toMono()
             }
     }
 }

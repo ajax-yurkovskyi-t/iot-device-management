@@ -1,10 +1,10 @@
 package com.example.iotmanagementdevice.service.user
 
 import com.example.core.dto.response.DeviceResponseDto
+import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
 import com.example.iotmanagementdevice.dto.user.response.UserResponseDto
-import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.mapper.UserMapper
 import com.example.iotmanagementdevice.model.MongoRole

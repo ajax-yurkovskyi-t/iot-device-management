@@ -21,7 +21,7 @@ class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
     private lateinit var updateDeviceMapper: UpdateDeviceMapper
 
     @Autowired
-    private lateinit var deviceMapper : DeviceMapper
+    private lateinit var deviceMapper: DeviceMapper
 
     @Test
     fun `should return updated device`() {
@@ -52,6 +52,13 @@ class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
         )
 
         // THEN
-        assertEquals(updateDeviceMapper.toErrorResponse(EntityNotFoundException("Device with id $invalidId not found")), actual)
+        assertEquals(
+            updateDeviceMapper.toFailureUpdateDeviceResponse(
+                EntityNotFoundException(
+                    "Device with id $invalidId not found"
+                )
+            ),
+            actual
+        )
     }
 }

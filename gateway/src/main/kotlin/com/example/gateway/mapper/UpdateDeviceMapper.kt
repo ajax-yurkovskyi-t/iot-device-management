@@ -3,14 +3,12 @@ package com.example.gateway.mapper
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.core.exception.EntityNotFoundException
+import com.example.internal.commonmodels.Device
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.Mappings
 import org.mapstruct.NullValueCheckStrategy
-import org.mapstruct.ValueMapping
 
 @Mapper(
     componentModel = "spring",
@@ -22,15 +20,11 @@ import org.mapstruct.ValueMapping
 abstract class UpdateDeviceMapper {
     abstract fun toUpdateRequestProto(deviceUpdateRequestDto: DeviceUpdateRequestDto, id: String): UpdateDeviceRequest
 
-    @Mapping(target = "name", source = "success.device.name")
-    @Mapping(target = "description", source = "success.device.description")
-    @Mapping(target = "type", source = "success.device.type")
-    @Mapping(target = "statusType", source = "success.device.statusType")
-    abstract fun toSuccess(response: UpdateDeviceResponse): DeviceResponseDto
+    abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
 
     fun toDto(response: UpdateDeviceResponse): DeviceResponseDto {
         return when (response.responseCase!!) {
-            UpdateDeviceResponse.ResponseCase.SUCCESS -> toSuccess(response)
+            UpdateDeviceResponse.ResponseCase.SUCCESS -> toDeviceResponseDto(response.success.device)
             UpdateDeviceResponse.ResponseCase.FAILURE -> toFailure(response)
             UpdateDeviceResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException("No response case set")
         }
@@ -44,4 +38,3 @@ abstract class UpdateDeviceMapper {
         }
     }
 }
-

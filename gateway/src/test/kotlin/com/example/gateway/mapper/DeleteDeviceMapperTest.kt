@@ -1,14 +1,10 @@
 package com.example.gateway.mapper
 
-import com.example.gateway.mapper.impl.CreateDeviceMapperImpl
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 
 class DeleteDeviceMapperTest {
     private val deleteDeviceMapper = DeleteDeviceMapperImpl()
@@ -76,6 +72,6 @@ class DeleteDeviceMapperTest {
         }
 
         // Assert that the exception type is RuntimeException
-        assertTrue(exception is RuntimeException)
+        assertEquals("No response case set", exception.message)
     }
 }

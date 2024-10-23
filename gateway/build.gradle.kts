@@ -1,12 +1,12 @@
 plugins {
-    id("spring-conventions")
+    `spring-conventions`
     kotlin("kapt")
 }
 
 dependencies {
     implementation("org.mapstruct:mapstruct:1.6.0")
     implementation(project(":internal-api"))
-
+    implementation("org.springframework.boot:spring-boot-starter-web:3.3.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.nats:jnats:2.16.14")
     implementation("io.projectreactor:reactor-core:3.6.10")

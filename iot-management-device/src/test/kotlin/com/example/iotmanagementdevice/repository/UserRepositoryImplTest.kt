@@ -43,8 +43,8 @@ class UserRepositoryImplTest : AbstractMongoTest {
         val user = UserFixture.createUser()
         userRepositoryImpl.save(user).block()
 
-        val device1 = UserFixture.createDevice().copy(id = ObjectId(), name = "Device1")
-        val device2 = UserFixture.createDevice().copy(id = ObjectId(), name = "Device2")
+        val device1 = UserFixture.createDevice().copy(name = "Device1")
+        val device2 = UserFixture.createDevice().copy(name = "Device2")
 
         deviceRepositoryImpl.save(device1).block()
         deviceRepositoryImpl.save(device2).block()
@@ -147,7 +147,6 @@ class UserRepositoryImplTest : AbstractMongoTest {
 
         assertTrue(updatedUser!!.devices!!.isEmpty()) { "User's devices should remain unchanged" }
     }
-
 
     @Test
     fun `should reflect the user update after being updated`() {
