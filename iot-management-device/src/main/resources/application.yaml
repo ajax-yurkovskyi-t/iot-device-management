@@ -14,9 +14,6 @@ spring:
 mongock:
   migration-scan-package: com.example.iotmanagementdevice.mongock.changelogs
 
-server:
-  port: 8090
-
 jwt:
   expiration: 300000000
   secret: P23wHHMjD4anZ+9DlEYXmcDf481v0Ptmcq9LzVtBcLjR79e5wD1MyEZgOI2a8Cw9
