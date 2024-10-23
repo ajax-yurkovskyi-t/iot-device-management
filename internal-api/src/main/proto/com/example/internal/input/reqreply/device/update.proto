@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "com/example/internal/commonmodels/device/device.proto";
+import "com/example/internal/commonmodels/error.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.internal.input.reqreply.device.update.proto";
+
+message UpdateDeviceRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  StatusType statusType = 5;
+
+  enum StatusType {
+    UNSPECIFIED = 0;
+    ONLINE = 1;
+    OFFLINE = 2;
+  }
+}
+
+message UpdateDeviceResponse {
+  oneof response {
+    Success success = 1;
+    Failure failure = 2;
+  }
+
+  message Success {
+    Device device = 1;
+  }
+
+  message Failure {
+    string message = 100;
+    oneof error {
+      Error device_not_found = 1;
+    }
+  }
+}

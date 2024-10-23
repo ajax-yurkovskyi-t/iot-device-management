@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "com/example/internal/commonmodels/device/device.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.internal.input.reqreply.device.create.proto";
+
+message CreateDeviceRequest {
+  string name = 1;
+  string description = 2;
+  string type = 3;
+  StatusType statusType = 4;
+
+  enum StatusType {
+    UNSPECIFIED = 0;
+    ONLINE = 1;
+    OFFLINE = 2;
+  }
+}
+
+message CreateDeviceResponse {
+  oneof response {
+    Success success = 1;
+    Failure failure = 2;
+  }
+
+  message Success {
+    Device device = 1;
+  }
+
+  message Failure {
+    string message = 100;
+  }
+}
+
