@@ -1,7 +1,6 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
 import com.example.internal.NatsSubject.Device.GET_BY_ID
-import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdRequest
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController

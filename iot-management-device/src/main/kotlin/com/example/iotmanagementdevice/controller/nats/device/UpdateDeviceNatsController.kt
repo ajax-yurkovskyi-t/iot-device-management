@@ -1,7 +1,6 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
 import com.example.internal.NatsSubject.Device.UPDATE
-import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController
