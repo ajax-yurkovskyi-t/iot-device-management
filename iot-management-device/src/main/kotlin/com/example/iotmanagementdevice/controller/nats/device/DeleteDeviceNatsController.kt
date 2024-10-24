@@ -1,6 +1,7 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
 import com.example.internal.NatsSubject.Device.DELETE
+import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController
@@ -22,6 +23,7 @@ class DeleteDeviceNatsController(
     override val queueGroup: String = DEVICE_QUEUE_GROUP
     override val subject = DELETE
     override val parser: Parser<DeleteDeviceRequest> = DeleteDeviceRequest.parser()
+    override val responseType: DeleteDeviceResponse = DeleteDeviceResponse.getDefaultInstance()
 
     override fun handle(request: DeleteDeviceRequest): Mono<DeleteDeviceResponse> {
         return deviceService.deleteById(request.id)

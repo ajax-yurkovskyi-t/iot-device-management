@@ -22,6 +22,7 @@ class CreateDeviceNatsController(
     override val queueGroup: String = DEVICE_QUEUE_GROUP
     override val subject = CREATE
     override val parser: Parser<CreateDeviceRequest> = CreateDeviceRequest.parser()
+    override val responseType: CreateDeviceResponse = CreateDeviceResponse.getDefaultInstance()
 
     override fun handle(request: CreateDeviceRequest): Mono<CreateDeviceResponse> {
         return deviceService.create(createDeviceMapper.toDeviceCreateRequestDto(request))

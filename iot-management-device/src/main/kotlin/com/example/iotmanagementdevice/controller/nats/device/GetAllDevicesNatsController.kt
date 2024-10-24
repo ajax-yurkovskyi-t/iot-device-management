@@ -1,6 +1,7 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
 import com.example.internal.NatsSubject.Device.GET_ALL
+import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController
@@ -22,6 +23,7 @@ class GetAllDevicesNatsController(
     override val queueGroup: String = DEVICE_QUEUE_GROUP
     override val subject = GET_ALL
     override val parser: Parser<GetAllDevicesRequest> = GetAllDevicesRequest.parser()
+    override val responseType: GetAllDevicesResponse = GetAllDevicesResponse.getDefaultInstance()
 
     override fun handle(request: GetAllDevicesRequest): Mono<GetAllDevicesResponse> {
         return deviceService.getAll()

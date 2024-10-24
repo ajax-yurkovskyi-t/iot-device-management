@@ -1,6 +1,7 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
 import com.example.internal.NatsSubject.Device.UPDATE
+import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController
@@ -22,6 +23,7 @@ class UpdateDeviceNatsController(
     override val queueGroup: String = DEVICE_QUEUE_GROUP
     override val subject = UPDATE
     override val parser: Parser<UpdateDeviceRequest> = UpdateDeviceRequest.parser()
+    override val responseType: UpdateDeviceResponse = UpdateDeviceResponse.getDefaultInstance()
 
     override fun handle(request: UpdateDeviceRequest): Mono<UpdateDeviceResponse> {
         return deviceService.update(request.id, updateDeviceMapper.toDeviceUpdateRequestDto(request))

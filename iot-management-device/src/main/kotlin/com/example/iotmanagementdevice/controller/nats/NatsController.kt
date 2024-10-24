@@ -10,5 +10,6 @@ interface NatsController<T : GeneratedMessage, R : GeneratedMessage> {
     val subject: String
     val queueGroup: String
     val parser: Parser<T>
+    val responseType: R
     fun handle(request: T): Mono<R>
 }
