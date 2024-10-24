@@ -32,12 +32,12 @@ object DeviceProtoFixture {
         statusType = DeviceStatusType.ONLINE
     )
 
-    val deviceProto = Device.newBuilder()
-        .setName("Device")
-        .setDescription("A test device")
-        .setType("Sensor")
-        .setStatusType(Device.StatusType.ONLINE)
-        .build()
+    val deviceProto = Device.newBuilder().apply {
+        name = "Device"
+        description = ("A test device")
+        type = ("Sensor")
+        statusType = (Device.StatusType.STATUS_TYPE_ONLINE)
+    }.build()
 
     fun successfulCreateResponse(device: Device): CreateDeviceResponse {
         return CreateDeviceResponse.newBuilder().apply {
@@ -83,9 +83,7 @@ object DeviceProtoFixture {
 
     fun successfulGetAllDevicesResponse(devices: List<Device>): GetAllDevicesResponse {
         return GetAllDevicesResponse.newBuilder().apply {
-            devices.forEach { device ->
-                (successBuilder.addDevices(device))
-            }
+            successBuilder.addAllDevices(devices)
         }.build()
     }
 }

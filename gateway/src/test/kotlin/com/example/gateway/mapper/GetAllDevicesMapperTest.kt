@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class GetAllDevicesMapperTest {
     private val enumMapper = EnumMapperImpl()
@@ -30,34 +33,35 @@ class GetAllDevicesMapperTest {
         assertTrue(responseDtoList.contains(deviceResponseDto))
     }
 
-    @Test
-    fun `should throw error for failure response case`() {
-        // GIVEN
-        val failureMessage = "Failed to get devices"
-        val failureResponse = GetAllDevicesResponse.newBuilder()
-            .setFailure(
-                GetAllDevicesResponse.Failure.newBuilder()
-                    .setMessage(failureMessage)
-            )
-            .build()
-
+    @ParameterizedTest
+    @MethodSource("provideFailureResponseCases")
+    fun `should throw exception for failure response cases`(
+        response: GetAllDevicesResponse,
+        expectedMessage: String
+    ) {
         // WHEN & THEN
         val exception = assertThrows<RuntimeException> {
-            getAllDevicesMapper.toDto(failureResponse)
+            getAllDevicesMapper.toDto(response)
         }
-        assertEquals(failureMessage, exception.message)
+
+        assertEquals(expectedMessage, exception.message)
     }
 
-    @Test
-    fun `should throw RuntimeException when response case is not set`() {
-        // GIVEN
-        val noResponseCaseSet = GetAllDevicesResponse.getDefaultInstance()
-
-        // WHEN & THEN
-        val exception = assertThrows<RuntimeException> {
-            getAllDevicesMapper.toDto(noResponseCaseSet)
+    companion object {
+        @JvmStatic
+        fun provideFailureResponseCases(): List<Arguments> {
+            return listOf(
+                Arguments.of(
+                    GetAllDevicesResponse.newBuilder().apply {
+                        failureBuilder.message = ("Failed to get devices")
+                    }.build(),
+                    "Failed to get devices"
+                ),
+                Arguments.of(
+                    GetAllDevicesResponse.getDefaultInstance(),
+                    "No response case set"
+                )
+            )
         }
-
-        assertEquals("No response case set", exception.message)
     }
 }

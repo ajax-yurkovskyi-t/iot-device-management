@@ -14,9 +14,9 @@ message UpdateDeviceRequest {
   StatusType statusType = 5;
 
   enum StatusType {
-    UNSPECIFIED = 0;
-    ONLINE = 1;
-    OFFLINE = 2;
+    STATUS_TYPE_UNSPECIFIED = 0;
+    STATUS_TYPE_ONLINE = 1;
+    STATUS_TYPE_OFFLINE = 2;
   }
 }
 

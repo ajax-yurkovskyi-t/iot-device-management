@@ -99,8 +99,13 @@ class DeviceControllerTest {
         every { createDeviceMapper.toDto(response) } returns deviceResponseDto
 
         // WHEN // THEN
-        webTestClient.post().uri(URL).contentType(MediaType.APPLICATION_JSON).bodyValue(deviceResponseDto).exchange()
-            .expectStatus().isCreated.expectBody<DeviceResponseDto>().isEqualTo(deviceResponseDto)
+        webTestClient.post()
+            .uri(URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(deviceResponseDto)
+            .exchange()
+            .expectStatus().isCreated.expectBody<DeviceResponseDto>()
+            .isEqualTo(deviceResponseDto)
     }
 
     @Test

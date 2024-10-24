@@ -4,13 +4,15 @@ import DeviceProtoFixture.deviceProto
 import DeviceProtoFixture.deviceResponseDto
 import DeviceProtoFixture.failureGetDeviceByIdResponse
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
-import com.example.core.exception.EntityNotFoundException
 import com.example.gateway.mapper.impl.GetDeviceByIdMapperImpl
 import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class GetDeviceByIdMapperTest {
 
@@ -30,45 +32,40 @@ class GetDeviceByIdMapperTest {
         assertEquals(response, deviceResponseDto)
     }
 
-    @Test
-    fun `should throw RuntimeException when no response case is set`() {
-        // GIVEN
-        val getDeviceResponse = GetDeviceByIdResponse.getDefaultInstance()
-
+    @ParameterizedTest
+    @MethodSource("provideFailureResponseCases")
+    fun `should throw exception for failure response cases`(
+        response: GetDeviceByIdResponse,
+        expectedMessage: String
+    ) {
         // WHEN & THEN
         val exception = assertThrows<RuntimeException> {
-            getDeviceByIdMapper.toDto(getDeviceResponse)
+            getDeviceByIdMapper.toDto(response)
         }
-        assertEquals("No response case set", exception.message)
+
+        assertEquals(expectedMessage, exception.message)
     }
 
-    @Test
-    fun `should throw error for FAILURE response case`() {
-        // GIVEN
-        val failureMessage = "Failed to find device by id"
-        val getDeviceResponse = failureGetDeviceByIdResponse(failureMessage)
-
-        // WHEN & THEN
-        val exception = assertThrows<RuntimeException> {
-            getDeviceByIdMapper.toDto(getDeviceResponse)
+    companion object {
+        @JvmStatic
+        fun provideFailureResponseCases(): List<Arguments> {
+            return listOf(
+                Arguments.of(
+                    GetDeviceByIdResponse.getDefaultInstance(),
+                    "No response case set"
+                ),
+                Arguments.of(
+                    failureGetDeviceByIdResponse("Failed to find device by id"),
+                    "Failed to find device by id"
+                ),
+                Arguments.of(
+                    GetDeviceByIdResponse.newBuilder().apply {
+                        failureBuilder.setDeviceNotFound(Error.getDefaultInstance())
+                        failureBuilder.message = "Device not found"
+                    }.build(),
+                    "Device not found"
+                )
+            )
         }
-        assertEquals(failureMessage, exception.message)
-    }
-
-    @Test
-    fun `should throw EntityNotFoundException when DEVICE_NOT_FOUND is the error case`() {
-        // GIVEN
-        val failureMessage = "Device not found"
-        val getDeviceResponse = GetDeviceByIdResponse.newBuilder().apply {
-            failureBuilder.setDeviceNotFound(Error.getDefaultInstance())
-            failureBuilder.message = failureMessage
-        }.build()
-
-        // WHEN & THEN
-        val exception = assertThrows<EntityNotFoundException> {
-            getDeviceByIdMapper.toDto(getDeviceResponse)
-        }
-
-        assertEquals(failureMessage, exception.message)
     }
 }

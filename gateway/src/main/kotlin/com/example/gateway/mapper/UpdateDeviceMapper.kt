@@ -9,6 +9,8 @@ import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRespo
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
+import org.mapstruct.ValueMapping
+import org.mapstruct.ValueMappings
 
 @Mapper(
     componentModel = "spring",
@@ -18,6 +20,10 @@ import org.mapstruct.NullValueCheckStrategy
     uses = [EnumMapper::class]
 )
 abstract class UpdateDeviceMapper {
+    @ValueMappings(
+        ValueMapping(source = "ONLINE", target = "STATUS_TYPE_ONLINE"),
+        ValueMapping(source = "OFFLINE", target = "STATUS_TYPE_OFFLINE"),
+    )
     abstract fun toUpdateRequestProto(deviceUpdateRequestDto: DeviceUpdateRequestDto, id: String): UpdateDeviceRequest
 
     abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
@@ -32,8 +38,8 @@ abstract class UpdateDeviceMapper {
 
     private fun toFailure(response: UpdateDeviceResponse): Nothing {
         val message = response.failure.message.orEmpty()
-        when (response.failure.errorCase!!) {
-            UpdateDeviceResponse.Failure.ErrorCase.DEVICE_NOT_FOUND -> throw EntityNotFoundException(message)
+        throw when (response.failure.errorCase!!) {
+            UpdateDeviceResponse.Failure.ErrorCase.DEVICE_NOT_FOUND -> EntityNotFoundException(message)
             UpdateDeviceResponse.Failure.ErrorCase.ERROR_NOT_SET -> error(message)
         }
     }

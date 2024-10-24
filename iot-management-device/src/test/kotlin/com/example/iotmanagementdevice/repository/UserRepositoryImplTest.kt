@@ -46,6 +46,11 @@ class UserRepositoryImplTest : AbstractMongoTest {
         val device1 = UserFixture.createDevice().copy(name = "Device1")
         val device2 = UserFixture.createDevice().copy(name = "Device2")
 
+        val expectedDevices = listOf(
+            device1.copy(userId = user.id),
+            device2.copy(userId = user.id)
+        )
+
         deviceRepositoryImpl.save(device1).block()
         deviceRepositoryImpl.save(device2).block()
 
@@ -58,9 +63,7 @@ class UserRepositoryImplTest : AbstractMongoTest {
 
         // Then
         devices.test()
-            .expectNextMatches {
-                it.contains(device1.copy(userId = user.id)) && it.contains(device2.copy(userId = user.id))
-            }
+            .expectNextMatches { it.containsAll(expectedDevices) }
             .verifyComplete()
     }
 
@@ -134,18 +137,17 @@ class UserRepositoryImplTest : AbstractMongoTest {
     fun `should rollback transaction when device assignment fails`() {
         // Given
         val user = UserFixture.createUser()
-        userRepositoryImpl.save(user).block()
+        userRepositoryImpl.save(user).block()!!
 
         val invalidDeviceId = ObjectId() // Non-existent device ID
 
         // When & Then
-
         userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), invalidDeviceId.toString()).test()
             .verifyError<RuntimeException>()
 
-        val updatedUser = userRepositoryImpl.findById(user.id!!.toString()).block()
+        val updatedUser = userRepositoryImpl.findById(user.id!!.toString()).block()!!
 
-        assertTrue(updatedUser!!.devices!!.isEmpty()) { "User's devices should remain unchanged" }
+        assertTrue(updatedUser.devices!!.isEmpty()) { "User's devices should remain unchanged" }
     }
 
     @Test

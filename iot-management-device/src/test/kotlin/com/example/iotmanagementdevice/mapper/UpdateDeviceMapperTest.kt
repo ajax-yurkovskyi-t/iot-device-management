@@ -3,10 +3,12 @@ package com.example.iotmanagementdevice.mapper
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.mapper.impl.UpdateDeviceMapperImpl
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class UpdateDeviceMapperTest {
-    private val updateDeviceMapper = UpdateDeviceMapperImpl()
+    private val enumMapper = EnumMapperImpl()
+    private val updateDeviceMapper = UpdateDeviceMapperImpl(enumMapper)
 
     @Test
     fun `should return error response`() {
@@ -31,7 +33,7 @@ class UpdateDeviceMapperTest {
         val actualResponse = updateDeviceMapper.toFailureUpdateDeviceResponse(exception)
 
         // THEN
-        assertEquals("", actualResponse.failure.message)
+        assertTrue(actualResponse.failure.message.isBlank())
         assertEquals(UpdateDeviceResponse.ResponseCase.FAILURE, actualResponse.responseCase)
     }
 }

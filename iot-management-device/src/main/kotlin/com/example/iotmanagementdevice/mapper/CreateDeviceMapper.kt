@@ -14,10 +14,13 @@ import org.mapstruct.ValueMapping
     componentModel = "spring",
     injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    implementationPackage = "<PACKAGE_NAME>.impl"
+    implementationPackage = "<PACKAGE_NAME>.impl",
+    uses = [EnumMapper::class]
 )
 abstract class CreateDeviceMapper {
-    @ValueMapping(source = "UNSPECIFIED", target = "OFFLINE")
+    @ValueMapping(source = "STATUS_TYPE_ONLINE", target = "ONLINE")
+    @ValueMapping(source = "STATUS_TYPE_OFFLINE", target = "OFFLINE")
+    @ValueMapping(source = "STATUS_TYPE_UNSPECIFIED", target = "OFFLINE")
     @ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
     abstract fun toDeviceCreateRequestDto(request: CreateDeviceRequest): DeviceCreateRequestDto
 

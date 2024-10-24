@@ -1,6 +1,5 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
-import com.example.internal.NatsSubject.Device.DEVICE_QUEUE_GROUP
 import com.example.internal.NatsSubject.Device.GET_ALL
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
@@ -31,5 +30,9 @@ class GetAllDevicesNatsController(
             .onErrorResume { throwable ->
                 getAllDevicesMapper.toFailureGetAllDevicesResponse(throwable).toMono()
             }
+    }
+
+    companion object {
+        const val DEVICE_QUEUE_GROUP = "deviceQueueGroup"
     }
 }

@@ -1,7 +1,6 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
 import com.example.internal.NatsSubject.Device.DELETE
-import com.example.internal.NatsSubject.Device.DEVICE_QUEUE_GROUP
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
 import com.example.iotmanagementdevice.controller.nats.NatsController
@@ -30,5 +29,9 @@ class DeleteDeviceNatsController(
             .onErrorResume {
                 deleteDeviceMapper.toFailureDeleteDeviceResponse(it).toMono()
             }
+    }
+
+    companion object {
+        const val DEVICE_QUEUE_GROUP = "deviceQueueGroup"
     }
 }

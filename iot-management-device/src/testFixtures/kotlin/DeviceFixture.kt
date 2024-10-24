@@ -58,7 +58,7 @@ object DeviceFixture {
         setName("ProtoDevice")
         setType("Sensor")
         setDescription("A test device")
-        setStatusType(CreateDeviceRequest.StatusType.ONLINE)
+        setStatusType(CreateDeviceRequest.StatusType.STATUS_TYPE_ONLINE)
     }.build()
 
     fun deleteDeviceRequest(deviceId: String): DeleteDeviceRequest =
@@ -72,7 +72,7 @@ object DeviceFixture {
         setName("ProtoDevice")
         setType("Sensor")
         setDescription("A test device")
-        setStatusType(UpdateDeviceRequest.StatusType.ONLINE)
+        setStatusType(UpdateDeviceRequest.StatusType.STATUS_TYPE_ONLINE)
     }.build()
 
     fun getAllDevicesRequest(): GetAllDevicesRequest =

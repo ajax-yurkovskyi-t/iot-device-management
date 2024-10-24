@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class DeleteDeviceMapperTest {
     private val deleteDeviceMapper = DeleteDeviceMapperImpl()
@@ -12,9 +15,7 @@ class DeleteDeviceMapperTest {
     @Test
     fun `should do nothing for SUCCESS response case`() {
         // GIVEN
-        val successResponse = DeleteDeviceResponse.newBuilder()
-            .setSuccess(DeleteDeviceResponse.Success.newBuilder().build())
-            .build()
+        val successResponse = DeleteDeviceResponse.newBuilder().apply { successBuilder }.build()
 
         // WHEN & THEN
         assertDoesNotThrow {
@@ -22,56 +23,41 @@ class DeleteDeviceMapperTest {
         }
     }
 
-    @Test
-    fun `should throw RuntimeException for FAILURE response case with a message`() {
-        // GIVEN
-        val failureMessage = "Failed to delete device"
-        val failureResponse = DeleteDeviceResponse.newBuilder()
-            .setFailure(
-                DeleteDeviceResponse.Failure.newBuilder()
-                    .setMessage(failureMessage)
-            )
-            .build()
-
+    @ParameterizedTest
+    @MethodSource("provideFailureResponseCases")
+    fun `should throw exception for failure response cases`(
+        failureResponse: DeleteDeviceResponse,
+        expectedMessage: String
+    ) {
         // WHEN & THEN
         val exception = assertThrows<RuntimeException> {
             deleteDeviceMapper.toDeleteResponse(failureResponse)
         }
 
-        // Assert that the exception message matches the failure message
-        assertEquals(failureMessage, exception.message)
+        assertEquals(expectedMessage, exception.message)
     }
 
-    @Test
-    fun `should throw RuntimeException for FAILURE response case with empty message`() {
-        // GIVEN
-        val failureResponse = DeleteDeviceResponse.newBuilder()
-            .setFailure(
-                DeleteDeviceResponse.Failure.newBuilder()
-                    .clearMessage() // Simulate empty message
+    companion object {
+        @JvmStatic
+        fun provideFailureResponseCases(): List<Arguments> {
+            return listOf(
+                Arguments.of(
+                    DeleteDeviceResponse.newBuilder().apply {
+                        failureBuilder.setMessage("Failed to delete device")
+                    }.build(),
+                    "Failed to delete device"
+                ),
+
+                Arguments.of(
+                    DeleteDeviceResponse.newBuilder().apply { failureBuilder }.build(),
+                    "" // empty message
+                ),
+
+                Arguments.of(
+                    DeleteDeviceResponse.getDefaultInstance(),
+                    "No response case set"
+                )
             )
-            .build()
-
-        // WHEN & THEN
-        val exception = assertThrows<RuntimeException> {
-            deleteDeviceMapper.toDeleteResponse(failureResponse)
         }
-
-        // Assert that the exception message is empty
-        assertEquals("", exception.message)
-    }
-
-    @Test
-    fun `should throw RuntimeException when response case is RESPONSE_NOT_SET`() {
-        // GIVEN
-        val noResponseCaseSet = DeleteDeviceResponse.getDefaultInstance()
-
-        // WHEN & THEN
-        val exception = assertThrows<RuntimeException> {
-            deleteDeviceMapper.toDeleteResponse(noResponseCaseSet)
-        }
-
-        // Assert that the exception type is RuntimeException
-        assertEquals("No response case set", exception.message)
     }
 }

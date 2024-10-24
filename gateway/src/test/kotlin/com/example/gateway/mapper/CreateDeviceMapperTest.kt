@@ -9,6 +9,9 @@ import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRespo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class CreateDeviceMapperTest {
     private val enumMapper = EnumMapperImpl()
@@ -26,28 +29,32 @@ class CreateDeviceMapperTest {
         assertEquals(response, deviceResponseDto)
     }
 
-    @Test
-    fun `should throw RuntimeException for no response case set`() {
-        // Given
-        val createDeviceResponse = CreateDeviceResponse.getDefaultInstance()
-
+    @ParameterizedTest
+    @MethodSource("provideFailureResponseCases")
+    fun `should throw exception for failure response case`(
+        createDeviceResponse: CreateDeviceResponse,
+        expectedMessage: String
+    ) {
         // When & Then
         val exception = assertThrows<RuntimeException> {
             createDeviceMapper.toDto(createDeviceResponse)
         }
-        assertEquals("No response case set", exception.message)
+        assertEquals(expectedMessage, exception.message)
     }
 
-    @Test
-    fun `should throw error for FAILURE response case`() {
-        // Given
-        val failureMessage = "Device creation failed"
-        val createDeviceResponse = failureCreateResponse(failureMessage)
-
-        // When & Then
-        val exception = assertThrows<RuntimeException> {
-            createDeviceMapper.toDto(createDeviceResponse)
+    companion object {
+        @JvmStatic
+        fun provideFailureResponseCases(): List<Arguments> {
+            return listOf(
+                Arguments.of(
+                    CreateDeviceResponse.getDefaultInstance(),
+                    "No response case set"
+                ),
+                Arguments.of(
+                    failureCreateResponse("Device creation failed"),
+                    "Device creation failed"
+                ),
+            )
         }
-        assertEquals(failureMessage, exception.message)
     }
 }

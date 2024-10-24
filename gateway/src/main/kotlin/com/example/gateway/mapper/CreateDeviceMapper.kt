@@ -8,6 +8,8 @@ import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRespo
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
+import org.mapstruct.ValueMapping
+import org.mapstruct.ValueMappings
 
 @Mapper(
     componentModel = "spring",
@@ -17,6 +19,10 @@ import org.mapstruct.NullValueCheckStrategy
     uses = [EnumMapper::class]
 )
 abstract class CreateDeviceMapper {
+    @ValueMappings(
+        ValueMapping(source = "ONLINE", target = "STATUS_TYPE_ONLINE"),
+        ValueMapping(source = "OFFLINE", target = "STATUS_TYPE_OFFLINE"),
+    )
     abstract fun toCreateRequestProto(dto: DeviceCreateRequestDto): CreateDeviceRequest
 
     abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto

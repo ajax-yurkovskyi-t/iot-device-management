@@ -11,17 +11,18 @@ import org.mapstruct.NullValueCheckStrategy
     componentModel = "spring",
     injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    implementationPackage = "<PACKAGE_NAME>.impl"
+    implementationPackage = "<PACKAGE_NAME>.impl",
+    uses = [EnumMapper::class]
 )
 abstract class GetAllDevicesMapper {
+
     abstract fun toProtoDevice(deviceResponseDto: DeviceResponseDto): Device
 
     fun toGetAllDevicesResponse(deviceResponseDtoList: List<DeviceResponseDto>): GetAllDevicesResponse {
-        val successBuilder = GetAllDevicesResponse.Success.newBuilder()
+        val devicesProtoList = deviceResponseDtoList.map { dto -> toProtoDevice(dto) }
 
-        deviceResponseDtoList.forEach { dto ->
-            successBuilder.addDevices(toProtoDevice(dto))
-        }
+        val successBuilder = GetAllDevicesResponse.Success.newBuilder()
+            .addAllDevices(devicesProtoList)
 
         return GetAllDevicesResponse.newBuilder()
             .setSuccess(successBuilder.build())

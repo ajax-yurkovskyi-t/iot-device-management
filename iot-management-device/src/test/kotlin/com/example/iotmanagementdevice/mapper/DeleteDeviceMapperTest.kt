@@ -3,6 +3,7 @@ package com.example.iotmanagementdevice.mapper
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
 import com.example.iotmanagementdevice.mapper.impl.DeleteDeviceMapperImpl
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class DeleteDeviceMapperTest {
@@ -31,7 +32,7 @@ class DeleteDeviceMapperTest {
         val actualResponse = deleteDeviceMapper.toFailureDeleteDeviceResponse(exception)
 
         // THEN
-        assertEquals("", actualResponse.failure.message)
+        assertTrue(actualResponse.failure.message.isBlank())
         assertEquals(DeleteDeviceResponse.ResponseCase.FAILURE, actualResponse.responseCase)
     }
 }

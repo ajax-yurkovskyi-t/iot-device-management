@@ -1,5 +1,8 @@
 logging:
   level:
     org.springframework.test.context.cache: DEBUG
+
 mongock:
   enabled: false
+
+nats.uri: nats://localhost:4222

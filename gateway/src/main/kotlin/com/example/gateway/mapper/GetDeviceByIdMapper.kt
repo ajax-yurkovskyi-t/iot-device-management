@@ -28,8 +28,8 @@ abstract class GetDeviceByIdMapper {
 
     private fun toFailure(response: GetDeviceByIdResponse): Nothing {
         val message = response.failure.message.orEmpty()
-        when (response.failure.errorCase!!) {
-            GetDeviceByIdResponse.Failure.ErrorCase.DEVICE_NOT_FOUND -> throw EntityNotFoundException(message)
+        throw when (response.failure.errorCase!!) {
+            GetDeviceByIdResponse.Failure.ErrorCase.DEVICE_NOT_FOUND -> EntityNotFoundException(message)
             GetDeviceByIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> error(message)
         }
     }

@@ -1,6 +1,5 @@
 package com.example.iotmanagementdevice.controller.nats.device
 
-import com.example.internal.NatsSubject.Device.DEVICE_QUEUE_GROUP
 import com.example.internal.NatsSubject.Device.UPDATE
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
@@ -30,5 +29,9 @@ class UpdateDeviceNatsController(
             .onErrorResume { throwable ->
                 updateDeviceMapper.toFailureUpdateDeviceResponse(throwable).toMono()
             }
+    }
+
+    companion object {
+        const val DEVICE_QUEUE_GROUP = "deviceQueueGroup"
     }
 }

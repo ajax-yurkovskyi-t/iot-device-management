@@ -10,8 +10,10 @@ import org.mapstruct.ValueMappings
 interface EnumMapper {
 
     @ValueMappings(
-        ValueMapping(source = "UNSPECIFIED", target = "OFFLINE"),
-        ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
+        ValueMapping(source = "STATUS_TYPE_ONLINE", target = "ONLINE"),
+        ValueMapping(source = "STATUS_TYPE_OFFLINE", target = "OFFLINE"),
+        ValueMapping(source = "STATUS_TYPE_UNSPECIFIED", target = "OFFLINE"),
+        ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE"),
     )
     fun mapStatusType(statusType: Device.StatusType): DeviceStatusType
 }

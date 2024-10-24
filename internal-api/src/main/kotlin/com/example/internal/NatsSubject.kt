@@ -5,7 +5,6 @@ object NatsSubject {
 
     object Device {
         private const val DEVICE_PREFIX = "$REQUEST_PREFIX.device"
-        const val DEVICE_QUEUE_GROUP = "deviceQueueGroup"
 
         const val GET_BY_ID = "$DEVICE_PREFIX.get_by_id"
         const val CREATE = "$DEVICE_PREFIX.create"
