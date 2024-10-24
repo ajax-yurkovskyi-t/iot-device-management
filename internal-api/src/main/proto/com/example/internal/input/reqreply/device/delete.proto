@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "com/example/internal/commonmodels/device/device.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.internal.input.reqreply.device.delete.proto";
+
+message DeleteDeviceRequest {
+  string id = 1;
+}
+
+message DeleteDeviceResponse {
+  oneof response {
+    Success success = 1;
+    Failure failure = 2;
+  }
+
+  message Success {}
+
+  message Failure {
+    string message = 100;
+  }
+}

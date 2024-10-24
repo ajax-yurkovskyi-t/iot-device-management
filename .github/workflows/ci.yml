@@ -25,6 +25,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Start containers
+        run: docker compose -f .github/docker-compose-github-actions.yaml up -d
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
