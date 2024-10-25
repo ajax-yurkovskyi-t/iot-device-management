@@ -13,7 +13,7 @@ import reactor.kotlin.core.publisher.toMono
 @Component
 class NatsControllerBeanPostProcessor(private val dispatcher: Dispatcher) : BeanPostProcessor {
 
-    override fun postProcessBeforeInitialization(bean: Any, beanName: String): Any? {
+    override fun postProcessAfterInitialization(bean: Any, beanName: String): Any? {
         if (bean is NatsController<*, *>) {
             dispatch(bean)
         }
