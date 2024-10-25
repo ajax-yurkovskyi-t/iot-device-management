@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class DeleteDeviceMapperTest {
-    private val deleteDeviceMapper = DeleteDeviceMapperImpl()
+    private val deleteDeviceMapper = DeleteDeviceMapper()
 
     @Test
     fun `should do nothing for SUCCESS response case`() {

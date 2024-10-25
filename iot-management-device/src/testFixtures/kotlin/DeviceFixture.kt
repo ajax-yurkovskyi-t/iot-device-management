@@ -2,6 +2,7 @@ import com.example.core.dto.DeviceStatusType
 import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
+import com.example.internal.commonmodels.Device
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
@@ -58,7 +59,7 @@ object DeviceFixture {
         setName("ProtoDevice")
         setType("Sensor")
         setDescription("A test device")
-        setStatusType(CreateDeviceRequest.StatusType.STATUS_TYPE_ONLINE)
+        setStatusType(Device.StatusType.STATUS_TYPE_ONLINE)
     }.build()
 
     fun deleteDeviceRequest(deviceId: String): DeleteDeviceRequest =
@@ -72,7 +73,7 @@ object DeviceFixture {
         setName("ProtoDevice")
         setType("Sensor")
         setDescription("A test device")
-        setStatusType(UpdateDeviceRequest.StatusType.STATUS_TYPE_ONLINE)
+        setStatusType(Device.StatusType.STATUS_TYPE_ONLINE)
     }.build()
 
     fun getAllDevicesRequest(): GetAllDevicesRequest =

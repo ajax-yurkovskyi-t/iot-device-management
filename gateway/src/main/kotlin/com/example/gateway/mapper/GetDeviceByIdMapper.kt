@@ -18,6 +18,7 @@ import org.mapstruct.NullValueCheckStrategy
 abstract class GetDeviceByIdMapper {
     abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
 
+    @Suppress("TooGenericExceptionThrown")
     fun toDto(response: GetDeviceByIdResponse): DeviceResponseDto {
         return when (response.responseCase!!) {
             GetDeviceByIdResponse.ResponseCase.SUCCESS -> toDeviceResponseDto(response.success.device)

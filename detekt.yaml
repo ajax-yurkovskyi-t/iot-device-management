@@ -1,7 +1,0 @@
-exceptions:
-  TooGenericExceptionThrown:
-    active: false
-
-complexity:
-  TooManyFunctions:
-    active: false

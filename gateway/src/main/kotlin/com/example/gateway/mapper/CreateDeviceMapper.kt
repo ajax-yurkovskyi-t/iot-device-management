@@ -27,6 +27,7 @@ abstract class CreateDeviceMapper {
 
     abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
 
+    @Suppress("TooGenericExceptionThrown")
     fun toDto(response: CreateDeviceResponse): DeviceResponseDto {
         val message = response.failure.message.orEmpty()
         return when (response.responseCase!!) {

@@ -1,16 +1,9 @@
 package com.example.gateway.mapper
 
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
-import org.mapstruct.InjectionStrategy
-import org.mapstruct.Mapper
-import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(
-    componentModel = "spring",
-    injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
-)
-abstract class DeleteDeviceMapper {
+class DeleteDeviceMapper {
+    @Suppress("TooGenericExceptionThrown")
     fun toDeleteResponse(response: DeleteDeviceResponse) {
         val message = response.failure.message.orEmpty()
         when (response.responseCase!!) {

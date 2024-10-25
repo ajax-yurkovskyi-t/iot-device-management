@@ -28,6 +28,7 @@ abstract class UpdateDeviceMapper {
 
     abstract fun toDeviceResponseDto(device: Device): DeviceResponseDto
 
+    @Suppress("TooGenericExceptionThrown")
     fun toDto(response: UpdateDeviceResponse): DeviceResponseDto {
         return when (response.responseCase!!) {
             UpdateDeviceResponse.ResponseCase.SUCCESS -> toDeviceResponseDto(response.success.device)

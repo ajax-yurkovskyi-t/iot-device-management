@@ -25,11 +25,6 @@ java {
     }
 }
 
-detekt {
-    buildUponDefaultConfig = true
-    config.from(file("${rootDir}/detekt.yaml"))
-}
-
 tasks.withType<Detekt> {
     reports {
         html.required.set(true)

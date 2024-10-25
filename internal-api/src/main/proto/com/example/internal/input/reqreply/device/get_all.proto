@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package com.example.internal.input.reqreply.device;
+
 import "com/example/internal/commonmodels/device/device.proto";
 
 option java_multiple_files = true;
@@ -16,7 +18,7 @@ message GetAllDevicesResponse {
   }
 
   message Success {
-    repeated Device devices = 1;
+    repeated commonmodels.Device devices = 1;
   }
 
   message Failure {

@@ -1,13 +1,12 @@
 package com.example.iotmanagementdevice.mapper
 
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
-import com.example.iotmanagementdevice.mapper.impl.DeleteDeviceMapperImpl
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class DeleteDeviceMapperTest {
-    private val deleteDeviceMapper = DeleteDeviceMapperImpl()
+    private val deleteDeviceMapper = DeleteDeviceMapper()
 
     @Test
     fun `should return error response`() {

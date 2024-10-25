@@ -8,7 +8,6 @@ import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
-import org.mapstruct.ValueMapping
 
 @Mapper(
     componentModel = "spring",
@@ -18,10 +17,6 @@ import org.mapstruct.ValueMapping
     uses = [EnumMapper::class]
 )
 abstract class CreateDeviceMapper {
-    @ValueMapping(source = "STATUS_TYPE_ONLINE", target = "ONLINE")
-    @ValueMapping(source = "STATUS_TYPE_OFFLINE", target = "OFFLINE")
-    @ValueMapping(source = "STATUS_TYPE_UNSPECIFIED", target = "OFFLINE")
-    @ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
     abstract fun toDeviceCreateRequestDto(request: CreateDeviceRequest): DeviceCreateRequestDto
 
     @Mapping(target = "success.device", source = "deviceResponseDto")

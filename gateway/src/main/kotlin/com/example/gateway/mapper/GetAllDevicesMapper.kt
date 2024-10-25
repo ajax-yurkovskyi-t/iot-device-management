@@ -16,6 +16,7 @@ import org.mapstruct.NullValueCheckStrategy
 abstract class GetAllDevicesMapper {
     abstract fun toDeviceResponseDtoList(devicesList: List<Device>): List<DeviceResponseDto>
 
+    @Suppress("TooGenericExceptionThrown")
     fun toDto(response: GetAllDevicesResponse): List<DeviceResponseDto> {
         val message = response.failure.message.orEmpty()
         return when (response.responseCase!!) {

@@ -10,7 +10,6 @@ import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
-import org.mapstruct.ValueMapping
 
 @Mapper(
     componentModel = "spring",
@@ -21,10 +20,6 @@ import org.mapstruct.ValueMapping
 )
 abstract class UpdateDeviceMapper {
 
-    @ValueMapping(source = "STATUS_TYPE_ONLINE", target = "ONLINE")
-    @ValueMapping(source = "STATUS_TYPE_OFFLINE", target = "OFFLINE")
-    @ValueMapping(source = "STATUS_TYPE_UNSPECIFIED", target = "OFFLINE")
-    @ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
     abstract fun toDeviceUpdateRequestDto(updateDeviceRequest: UpdateDeviceRequest): DeviceUpdateRequestDto
 
     @Mapping(target = "success.device", source = "deviceResponseDto")
