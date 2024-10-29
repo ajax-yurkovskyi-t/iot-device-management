@@ -1,7 +1,9 @@
 package com.example.gateway.mapper
 
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
+import org.springframework.stereotype.Component
 
+@Component
 class DeleteDeviceMapper {
     @Suppress("TooGenericExceptionThrown")
     fun toDeleteResponse(response: DeleteDeviceResponse) {
