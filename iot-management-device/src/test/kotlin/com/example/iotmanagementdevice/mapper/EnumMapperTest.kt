@@ -17,7 +17,7 @@ class EnumMapperTest {
         val result = enumMapper.mapStatusType(statusType)
 
         // Then
-        assertEquals(result, expected)
+        assertEquals(expected, result)
     }
 
     @ParameterizedTest
@@ -27,7 +27,7 @@ class EnumMapperTest {
         val result = enumMapper.mapStatusType(statusType)
 
         // Then
-        assertEquals(result, expected)
+        assertEquals(expected, result)
     }
 
     companion object {
