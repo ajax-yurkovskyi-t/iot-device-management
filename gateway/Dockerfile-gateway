@@ -1,7 +1,5 @@
-FROM amazoncorretto:17 AS builder
+FROM amazoncorretto:17
 WORKDIR /workspace/app
-
-FROM builder AS gateway
 COPY gateway/build/libs/*.jar ./gateway.jar
 EXPOSE 8080
 CMD ["java", "-jar", "./gateway.jar"]
