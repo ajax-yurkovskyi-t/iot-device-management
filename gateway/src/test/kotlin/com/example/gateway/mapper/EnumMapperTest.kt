@@ -17,7 +17,7 @@ class EnumMapperTest {
         val result = enumMapper.mapStatusType(statusType)
 
         // Then
-        assertEquals(expected, result)
+        assertEquals(result, expected)
     }
 
     companion object {
