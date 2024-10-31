@@ -13,6 +13,9 @@ services:
   app:
     image: iot-management-device
     container_name: iot-management-device
+    build:
+      context: .
+      dockerfile: iot-management-device/Dockerfile-iot
     env_file:
       - .env
     ports:
@@ -23,6 +26,9 @@ services:
   gateway:
     image: gateway
     container_name: gateway
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile-gateway
     env_file:
       - .env
     ports:

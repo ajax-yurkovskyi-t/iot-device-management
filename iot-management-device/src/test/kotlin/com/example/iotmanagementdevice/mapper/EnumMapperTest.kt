@@ -4,14 +4,17 @@ import com.example.core.dto.DeviceStatusType
 import com.example.internal.commonmodels.Device
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.CsvSource
 
 class EnumMapperTest {
     private val enumMapper = EnumMapperImpl()
 
     @ParameterizedTest
-    @MethodSource("provideProtoDeviceStatusMappingCases")
+    @CsvSource(
+        textBlock = """
+        ONLINE, STATUS_TYPE_ONLINE,
+        OFFLINE, STATUS_TYPE_OFFLINE"""
+    )
     fun `should return the correct proto DeviceStatusType`(statusType: DeviceStatusType, expected: Device.StatusType) {
         // When
         val result = enumMapper.mapStatusType(statusType)
@@ -21,32 +24,18 @@ class EnumMapperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideDeviceStatusMappingCases")
+    @CsvSource(
+        textBlock = """
+        STATUS_TYPE_UNSPECIFIED, OFFLINE,
+        STATUS_TYPE_ONLINE, ONLINE,
+        STATUS_TYPE_OFFLINE, OFFLINE,
+        UNRECOGNIZED, OFFLINE"""
+    )
     fun `should return the correct DeviceStatusType`(statusType: Device.StatusType, expected: DeviceStatusType) {
         // When
         val result = enumMapper.mapStatusType(statusType)
 
         // Then
         assertEquals(expected, result)
-    }
-
-    companion object {
-        @JvmStatic
-        fun provideProtoDeviceStatusMappingCases(): List<Arguments> {
-            return listOf(
-                Arguments.of(DeviceStatusType.ONLINE, Device.StatusType.STATUS_TYPE_ONLINE),
-                Arguments.of(DeviceStatusType.OFFLINE, Device.StatusType.STATUS_TYPE_OFFLINE)
-            )
-        }
-
-        @JvmStatic
-        fun provideDeviceStatusMappingCases(): List<Arguments> {
-            return listOf(
-                Arguments.of(Device.StatusType.STATUS_TYPE_UNSPECIFIED, DeviceStatusType.OFFLINE),
-                Arguments.of(Device.StatusType.STATUS_TYPE_ONLINE, DeviceStatusType.ONLINE),
-                Arguments.of(Device.StatusType.STATUS_TYPE_OFFLINE, DeviceStatusType.OFFLINE),
-                Arguments.of(Device.StatusType.UNRECOGNIZED, DeviceStatusType.OFFLINE)
-            )
-        }
     }
 }

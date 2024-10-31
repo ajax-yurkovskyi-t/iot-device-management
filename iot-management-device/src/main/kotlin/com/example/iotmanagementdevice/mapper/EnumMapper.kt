@@ -16,9 +16,8 @@ abstract class EnumMapper {
 
     fun mapStatusType(statusType: Device.StatusType): DeviceStatusType {
         return when (statusType) {
-            Device.StatusType.STATUS_TYPE_UNSPECIFIED -> DeviceStatusType.OFFLINE
             Device.StatusType.STATUS_TYPE_ONLINE -> DeviceStatusType.ONLINE
-            Device.StatusType.STATUS_TYPE_OFFLINE -> DeviceStatusType.OFFLINE
+            Device.StatusType.STATUS_TYPE_UNSPECIFIED, Device.StatusType.STATUS_TYPE_OFFLINE,
             Device.StatusType.UNRECOGNIZED -> DeviceStatusType.OFFLINE
         }
     }
