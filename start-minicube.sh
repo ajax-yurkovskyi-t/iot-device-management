@@ -1,7 +1,7 @@
 eval "$(minikube docker-env)"
 
-docker build -f ./iot-management-device/Dockerfile-iot -t iot-management-device:v1 .
-docker build -f ./gateway/Dockerfile-gateway -t gateway:v1 .
+docker build -f ./iot-management-device/Dockerfile-iot -t iot-management-device:v1 ./iot-management-device
+docker build -f ./gateway/Dockerfile-gateway -t gateway:v1 ./gateway
 
 minikube addons enable ingress
 

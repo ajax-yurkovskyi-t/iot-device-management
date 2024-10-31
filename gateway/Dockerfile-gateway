@@ -1,5 +1,5 @@
 FROM amazoncorretto:17
 WORKDIR /workspace/app
-COPY gateway/build/libs/*.jar ./gateway.jar
+COPY build/libs/*.jar ./gateway.jar
 EXPOSE 8080
 CMD ["java", "-jar", "./gateway.jar"]
