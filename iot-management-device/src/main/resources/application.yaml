@@ -3,7 +3,7 @@ spring:
     name: iot_management_device
   data:
     mongodb:
-      uri: mongodb://localhost:27018/testDB?replicaSet=rs0&authSource=admin
+      uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
 
   main:
     web-application-type: reactive
@@ -19,3 +19,6 @@ jwt:
   secret: P23wHHMjD4anZ+9DlEYXmcDf481v0Ptmcq9LzVtBcLjR79e5wD1MyEZgOI2a8Cw9
 
 nats.uri: ${NATS_URI}
+
+server:
+  port: 8081

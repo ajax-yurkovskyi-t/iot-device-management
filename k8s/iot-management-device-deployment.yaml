@@ -16,10 +16,10 @@ spec:
     spec:
       containers:
         - name: iot-management-device
-          image: app
+          image: iot-management-device:v1
           imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
               protocol: TCP
           env:
             - name: MONGODB_USER
@@ -47,15 +47,8 @@ spec:
                 configMapKeyRef:
                   name: mongo-configmap
                   key: db_name
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: iot-management-device-service
-spec:
-  selector:
-    app: iot-management-device
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+            - name: NATS_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: nats-configmap
+                  key: nats_uri

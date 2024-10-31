@@ -11,14 +11,29 @@ services:
       - db-data:/data/db
 
   app:
-    build:
-      context: .
+    image: iot-management-device
+    container_name: iot-management-device
+    env_file:
+      - .env
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+
+  gateway:
+    image: gateway
+    container_name: gateway
     env_file:
       - .env
     ports:
       - "8080:8080"
-    depends_on:
-      - mongo
+
+  nats:
+    container_name: nats-server
+    image: nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
 
 volumes:
   db-data:

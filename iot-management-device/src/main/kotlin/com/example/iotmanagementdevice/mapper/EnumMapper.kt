@@ -3,21 +3,23 @@ package com.example.iotmanagementdevice.mapper
 import com.example.core.dto.DeviceStatusType
 import com.example.internal.commonmodels.Device
 import org.mapstruct.Mapper
-import org.mapstruct.ValueMapping
-import org.mapstruct.ValueMappings
 
 @Mapper(componentModel = "spring")
-interface EnumMapper {
+abstract class EnumMapper {
 
-    @ValueMappings(
-        ValueMapping(source = "ONLINE", target = "STATUS_TYPE_ONLINE"),
-        ValueMapping(source = "OFFLINE", target = "STATUS_TYPE_OFFLINE"),
-    )
-    fun mapStatusType(statusType: DeviceStatusType): Device.StatusType
+    fun mapStatusType(statusType: DeviceStatusType): Device.StatusType {
+        return when (statusType) {
+            DeviceStatusType.ONLINE -> Device.StatusType.STATUS_TYPE_ONLINE
+            DeviceStatusType.OFFLINE -> Device.StatusType.STATUS_TYPE_OFFLINE
+        }
+    }
 
-    @ValueMapping(source = "STATUS_TYPE_ONLINE", target = "ONLINE")
-    @ValueMapping(source = "STATUS_TYPE_OFFLINE", target = "OFFLINE")
-    @ValueMapping(source = "STATUS_TYPE_UNSPECIFIED", target = "OFFLINE")
-    @ValueMapping(source = "UNRECOGNIZED", target = "OFFLINE")
-    fun mapStatusType(statusType: Device.StatusType): DeviceStatusType
+    fun mapStatusType(statusType: Device.StatusType): DeviceStatusType {
+        return when (statusType) {
+            Device.StatusType.STATUS_TYPE_UNSPECIFIED -> DeviceStatusType.OFFLINE
+            Device.StatusType.STATUS_TYPE_ONLINE -> DeviceStatusType.ONLINE
+            Device.StatusType.STATUS_TYPE_OFFLINE -> DeviceStatusType.OFFLINE
+            Device.StatusType.UNRECOGNIZED -> DeviceStatusType.OFFLINE
+        }
+    }
 }
