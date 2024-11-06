@@ -3,7 +3,7 @@ spring:
     name: iot_management_device
   data:
     mongodb:
-      uri: mongodb://taras:taras@localhost:27017/test?authSource=admin
+      uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
 
   main:
     web-application-type: reactive
