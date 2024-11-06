@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.example.internal.commonmodels;
+
+import "com/example/internal/commonmodels/device/device.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.internal.commonmodels";
+
+message DeviceUpdateNotification {
+  string deviceId = 1;
+  string userId = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}

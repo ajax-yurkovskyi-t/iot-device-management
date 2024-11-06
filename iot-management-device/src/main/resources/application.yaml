@@ -3,13 +3,15 @@ spring:
     name: iot_management_device
   data:
     mongodb:
-      uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
+      uri: mongodb://taras:taras@localhost:27017/test?authSource=admin
 
   main:
     web-application-type: reactive
   security:
     public:
       endpoints: /v3/api-docs/**,/swagger-ui/**,/users/**,/error,/auth/**,/devices/**
+  kafka:
+    bootstrap-servers: http://localhost:9092
 
 mongock:
   migration-scan-package: com.example.iotmanagementdevice.mongock.changelogs

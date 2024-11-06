@@ -26,7 +26,7 @@ class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
     @Test
     fun `should return updated device`() {
         // GIVEN
-        val device = deviceRepository.save(createDevice().copy(name = "ProtoDevice")).block()!!
+        val device = deviceRepository.save(createDevice().copy(name = "ProtoDevice", userId = ObjectId())).block()!!
         val deviceDto = deviceMapper.toDto(device)
 
         // WHEN

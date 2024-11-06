@@ -8,6 +8,7 @@ import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceReque
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
+import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.model.MongoDevice
 import org.bson.types.ObjectId
 
@@ -78,4 +79,22 @@ object DeviceFixture {
 
     fun getAllDevicesRequest(): GetAllDevicesRequest =
         GetAllDevicesRequest.newBuilder().build()
+
+    fun updateDeviceResponse(deviceId: String, userId: String): UpdateDeviceResponse {
+        val device = Device.newBuilder().apply {
+            id = deviceId
+            this.userId = userId
+            name = "defaultName"
+            description = "defaultDescription"
+            type = "defaultType"
+        }.build()
+
+        val successResponse = UpdateDeviceResponse.Success.newBuilder().apply {
+            this.device = device
+        }.build()
+
+        return UpdateDeviceResponse.newBuilder().apply {
+            success = successResponse
+        }.build()
+    }
 }

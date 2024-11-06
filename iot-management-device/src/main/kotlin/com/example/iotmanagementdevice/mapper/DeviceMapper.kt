@@ -12,12 +12,12 @@ import org.mapstruct.NullValueCheckStrategy
     componentModel = "spring",
     injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    implementationPackage = "<PACKAGE_NAME>.impl"
+    implementationPackage = "<PACKAGE_NAME>.impl",
 )
-interface DeviceMapper {
-    fun toDto(device: MongoDevice): DeviceResponseDto
+abstract class DeviceMapper {
+    abstract fun toDto(device: MongoDevice): DeviceResponseDto
 
-    fun toEntity(dto: DeviceCreateRequestDto): MongoDevice
+    abstract fun toEntity(dto: DeviceCreateRequestDto): MongoDevice
 
-    fun toEntity(dto: DeviceUpdateRequestDto): MongoDevice
+    abstract fun toEntity(dto: DeviceUpdateRequestDto): MongoDevice
 }
