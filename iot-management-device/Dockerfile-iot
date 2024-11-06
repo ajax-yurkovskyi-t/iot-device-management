@@ -1,0 +1,5 @@
+FROM amazoncorretto:17
+WORKDIR /workspace/app
+COPY build/libs/*.jar ./iot-management-device.jar
+EXPOSE 8081
+CMD ["java", "-jar", "./iot-management-device.jar"]
