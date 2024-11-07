@@ -14,7 +14,7 @@ class KafkaProducerConfiguration(
     @Value("\${spring.kafka.bootstrap-servers}") private val bootstrapServers: String,
 ) {
     @Bean
-    fun reactiveKafkaProducerTemplate(): KafkaSender<String, ByteArray> {
+    fun reactiveKafkaProducer(): KafkaSender<String, ByteArray> {
         val properties = mapOf(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
             ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,

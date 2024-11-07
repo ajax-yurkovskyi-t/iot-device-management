@@ -39,7 +39,7 @@ object DeviceFixture {
             description = "A test device",
             type = "Sensor",
             statusType = MongoDevice.DeviceStatusType.ONLINE,
-            userId = null
+            userId = ObjectId()
         )
     }
 

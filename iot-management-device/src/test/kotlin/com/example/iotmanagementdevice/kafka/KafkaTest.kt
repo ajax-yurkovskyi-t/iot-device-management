@@ -10,11 +10,9 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.ByteArrayDeserializer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.awaitility.Awaitility.await
-import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -39,7 +37,7 @@ class KafkaTest : AbstractMongoTest {
     fun `should produce message on entity update`() {
         // GIVEN
         val updateRequestDto = createDeviceUpdateRequestDto()
-        val savedDevice = reactiveMongoTemplate.insert(createDevice().copy(userId = ObjectId())).block()!!
+        val savedDevice = reactiveMongoTemplate.insert(createDevice()).block()!!
         val receivedMessages = mutableListOf<DeviceUpdateNotification>()
 
         testConsumer.receive()
@@ -62,13 +60,13 @@ class KafkaTest : AbstractMongoTest {
             }
     }
 
-    class KafkaTestConfiguration(@Value("\${spring.kafka.bootstrap-servers}") val bootstrapServers: String) {
+    class KafkaTestConfiguration {
         @Bean
         fun testConsumer(kafkaProperties: KafkaProperties): KafkaReceiver<String, ByteArray>? {
             val properties = kafkaProperties.consumer.buildProperties(null).apply {
                 putAll(
                     mapOf(
-                        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+                        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
                         ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
                         ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to ByteArrayDeserializer::class.java,
                         ConsumerConfig.GROUP_ID_CONFIG to CONSUMER_GROUP

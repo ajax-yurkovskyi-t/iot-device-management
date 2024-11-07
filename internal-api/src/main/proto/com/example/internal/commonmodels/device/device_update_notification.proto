@@ -6,7 +6,6 @@ import "com/example/internal/commonmodels/device/device.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
-option java_package = "com.example.internal.commonmodels";
 
 message DeviceUpdateNotification {
   string deviceId = 1;

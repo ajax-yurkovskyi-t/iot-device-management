@@ -13,14 +13,14 @@ import reactor.kafka.receiver.KafkaReceiver
 
 @Component
 class DeviceUpdateProcessor(
-    private val kafkaReceiver: KafkaReceiver<String, ByteArray>,
+    private val updateDeviceKafkaReceiver: KafkaReceiver<String, ByteArray>,
     private val notificationProducer: DeviceUpdateNotificationProducer,
     private val deviceNotificationMapper: DeviceNotificationMapper,
 ) {
 
     @EventListener(ApplicationReadyEvent::class)
     fun consumeMessages() {
-        kafkaReceiver.receive()
+        updateDeviceKafkaReceiver.receive()
             .flatMap { record ->
                 val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
                 val notification: DeviceUpdateNotification =
