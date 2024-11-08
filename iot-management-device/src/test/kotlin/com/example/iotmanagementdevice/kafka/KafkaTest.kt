@@ -50,7 +50,6 @@ class KafkaTest : AbstractMongoTest {
 
         // WHEN
         deviceService.update(savedDevice.id.toString(), updateRequestDto).block()!!
-        println("method 1")
 
         // THEN
         await()
