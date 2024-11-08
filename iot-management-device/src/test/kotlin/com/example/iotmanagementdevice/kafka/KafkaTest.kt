@@ -16,10 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Scope
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import reactor.core.scheduler.Schedulers
 import reactor.kafka.receiver.KafkaReceiver
 import reactor.kafka.receiver.ReceiverOptions
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @Import(KafkaTest.KafkaTestConfiguration::class)
@@ -48,6 +50,7 @@ class KafkaTest : AbstractMongoTest {
 
         // WHEN
         deviceService.update(savedDevice.id.toString(), updateRequestDto).block()!!
+        println("method 1")
 
         // THEN
         await()
@@ -62,6 +65,7 @@ class KafkaTest : AbstractMongoTest {
 
     class KafkaTestConfiguration {
         @Bean
+        @Scope("prototype")
         fun testConsumer(kafkaProperties: KafkaProperties): KafkaReceiver<String, ByteArray>? {
             val properties = kafkaProperties.consumer.buildProperties(null).apply {
                 putAll(
@@ -69,7 +73,7 @@ class KafkaTest : AbstractMongoTest {
                         ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaProperties.bootstrapServers,
                         ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
                         ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to ByteArrayDeserializer::class.java,
-                        ConsumerConfig.GROUP_ID_CONFIG to CONSUMER_GROUP
+                        ConsumerConfig.GROUP_ID_CONFIG to "$CONSUMER_GROUP${UUID.randomUUID()}"
                     )
                 )
             }

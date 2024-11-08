@@ -24,8 +24,7 @@ class DeviceUpdateProcessor(
             .flatMap { record ->
                 val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
                 val notification: DeviceUpdateNotification =
-                    deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
-
+                    deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice, record.timestamp())
                 sendNotification(notification)
                     .doFinally { record.receiverOffset().acknowledge() }
             }

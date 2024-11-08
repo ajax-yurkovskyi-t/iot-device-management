@@ -3,6 +3,7 @@ import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.internal.commonmodels.Device
+import com.example.internal.commonmodels.DeviceUpdateNotification
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
@@ -10,7 +11,9 @@ import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdR
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.model.MongoDevice
+import com.google.protobuf.Timestamp
 import org.bson.types.ObjectId
+import java.time.Instant
 
 object DeviceFixture {
 
@@ -95,6 +98,17 @@ object DeviceFixture {
 
         return UpdateDeviceResponse.newBuilder().apply {
             success = successResponse
+        }.build()
+    }
+
+    fun updateDeviceNotification(deviceId: String, userId: String, timestamp: Instant): DeviceUpdateNotification {
+        return DeviceUpdateNotification.newBuilder().apply {
+            this.deviceId = deviceId
+            this.userId = userId
+            this.timestamp = Timestamp.newBuilder().apply {
+                seconds = timestamp.epochSecond
+                nanos = timestamp.nano
+            }.build()
         }.build()
     }
 }

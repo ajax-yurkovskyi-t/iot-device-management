@@ -8,8 +8,8 @@ import java.time.Instant
 
 @Component
 class DeviceNotificationMapper {
-    fun toDeviceUpdateNotification(response: UpdateDeviceResponse): DeviceUpdateNotification {
-        val currentTimestamp = Instant.now().let {
+    fun toDeviceUpdateNotification(response: UpdateDeviceResponse, timestampMillis: Long): DeviceUpdateNotification {
+        val currentTimestamp = Instant.ofEpochMilli(timestampMillis).let {
             Timestamp.newBuilder().apply {
                 seconds = it.epochSecond
                 nanos = it.nano
@@ -18,7 +18,7 @@ class DeviceNotificationMapper {
         return DeviceUpdateNotification.newBuilder().apply {
             deviceId = response.success.device.id
             userId = response.success.device.userId
-            timestamp = currentTimestamp
+            this.timestamp = currentTimestamp
         }.build()
     }
 }
