@@ -21,7 +21,7 @@ class DeviceServiceImpl(
     private val deviceRepository: DeviceRepository,
     private val deviceMapper: DeviceMapper,
     private val deviceUpdateProducer: DeviceUpdateProducer,
-    private val updateDeviceMapper: UpdateDeviceMapper
+    private val updateDeviceMapper: UpdateDeviceMapper,
 ) : DeviceService {
     override fun create(requestDto: DeviceCreateRequestDto): Mono<DeviceResponseDto> {
         val device: MongoDevice = deviceMapper.toEntity(requestDto)
