@@ -16,13 +16,13 @@ class DeviceNotificationMapperTest {
         // Given
         val deviceId = ObjectId().toString()
         val userId = ObjectId().toString()
-        val timestampMillis = Instant.now().toEpochMilli()
-        val updateDeviceResponse = updateDeviceResponse(deviceId, userId)
-        val updateDeviceNotification = updateDeviceNotification(deviceId, userId, Instant.ofEpochMilli(timestampMillis))
+        val timestamp = Instant.now()
+        val updateDeviceResponse = updateDeviceResponse(deviceId, userId, timestamp)
+        val updateDeviceNotification = updateDeviceNotification(deviceId, userId, timestamp)
 
         // When
         val result: DeviceUpdateNotification =
-            deviceNotificationMapper.toDeviceUpdateNotification(updateDeviceResponse, timestampMillis)
+            deviceNotificationMapper.toDeviceUpdateNotification(updateDeviceResponse)
 
         // Then
         assertEquals(updateDeviceNotification, result)

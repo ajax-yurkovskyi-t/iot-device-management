@@ -7,11 +7,13 @@ import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.model.MongoDevice
+import com.google.protobuf.Timestamp
 import org.bson.types.ObjectId
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
+import java.time.Instant
 
 @Mapper(
     componentModel = "spring",
@@ -41,5 +43,12 @@ abstract class UpdateDeviceMapper {
 
     fun mapObjectIdToString(objectId: ObjectId): String {
         return objectId.toString()
+    }
+
+    fun mapInstantToTimestamp(instant: Instant): Timestamp {
+        return Timestamp.newBuilder().apply {
+            seconds = instant.epochSecond
+            nanos = instant.nano
+        }.build()
     }
 }

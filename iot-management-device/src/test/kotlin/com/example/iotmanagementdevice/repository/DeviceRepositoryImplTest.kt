@@ -1,5 +1,6 @@
 package com.example.iotmanagementdevice.repository
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.kotlin.test.test
@@ -20,7 +21,11 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
 
         // Then
         foundDevice.test()
-            .expectNext(device)
+            .assertNext { found ->
+                assertThat(found).usingRecursiveComparison()
+                    .ignoringFields("updatedAt")
+                    .isEqualTo(device)
+            }
             .verifyComplete()
     }
 
@@ -39,8 +44,10 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
 
         // Then
         devices.test()
-            .expectNextMatches {
-                it.containsAll(listOf(device1, device2))
+            .assertNext { foundDevices ->
+                assertThat(foundDevices)
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("updatedAt")
+                    .containsAll(listOf(device1, device2))
             }
             .verifyComplete()
     }

@@ -83,13 +83,17 @@ object DeviceFixture {
     fun getAllDevicesRequest(): GetAllDevicesRequest =
         GetAllDevicesRequest.newBuilder().build()
 
-    fun updateDeviceResponse(deviceId: String, userId: String): UpdateDeviceResponse {
+    fun updateDeviceResponse(deviceId: String, userId: String, timestamp: Instant): UpdateDeviceResponse {
         val device = Device.newBuilder().apply {
             id = deviceId
             this.userId = userId
             name = "defaultName"
             description = "defaultDescription"
             type = "defaultType"
+            updatedAt = Timestamp.newBuilder().apply {
+                seconds = timestamp.epochSecond
+                nanos = timestamp.nano
+            }.build()
         }.build()
 
         val successResponse = UpdateDeviceResponse.Success.newBuilder().apply {

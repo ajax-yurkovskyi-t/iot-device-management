@@ -3,6 +3,7 @@ package com.example.iotmanagementdevice.repository
 import UserFixture
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
 import com.example.iotmanagementdevice.mapper.UserMapper
+import org.assertj.core.api.Assertions.assertThat
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -63,7 +64,11 @@ class UserRepositoryImplTest : AbstractMongoTest {
 
         // Then
         devices.test()
-            .expectNextMatches { it.containsAll(expectedDevices) }
+            .assertNext { found ->
+                assertThat(found)
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("updatedAt")
+                    .containsAll(expectedDevices)
+            }
             .verifyComplete()
     }
 

@@ -12,6 +12,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
@@ -24,8 +25,9 @@ import reactor.kafka.receiver.ReceiverOptions
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-@Import(KafkaTest.KafkaTestConfiguration::class)
-class KafkaTest : AbstractMongoTest {
+@Import(DeviceUpdateKafkaIntegrationTest.KafkaTestConfiguration::class)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+class DeviceUpdateKafkaIntegrationTest : AbstractMongoTest {
     @Autowired
     private lateinit var deviceService: DeviceService
 

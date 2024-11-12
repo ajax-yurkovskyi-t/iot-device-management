@@ -14,13 +14,14 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toMono
 
 @Service
 class DeviceServiceImpl(
     private val deviceRepository: DeviceRepository,
     private val deviceMapper: DeviceMapper,
     private val deviceUpdateProducer: DeviceUpdateProducer,
-    private val updateDeviceMapper: UpdateDeviceMapper,
+    private val updateDeviceMapper: UpdateDeviceMapper
 ) : DeviceService {
     override fun create(requestDto: DeviceCreateRequestDto): Mono<DeviceResponseDto> {
         val device: MongoDevice = deviceMapper.toEntity(requestDto)
@@ -50,14 +51,15 @@ class DeviceServiceImpl(
             }
             .flatMap { updatedDevice ->
                 deviceUpdateProducer.sendMessage(updateDeviceMapper.toUpdateDeviceResponse(updatedDevice))
-                    .doOnError { error ->
+                    .thenReturn(updatedDevice)
+                    .onErrorResume { error ->
                         log.error(
                             "Failed to send device update message for device {}",
                             updatedDevice,
                             error
                         )
+                        updatedDevice.toMono()
                     }
-                    .thenReturn(updatedDevice)
             }
             .map { updatedDevice -> deviceMapper.toDto(updatedDevice) }
     }

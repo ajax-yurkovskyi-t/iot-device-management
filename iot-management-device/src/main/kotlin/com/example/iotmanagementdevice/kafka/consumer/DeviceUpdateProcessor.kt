@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.kafka.receiver.KafkaReceiver
+import reactor.kotlin.core.publisher.toMono
 
 @Component
 class DeviceUpdateProcessor(
@@ -24,23 +25,27 @@ class DeviceUpdateProcessor(
             .flatMap { record ->
                 val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
                 val notification: DeviceUpdateNotification =
-                    deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice, record.timestamp())
+                    deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
                 sendNotification(notification)
                     .doFinally { record.receiverOffset().acknowledge() }
+            }.onErrorResume { error ->
+                log.error("Failed to process a device update message", error)
+                Unit.toMono()
             }
             .subscribe()
     }
 
     private fun sendNotification(notification: DeviceUpdateNotification): Mono<Unit> =
         notificationProducer.sendMessage(notification)
-            .doOnError { error ->
+            .thenReturn(Unit)
+            .onErrorResume { error ->
                 log.error(
                     "Failed to send device update notification {}",
                     notification,
                     error
                 )
+                Unit.toMono()
             }
-            .thenReturn(Unit)
 
     companion object {
         private val log = LoggerFactory.getLogger(DeviceUpdateProcessor::class.java)
