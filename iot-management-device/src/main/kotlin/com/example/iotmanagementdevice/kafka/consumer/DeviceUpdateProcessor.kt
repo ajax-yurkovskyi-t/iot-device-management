@@ -19,7 +19,6 @@ class DeviceUpdateProcessor(
     private val deviceNotificationMapper: DeviceNotificationMapper,
 ) {
 
-
     @EventListener(ApplicationReadyEvent::class)
     fun consumeMessages() {
         updateDeviceKafkaReceiver.receive()
