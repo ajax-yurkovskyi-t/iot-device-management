@@ -19,20 +19,27 @@ class DeviceUpdateProcessor(
     private val deviceNotificationMapper: DeviceNotificationMapper,
 ) {
 
+
     @EventListener(ApplicationReadyEvent::class)
     fun consumeMessages() {
         updateDeviceKafkaReceiver.receive()
             .flatMap { record ->
-                val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
-                val notification: DeviceUpdateNotification =
-                    deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
-                sendNotification(notification)
-                    .doFinally { record.receiverOffset().acknowledge() }
-            }.onErrorContinue { error, failedMessage ->
-                log.error("Failed to process a device update message {}", failedMessage, error)
+                Mono.defer {
+                    val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
+                    val notification: DeviceUpdateNotification =
+                        deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
+
+                    sendNotification(notification)
+                        .doFinally { record.receiverOffset().acknowledge() }
+                }
+                    .onErrorResume { error ->
+                        log.error("Failed to process a device update message", error)
+                        Unit.toMono()
+                    }
             }
             .subscribe()
     }
+
 
     private fun sendNotification(notification: DeviceUpdateNotification): Mono<Unit> =
         notificationProducer.sendMessage(notification)
