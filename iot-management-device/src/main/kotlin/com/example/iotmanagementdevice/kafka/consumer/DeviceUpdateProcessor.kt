@@ -28,9 +28,8 @@ class DeviceUpdateProcessor(
                     deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
                 sendNotification(notification)
                     .doFinally { record.receiverOffset().acknowledge() }
-            }.onErrorResume { error ->
-                log.error("Failed to process a device update message", error)
-                Unit.toMono()
+            }.onErrorContinue { error, failedMessage ->
+                log.error("Failed to process a device update message {}", failedMessage, error)
             }
             .subscribe()
     }

@@ -24,8 +24,8 @@ import reactor.kafka.receiver.ReceiverOptions
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-@Import(DeviceUpdateKafkaIntegrationTest.KafkaTestConfiguration::class)
-class DeviceUpdateKafkaIntegrationTest : AbstractMongoTest {
+@Import(DeviceUpdateKafkaIT.KafkaTestConfiguration::class)
+class DeviceUpdateKafkaIT : AbstractMongoTest {
     @Autowired
     private lateinit var deviceService: DeviceService
 
