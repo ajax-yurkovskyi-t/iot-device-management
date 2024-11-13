@@ -39,7 +39,6 @@ class DeviceUpdateProcessor(
             .subscribe()
     }
 
-
     private fun sendNotification(notification: DeviceUpdateNotification): Mono<Unit> =
         notificationProducer.sendMessage(notification)
             .thenReturn(Unit)
