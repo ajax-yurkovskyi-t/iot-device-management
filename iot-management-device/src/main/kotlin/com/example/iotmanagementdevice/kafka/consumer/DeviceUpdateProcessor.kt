@@ -29,7 +29,6 @@ class DeviceUpdateProcessor(
                         deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
 
                     sendNotification(notification)
-
                 }
                     .onErrorResume { error ->
                         log.error("Failed to process a device update message", error)
