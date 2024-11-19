@@ -13,14 +13,14 @@ class GetDevicesByUserIdMapper {
     fun toUpdateDeviceResponseList(response: GetDevicesByUserIdResponse): List<UpdateDeviceResponse> {
         return when (response.responseCase!!) {
             GetDevicesByUserIdResponse.ResponseCase.SUCCESS ->
-                mapDevicesToUpdateDeviceResponses(response.success.devicesList)
+                mapDeviceListToUpdateDeviceResponseList(response.success.devicesList)
 
             GetDevicesByUserIdResponse.ResponseCase.FAILURE -> toFailure(response)
             GetDevicesByUserIdResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException("No response case set")
         }
     }
 
-    private fun mapDevicesToUpdateDeviceResponses(devicesList: List<Device>): List<UpdateDeviceResponse> =
+    private fun mapDeviceListToUpdateDeviceResponseList(devicesList: List<Device>): List<UpdateDeviceResponse> =
         devicesList.map { device ->
             UpdateDeviceResponse.newBuilder().apply {
                 successBuilder.device = device
