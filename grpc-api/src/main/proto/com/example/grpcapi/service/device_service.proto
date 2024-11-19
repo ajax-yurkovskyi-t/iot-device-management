@@ -3,7 +3,7 @@ syntax = "proto3";
 package com.example.grpcapi.service;
 
 import "com/example/grpcapi/reqrep/device/get_by_id.proto";
-import "com/example/grpcapi/reqrep/device/update.proto";
+import "com/example/grpcapi/reqrep/device/get_updated_devices.proto";
 import "com/example/grpcapi/reqrep/device/create.proto";
 import "com/example/internal/input/reqreply/device/update.proto";
 
