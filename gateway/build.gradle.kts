@@ -18,7 +18,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation:3.3.2")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.2")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("net.devh:grpc-server-spring-boot-starter:3.1.0.RELEASE")
     implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
     testImplementation("io.mockk:mockk:1.13.12")
