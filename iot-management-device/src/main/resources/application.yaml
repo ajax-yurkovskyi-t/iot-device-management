@@ -10,6 +10,8 @@ spring:
   security:
     public:
       endpoints: /v3/api-docs/**,/swagger-ui/**,/users/**,/error,/auth/**,/devices/**
+  kafka:
+    bootstrap-servers: http://localhost:9092
 
 mongock:
   migration-scan-package: com.example.iotmanagementdevice.mongock.changelogs

@@ -5,7 +5,10 @@ import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.core.exception.EntityNotFoundException
+import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.iotmanagementdevice.kafka.producer.DeviceUpdateProducer
 import com.example.iotmanagementdevice.mapper.DeviceMapper
+import com.example.iotmanagementdevice.mapper.UpdateDeviceMapper
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.repository.DeviceRepository
 import io.mockk.every
@@ -31,6 +34,12 @@ class DeviceServiceImplTest {
 
     @MockK
     private lateinit var deviceMapper: DeviceMapper
+
+    @MockK
+    private lateinit var deviceUpdateProducer: DeviceUpdateProducer
+
+    @MockK
+    private lateinit var updateDeviceMapper: UpdateDeviceMapper
 
     @InjectMockKs
     lateinit var deviceService: DeviceServiceImpl
@@ -201,6 +210,9 @@ class DeviceServiceImplTest {
         every { deviceMapper.toEntity(deviceUpdateDto) } returns updatedDevice
         every { deviceRepository.save(updatedDevice) } returns updatedDevice.toMono()
         every { deviceMapper.toDto(updatedDevice) } returns updatedDeviceResponseDto
+        every { updateDeviceMapper.toUpdateDeviceResponse(updatedDevice) } returns
+            UpdateDeviceResponse.getDefaultInstance()
+        every { deviceUpdateProducer.sendMessage(any()) } returns Unit.toMono()
 
         // When
         val updateResult = deviceService.update(deviceId.toString(), deviceUpdateDto)

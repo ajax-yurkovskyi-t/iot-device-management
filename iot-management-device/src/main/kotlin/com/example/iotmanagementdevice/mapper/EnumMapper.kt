@@ -2,6 +2,7 @@ package com.example.iotmanagementdevice.mapper
 
 import com.example.core.dto.DeviceStatusType
 import com.example.internal.commonmodels.Device
+import com.example.iotmanagementdevice.model.MongoDevice
 import org.mapstruct.Mapper
 
 @Mapper(componentModel = "spring")
@@ -19,6 +20,13 @@ abstract class EnumMapper {
             Device.StatusType.STATUS_TYPE_ONLINE -> DeviceStatusType.ONLINE
             Device.StatusType.STATUS_TYPE_UNSPECIFIED, Device.StatusType.STATUS_TYPE_OFFLINE,
             Device.StatusType.UNRECOGNIZED -> DeviceStatusType.OFFLINE
+        }
+    }
+
+    fun mapStatusType(statusType: MongoDevice.DeviceStatusType): Device.StatusType {
+        return when (statusType) {
+            MongoDevice.DeviceStatusType.ONLINE -> Device.StatusType.STATUS_TYPE_ONLINE
+            MongoDevice.DeviceStatusType.OFFLINE -> Device.StatusType.STATUS_TYPE_OFFLINE
         }
     }
 }

@@ -23,7 +23,9 @@ Sending notifications to users regarding updates to their device status.
 
 Ensuring users are informed in real-time about any changes that might require their attention.
 
-## Technologies used
+## Kafka Diagram
+![Kafka-Diagram.png](Kafka-Diagram.png)
+
 ### Core Technologies:
 * ***Kotlin***
 * ***Gradle***
