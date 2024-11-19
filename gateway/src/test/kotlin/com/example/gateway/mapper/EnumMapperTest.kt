@@ -1,7 +1,7 @@
 package com.example.gateway.mapper
 
+import com.example.commonmodels.device.Device
 import com.example.core.dto.DeviceStatusType
-import com.example.internal.commonmodels.Device
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource

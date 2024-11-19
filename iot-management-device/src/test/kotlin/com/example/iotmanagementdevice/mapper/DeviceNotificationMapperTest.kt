@@ -2,7 +2,7 @@ package com.example.iotmanagementdevice.mapper
 
 import DeviceFixture.updateDeviceNotification
 import DeviceFixture.updateDeviceResponse
-import com.example.internal.commonmodels.DeviceUpdateNotification
+import com.example.commonmodels.device.DeviceUpdateNotification
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

@@ -1,18 +1,17 @@
 syntax = "proto3";
 
-package com.example.internal.commonmodels;
+package com.example.commonmodels.device;
 
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
-option java_package = "com.example.internal.commonmodels";
 
 message Device {
   string id = 1;
   string name = 2;
   string description = 3;
   string type = 4;
-  StatusType statusType = 5;
+  StatusType status_type = 5;
   string user_id = 6;
   google.protobuf.Timestamp updated_at = 7;
 

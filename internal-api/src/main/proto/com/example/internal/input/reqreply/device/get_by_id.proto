@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package com.example.internal.input.reqreply.device;
 
-import "com/example/internal/commonmodels/device/device.proto";
-import "com/example/internal/commonmodels/error.proto";
+import "com/example/commonmodels/device/device.proto";
+import "com/example/commonmodels/error.proto";
 
 option java_multiple_files = true;
 option java_package = "com.example.internal.input.reqreply.device.get_by_id.proto";
@@ -19,13 +19,13 @@ message GetDeviceByIdResponse {
   }
 
   message Success {
-    commonmodels.Device device = 1;
+    commonmodels.device.Device device = 1;
   }
 
   message Failure {
     string message = 100;
     oneof error {
-      Error device_not_found = 1;
+      commonmodels.Error device_not_found = 1;
     }
   }
 }

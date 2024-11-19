@@ -4,8 +4,8 @@ import DeviceProtoFixture.deviceProto
 import DeviceProtoFixture.deviceResponseDto
 import DeviceProtoFixture.failureGetDeviceByIdResponse
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
+import com.example.commonmodels.Error
 import com.example.gateway.mapper.impl.GetDeviceByIdMapperImpl
-import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

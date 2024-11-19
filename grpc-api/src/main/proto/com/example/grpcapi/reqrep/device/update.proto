@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package com.example.grpcapi.reqrep.device;
+
+option java_multiple_files = true;
+
+message GetUpdatedDevicesRequest {
+  string user_id = 1;
+}

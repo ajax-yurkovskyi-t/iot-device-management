@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.mapper
 
+import com.example.commonmodels.device.Device
 import com.example.core.dto.DeviceStatusType
-import com.example.internal.commonmodels.Device
 import com.example.iotmanagementdevice.model.MongoDevice
 import org.mapstruct.Mapper
 

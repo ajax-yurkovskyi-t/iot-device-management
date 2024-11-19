@@ -1,9 +1,9 @@
 package com.example.iotmanagementdevice.mapper
 
+import com.example.commonmodels.Error
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.core.exception.EntityNotFoundException
-import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.model.MongoDevice

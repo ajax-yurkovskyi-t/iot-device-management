@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.kafka.producer
 
+import com.example.commonmodels.device.DeviceUpdateNotification
 import com.example.internal.KafkaTopic.KafkaDeviceUpdateEvents.NOTIFY
-import com.example.internal.commonmodels.DeviceUpdateNotification
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono

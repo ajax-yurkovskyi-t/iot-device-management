@@ -1,8 +1,8 @@
 package com.example.gateway.mapper
 
+import com.example.commonmodels.device.Device
 import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
-import com.example.internal.commonmodels.Device
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import org.mapstruct.InjectionStrategy

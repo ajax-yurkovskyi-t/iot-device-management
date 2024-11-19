@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package com.example.grpcapi.reqrep.device;
+
+import "com/example/commonmodels/device/device.proto";
+
+option java_multiple_files = true;
+
+message CreateDeviceRequest {
+  string name = 1;
+  string description = 2;
+  string type = 3;
+  commonmodels.device.Device.StatusType status_type = 4;
+}
+
+message CreateDeviceResponse {
+  oneof response {
+    Success success = 1;
+    Failure failure = 2;
+  }
+
+  message Success {
+    commonmodels.device.Device device = 1;
+  }
+
+  message Failure {
+    string message = 100;
+  }
+}

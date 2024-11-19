@@ -4,8 +4,8 @@ import DeviceProtoFixture.deviceProto
 import DeviceProtoFixture.deviceResponseDto
 import DeviceProtoFixture.failureUpdateDeviceResponse
 import DeviceProtoFixture.successfulUpdateResponse
+import com.example.commonmodels.Error
 import com.example.gateway.mapper.impl.UpdateDeviceMapperImpl
-import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

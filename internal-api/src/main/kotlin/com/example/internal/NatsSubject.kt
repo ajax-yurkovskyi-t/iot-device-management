@@ -11,5 +11,7 @@ object NatsSubject {
         const val GET_ALL = "$DEVICE_PREFIX.get_all"
         const val UPDATE = "$DEVICE_PREFIX.update"
         const val DELETE = "$DEVICE_PREFIX.delete"
+        const val GET_BY_USER_ID = "$DEVICE_PREFIX.get_by_user_id"
+        fun updateByUserId(userId: String) = "$DEVICE_PREFIX.$userId"
     }
 }

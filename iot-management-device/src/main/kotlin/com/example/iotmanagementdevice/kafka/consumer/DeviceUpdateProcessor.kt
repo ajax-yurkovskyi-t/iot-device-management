@@ -1,6 +1,6 @@
 package com.example.iotmanagementdevice.kafka.consumer
 
-import com.example.internal.commonmodels.DeviceUpdateNotification
+import com.example.commonmodels.device.DeviceUpdateNotification
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.kafka.producer.DeviceUpdateNotificationProducer
 import com.example.iotmanagementdevice.mapper.DeviceNotificationMapper
