@@ -14,7 +14,7 @@ import reactor.kotlin.core.publisher.toMono
 @Component
 class DeviceUpdateConsumerForNats(
     private val updateDeviceForNatsKafkaReceiver: KafkaReceiver<String, ByteArray>,
-    private val natsConnection: Connection
+    private val natsConnection: Connection,
 ) {
     @EventListener(ApplicationReadyEvent::class)
     fun consumeMessages() {

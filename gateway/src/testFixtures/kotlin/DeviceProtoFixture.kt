@@ -3,7 +3,8 @@ import com.example.core.dto.DeviceStatusType
 import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
-import com.example.grpcapi.reqrep.device.GetUpdatedDevicesRequest
+import com.example.grpcapi.reqrep.device.GetUpdatedDeviceRequest
+import com.example.grpcapi.reqrep.device.GetUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
@@ -79,6 +80,12 @@ object DeviceProtoFixture {
         }.build()
     }
 
+    fun successfulGetUpdatedDevicesResponse(device: Device): GetUpdatedDeviceResponse {
+        return GetUpdatedDeviceResponse.newBuilder().apply {
+            successBuilder.device = device
+        }.build()
+    }
+
     fun successfulUpdateResponse(device: Device): UpdateDeviceResponse {
         return UpdateDeviceResponse.newBuilder().apply {
             successBuilder.device = device
@@ -140,8 +147,8 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun getUpdatedDevicesRequest(userId: String): GetUpdatedDevicesRequest {
-        return GetUpdatedDevicesRequest.newBuilder().apply {
+    fun getUpdatedDevicesRequest(userId: String): GetUpdatedDeviceRequest {
+        return GetUpdatedDeviceRequest.newBuilder().apply {
             this.userId = userId
         }.build()
     }
@@ -158,9 +165,9 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun updateDeviceResponseList(devicesList: List<Device>): List<UpdateDeviceResponse> =
+    fun getUpdatedDeviceResponse(devicesList: List<Device>): List<GetUpdatedDeviceResponse> =
         devicesList.map { device ->
-            UpdateDeviceResponse.newBuilder().apply {
+            GetUpdatedDeviceResponse.newBuilder().apply {
                 successBuilder.device = device
             }.build()
         }

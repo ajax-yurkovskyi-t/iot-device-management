@@ -28,4 +28,18 @@ class GrpcExceptionHandler {
 
         return StatusProto.toStatusRuntimeException(status)
     }
+
+    @GrpcExceptionHandler(Exception::class)
+    fun handleException(cause: Exception): StatusRuntimeException {
+        val errorInfo = ErrorInfo.newBuilder().apply {
+            reason = "internal_server_error"
+            metadata["error_message"] = cause.message ?: "An unexpected error occurred"
+        }.build()
+
+        val status = RpcStatus.newBuilder().apply {
+            code = Code.INTERNAL.number
+            addDetails(Any.pack(errorInfo))
+        }.build()
+        return StatusProto.toStatusRuntimeException(status)
+    }
 }

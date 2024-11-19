@@ -1,23 +1,20 @@
 package com.example.gateway.grpc
 
-import DeviceProtoFixture.createDeviceRequest
 import DeviceProtoFixture.deviceProto
 import DeviceProtoFixture.getDeviceByIdRequest
 import DeviceProtoFixture.getDevicesByUserIdRequest
+import DeviceProtoFixture.getUpdatedDeviceResponse
 import DeviceProtoFixture.getUpdatedDevicesRequest
 import DeviceProtoFixture.grpcCreateDeviceRequest
 import DeviceProtoFixture.grpcGetDeviceByIdRequest
 import DeviceProtoFixture.successfulCreateResponse
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
 import DeviceProtoFixture.successfulGetDevicesByUserIdResponse
-import DeviceProtoFixture.successfulGrpcCreateResponse
-import DeviceProtoFixture.successfulGrpcGetDeviceByIdResponse
 import DeviceProtoFixture.successfulUpdateResponse
-import DeviceProtoFixture.updateDeviceResponseList
 import com.example.gateway.client.NatsClient
-import com.example.gateway.mapper.GetDevicesByUserIdMapper
 import com.example.gateway.mapper.grpc.CreateDeviceGrpcMapper
 import com.example.gateway.mapper.grpc.GetDeviceByIdGrpcMapper
+import com.example.gateway.mapper.grpc.GetUpdatedDeviceGrpcMapper
 import com.example.internal.NatsSubject.Device.CREATE
 import com.example.internal.NatsSubject.Device.GET_BY_ID
 import com.example.internal.NatsSubject.Device.GET_BY_USER_ID
@@ -41,14 +38,9 @@ class GrpcDeviceServiceTest {
     @MockK
     private lateinit var natsClient: NatsClient
 
-    @MockK
-    private lateinit var createDeviceGrpcMapper: CreateDeviceGrpcMapper
-
-    @MockK
-    private lateinit var getDeviceByIdGrpcMapper: GetDeviceByIdGrpcMapper
-
-    @MockK
-    private lateinit var getDevicesByUserIdMapper: GetDevicesByUserIdMapper
+    private val createDeviceGrpcMapper = CreateDeviceGrpcMapper()
+    private val getDeviceByIdGrpcMapper = GetDeviceByIdGrpcMapper()
+    private val getUpdatedDeviceGrpcMapper = GetUpdatedDeviceGrpcMapper()
 
     @InjectMockKs
     private lateinit var grpcDeviceService: GrpcDeviceService
@@ -57,11 +49,10 @@ class GrpcDeviceServiceTest {
     fun `should create a device and return grpc create response`() {
         // GIVEN
         val grpcCreateDeviceRequest = grpcCreateDeviceRequest()
-        val createDeviceRequest = createDeviceRequest()
-        val grpcCreateDeviceResponse = successfulGrpcCreateResponse(deviceProto)
         val createDeviceResponse = successfulCreateResponse(deviceProto)
+        val createDeviceRequest = createDeviceGrpcMapper.toInternal(grpcCreateDeviceRequest)
+        val grpcCreateDeviceResponse = createDeviceGrpcMapper.toGrpc(createDeviceResponse)
 
-        every { createDeviceGrpcMapper.toInternal(grpcCreateDeviceRequest) } returns createDeviceRequest
         every {
             natsClient.request(
                 CREATE,
@@ -69,7 +60,6 @@ class GrpcDeviceServiceTest {
                 CreateDeviceResponse.parser()
             )
         } returns createDeviceResponse.toMono()
-        every { createDeviceGrpcMapper.toGrpc(createDeviceResponse) } returns grpcCreateDeviceResponse
 
         // WHEN
         val result = grpcDeviceService.createDevice(grpcCreateDeviceRequest)
@@ -85,20 +75,16 @@ class GrpcDeviceServiceTest {
         // GIVEN
         val deviceId = ObjectId().toString()
         val grpcGetDeviceRequest = grpcGetDeviceByIdRequest(deviceId)
-        val getDeviceRequest = successfulGetDeviceByIdResponse(deviceProto)
-        val grpcGetDeviceResponse = successfulGrpcGetDeviceByIdResponse(deviceProto)
+        val getDeviceResponse = successfulGetDeviceByIdResponse(deviceProto)
+        val grpcGetDeviceResponse = getDeviceByIdGrpcMapper.toGrpc(getDeviceResponse)
 
-        every { getDeviceByIdGrpcMapper.toInternal(grpcGetDeviceRequest) } returns getDeviceByIdRequest(
-            grpcGetDeviceRequest.id
-        )
         every {
             natsClient.request(
                 GET_BY_ID,
                 getDeviceByIdRequest(grpcGetDeviceRequest.id),
                 GetDeviceByIdResponse.parser()
             )
-        } returns getDeviceRequest.toMono()
-        every { getDeviceByIdGrpcMapper.toGrpc(getDeviceRequest) } returns grpcGetDeviceResponse
+        } returns getDeviceResponse.toMono()
 
         // WHEN
         val result = grpcDeviceService.getDeviceById(grpcGetDeviceRequest)
@@ -114,10 +100,13 @@ class GrpcDeviceServiceTest {
         // GIVEN
         val userId = ObjectId().toString()
         val devices = listOf(deviceProto)
-        val existingDevices =
+        val existingUserDevices =
             successfulGetDevicesByUserIdResponse(devices)
-        val updatedDevices =
-            listOf(successfulUpdateResponse(deviceProto))
+        val updatedDevices = getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(existingUserDevices)
+
+        val updatedDevicesFromNats =
+            listOf(successfulUpdateResponse(deviceProto)).toFlux()
+
         val grpcGetUpdatedDevicesRequest = getUpdatedDevicesRequest(userId)
         val grpcGetDevicesByUserIdRequest = getDevicesByUserIdRequest(userId)
 
@@ -127,19 +116,18 @@ class GrpcDeviceServiceTest {
                 grpcGetDevicesByUserIdRequest,
                 GetDevicesByUserIdResponse.parser()
             )
-        } returns existingDevices.toMono()
+        } returns existingUserDevices.toMono()
 
-        every { getDevicesByUserIdMapper.toUpdateDeviceResponseList(existingDevices) } returns updatedDevices
-        every { natsClient.subscribeByUserId(grpcGetUpdatedDevicesRequest.userId) } returns updatedDevices.toFlux()
+        every { natsClient.subscribeByUserId(grpcGetUpdatedDevicesRequest.userId) } returns updatedDevicesFromNats
 
         // WHEN
-        val result = grpcDeviceService.subscribeToUpdateByUserId(grpcGetUpdatedDevicesRequest).collectList()
+        val result = grpcDeviceService.subscribeToUpdateByUserId(grpcGetUpdatedDevicesRequest)
 
         // THEN
-        result.test()
+        result.collectList().test()
             .assertNext {
                 assertTrue(
-                    it.containsAll(updatedDevices + updateDeviceResponseList(devices)),
+                    it.containsAll(updatedDevices + getUpdatedDeviceResponse(devices)),
                     "The updated device list should contain all expected updated devices"
                 )
             }

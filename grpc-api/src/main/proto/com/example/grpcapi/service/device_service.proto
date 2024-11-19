@@ -3,9 +3,8 @@ syntax = "proto3";
 package com.example.grpcapi.service;
 
 import "com/example/grpcapi/reqrep/device/get_by_id.proto";
-import "com/example/grpcapi/reqrep/device/get_updated_devices.proto";
+import "com/example/grpcapi/reqrep/device/get_updated_device.proto";
 import "com/example/grpcapi/reqrep/device/create.proto";
-import "com/example/internal/input/reqreply/device/update.proto";
 
 service DeviceService {
   rpc createDevice(grpcapi.reqrep.device.CreateDeviceRequest) returns
@@ -14,6 +13,6 @@ service DeviceService {
   rpc getDeviceById(grpcapi.reqrep.device.GetDeviceByIdRequest) returns
       (reqrep.device.GetDeviceByIdResponse);
 
-  rpc subscribeToUpdateByUserId (grpcapi.reqrep.device.GetUpdatedDevicesRequest)
-      returns (stream internal.input.reqreply.device.UpdateDeviceResponse);
+  rpc subscribeToUpdateByUserId (grpcapi.reqrep.device.GetUpdatedDeviceRequest)
+      returns (stream grpcapi.reqrep.device.GetUpdatedDeviceResponse);
 }

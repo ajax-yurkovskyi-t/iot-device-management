@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 @Component
 class NatsClient(
     private val natsConnection: Connection,
-    private val dispatcher: Dispatcher
+    private val dispatcher: Dispatcher,
 ) {
     fun <T : GeneratedMessage, R : GeneratedMessage> request(
         subject: String,

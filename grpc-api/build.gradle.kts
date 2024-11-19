@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":internal-api"))
+    implementation(project(":common-proto"))
     api("com.google.protobuf:protobuf-kotlin:4.28.2")
 }
 

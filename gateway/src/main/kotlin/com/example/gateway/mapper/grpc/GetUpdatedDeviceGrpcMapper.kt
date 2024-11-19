@@ -1,16 +1,17 @@
-package com.example.gateway.mapper
+package com.example.gateway.mapper.grpc
 
 import com.example.commonmodels.device.Device
 import com.example.core.exception.EntityNotFoundException
+import com.example.grpcapi.reqrep.device.GetUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.springframework.stereotype.Component
 
 @Component
-class GetDevicesByUserIdMapper {
+@Suppress("TooGenericExceptionThrown")
+class GetUpdatedDeviceGrpcMapper {
 
-    @Suppress("TooGenericExceptionThrown")
-    fun toUpdateDeviceResponseList(response: GetDevicesByUserIdResponse): List<UpdateDeviceResponse> {
+    fun toUpdateDeviceResponseList(response: GetDevicesByUserIdResponse): List<GetUpdatedDeviceResponse> {
         return when (response.responseCase!!) {
             GetDevicesByUserIdResponse.ResponseCase.SUCCESS ->
                 mapDeviceListToUpdateDeviceResponseList(response.success.devicesList)
@@ -20,9 +21,21 @@ class GetDevicesByUserIdMapper {
         }
     }
 
-    private fun mapDeviceListToUpdateDeviceResponseList(devicesList: List<Device>): List<UpdateDeviceResponse> =
+    fun toGetUpdatedDeviceResponse(response: UpdateDeviceResponse): GetUpdatedDeviceResponse {
+        val message = response.failure.message.orEmpty()
+        return when (response.responseCase!!) {
+            UpdateDeviceResponse.ResponseCase.SUCCESS -> GetUpdatedDeviceResponse.newBuilder().apply {
+                successBuilder.device = response.success.device
+            }.build()
+
+            UpdateDeviceResponse.ResponseCase.FAILURE -> error(message)
+            UpdateDeviceResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException("No response case set")
+        }
+    }
+
+    private fun mapDeviceListToUpdateDeviceResponseList(devicesList: List<Device>): List<GetUpdatedDeviceResponse> =
         devicesList.map { device ->
-            UpdateDeviceResponse.newBuilder().apply {
+            GetUpdatedDeviceResponse.newBuilder().apply {
                 successBuilder.device = device
             }.build()
         }

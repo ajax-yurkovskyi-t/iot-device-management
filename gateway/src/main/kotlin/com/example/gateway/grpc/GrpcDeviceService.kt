@@ -1,10 +1,11 @@
 package com.example.gateway.grpc
 
 import com.example.gateway.client.NatsClient
-import com.example.gateway.mapper.GetDevicesByUserIdMapper
 import com.example.gateway.mapper.grpc.CreateDeviceGrpcMapper
 import com.example.gateway.mapper.grpc.GetDeviceByIdGrpcMapper
-import com.example.grpcapi.reqrep.device.GetUpdatedDevicesRequest
+import com.example.gateway.mapper.grpc.GetUpdatedDeviceGrpcMapper
+import com.example.grpcapi.reqrep.device.GetUpdatedDeviceRequest
+import com.example.grpcapi.reqrep.device.GetUpdatedDeviceResponse
 import com.example.grpcapi.service.ReactorDeviceServiceGrpc
 import com.example.internal.NatsSubject.Device.CREATE
 import com.example.internal.NatsSubject.Device.GET_BY_ID
@@ -13,7 +14,6 @@ import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRespo
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdRequest
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import net.devh.boot.grpc.server.service.GrpcService
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -28,9 +28,9 @@ class GrpcDeviceService(
     private val getDeviceByIdGrpcMapper: GetDeviceByIdGrpcMapper,
     private val natsClient: NatsClient,
     private val createDeviceGrpcMapper: CreateDeviceGrpcMapper,
-    private val getDevicesByUserIdMapper: GetDevicesByUserIdMapper,
+    private val getUpdatedDeviceGrpcMapper: GetUpdatedDeviceGrpcMapper,
 ) : ReactorDeviceServiceGrpc.DeviceServiceImplBase() {
-    override fun subscribeToUpdateByUserId(request: Mono<GetUpdatedDevicesRequest>): Flux<UpdateDeviceResponse> {
+    override fun subscribeToUpdateByUserId(request: Mono<GetUpdatedDeviceRequest>): Flux<GetUpdatedDeviceResponse> {
         return request.flatMapMany { updateDeviceRequest ->
             val existingDevices = natsClient.request(
                 GET_BY_USER_ID,
@@ -39,10 +39,12 @@ class GrpcDeviceService(
                 }.build(),
                 GetDevicesByUserIdResponse.parser()
             ).flatMapMany { response ->
-                getDevicesByUserIdMapper.toUpdateDeviceResponseList(response).toFlux()
+                getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(response).toFlux()
             }
 
-            natsClient.subscribeByUserId(updateDeviceRequest.userId).startWith(existingDevices)
+            natsClient.subscribeByUserId(updateDeviceRequest.userId)
+                .map { getUpdatedDeviceGrpcMapper.toGetUpdatedDeviceResponse(it) }
+                .startWith(existingDevices)
         }
     }
 
