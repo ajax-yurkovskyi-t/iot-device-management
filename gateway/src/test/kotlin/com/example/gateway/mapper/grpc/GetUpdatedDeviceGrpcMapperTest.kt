@@ -2,9 +2,11 @@ package com.example.gateway.mapper.grpc
 
 import DeviceProtoFixture.deviceProto
 import DeviceProtoFixture.failureGetDevicesByUserIdResponse
+import DeviceProtoFixture.failureUpdateDeviceResponse
 import DeviceProtoFixture.successfulGetUpdatedDevicesResponse
 import DeviceProtoFixture.successfulUpdateResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
+import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -48,8 +50,8 @@ class GetUpdatedDeviceGrpcMapperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideFailureResponseCases")
-    fun `should throw exception for failure response cases`(
+    @MethodSource("provideGetDevicesByUserIdResponseFailure")
+    fun `should throw exception for GetDevicesByUserIdResponse failure response cases`(
         response: GetDevicesByUserIdResponse,
         expectedMessage: String
     ) {
@@ -61,9 +63,23 @@ class GetUpdatedDeviceGrpcMapperTest {
         assertEquals(expectedMessage, exception.message)
     }
 
+    @ParameterizedTest
+    @MethodSource("provideUpdateDeviceResponseFailure")
+    fun `should throw exception for UpdateDeviceResponse failure response cases`(
+        response: UpdateDeviceResponse,
+        expectedMessage: String
+    ) {
+        // WHEN & THEN
+        val exception = assertThrows<RuntimeException> {
+            getUpdatedDeviceGrpcMapper.toGetUpdatedDeviceResponse(response)
+        }
+
+        assertEquals(expectedMessage, exception.message)
+    }
+
     companion object {
         @JvmStatic
-        fun provideFailureResponseCases(): List<Arguments> {
+        fun provideGetDevicesByUserIdResponseFailure(): List<Arguments> {
             return listOf(
                 Arguments.of(
                     GetDevicesByUserIdResponse.getDefaultInstance(),
@@ -80,6 +96,20 @@ class GetUpdatedDeviceGrpcMapperTest {
                     }.build(),
                     "Device not found"
                 )
+            )
+        }
+
+        @JvmStatic
+        fun provideUpdateDeviceResponseFailure(): List<Arguments> {
+            return listOf(
+                Arguments.of(
+                    UpdateDeviceResponse.getDefaultInstance(),
+                    "No response case set"
+                ),
+                Arguments.of(
+                    failureUpdateDeviceResponse("Failed to update device by id"),
+                    "Failed to update device by id"
+                ),
             )
         }
     }
