@@ -4,7 +4,7 @@ import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.grpcapi.reqrep.device.GetUpdatedDeviceRequest
-import com.example.grpcapi.reqrep.device.GetUpdatedDeviceResponse
+import com.example.grpcapi.reqrep.device.UpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
@@ -13,7 +13,6 @@ import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdR
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdRequest
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
-import org.bson.types.ObjectId
 import com.example.grpcapi.reqrep.device.CreateDeviceRequest as GrpcCreateDeviceRequest
 import com.example.grpcapi.reqrep.device.CreateDeviceResponse as GrpcCreateDeviceResponse
 import com.example.grpcapi.reqrep.device.GetDeviceByIdRequest as GrpcGetDeviceByIdRequest
@@ -80,8 +79,8 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun successfulGetUpdatedDevicesResponse(device: Device): GetUpdatedDeviceResponse {
-        return GetUpdatedDeviceResponse.newBuilder().apply {
+    fun successfulGetUpdatedDevicesResponse(device: Device): UpdatedDeviceResponse {
+        return UpdatedDeviceResponse.newBuilder().apply {
             successBuilder.device = device
         }.build()
     }
@@ -165,9 +164,9 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun getUpdatedDeviceResponse(devicesList: List<Device>): List<GetUpdatedDeviceResponse> =
+    fun getUpdatedDeviceResponse(devicesList: List<Device>): List<UpdatedDeviceResponse> =
         devicesList.map { device ->
-            GetUpdatedDeviceResponse.newBuilder().apply {
+            UpdatedDeviceResponse.newBuilder().apply {
                 successBuilder.device = device
             }.build()
         }

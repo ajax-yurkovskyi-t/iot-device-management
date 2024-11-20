@@ -2,7 +2,7 @@ package com.example.gateway.mapper.grpc
 
 import com.example.commonmodels.device.Device
 import com.example.core.exception.EntityNotFoundException
-import com.example.grpcapi.reqrep.device.GetUpdatedDeviceResponse
+import com.example.grpcapi.reqrep.device.UpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.springframework.stereotype.Component
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Suppress("TooGenericExceptionThrown")
 class GetUpdatedDeviceGrpcMapper {
 
-    fun toUpdateDeviceResponseList(response: GetDevicesByUserIdResponse): List<GetUpdatedDeviceResponse> {
+    fun toUpdateDeviceResponseList(response: GetDevicesByUserIdResponse): List<UpdatedDeviceResponse> {
         return when (response.responseCase!!) {
             GetDevicesByUserIdResponse.ResponseCase.SUCCESS ->
                 mapDeviceListToUpdateDeviceResponseList(response.success.devicesList)
@@ -21,10 +21,10 @@ class GetUpdatedDeviceGrpcMapper {
         }
     }
 
-    fun toGetUpdatedDeviceResponse(response: UpdateDeviceResponse): GetUpdatedDeviceResponse {
+    fun toGetUpdatedDeviceResponse(response: UpdateDeviceResponse): UpdatedDeviceResponse {
         val message = response.failure.message.orEmpty()
         return when (response.responseCase!!) {
-            UpdateDeviceResponse.ResponseCase.SUCCESS -> GetUpdatedDeviceResponse.newBuilder().apply {
+            UpdateDeviceResponse.ResponseCase.SUCCESS -> UpdatedDeviceResponse.newBuilder().apply {
                 successBuilder.device = response.success.device
             }.build()
 
@@ -33,9 +33,9 @@ class GetUpdatedDeviceGrpcMapper {
         }
     }
 
-    private fun mapDeviceListToUpdateDeviceResponseList(devicesList: List<Device>): List<GetUpdatedDeviceResponse> =
+    private fun mapDeviceListToUpdateDeviceResponseList(devicesList: List<Device>): List<UpdatedDeviceResponse> =
         devicesList.map { device ->
-            GetUpdatedDeviceResponse.newBuilder().apply {
+            UpdatedDeviceResponse.newBuilder().apply {
                 successBuilder.device = device
             }.build()
         }

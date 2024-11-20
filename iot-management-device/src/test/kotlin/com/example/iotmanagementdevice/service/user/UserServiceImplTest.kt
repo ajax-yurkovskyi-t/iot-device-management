@@ -1,6 +1,7 @@
 package com.example.iotmanagementdevice.service.user
 
 import UserFixture
+import UserFixture.createUser
 import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.dto.user.request.UserRegistrationRequestDto
 import com.example.iotmanagementdevice.dto.user.request.UserUpdateRequestDto
@@ -144,6 +145,7 @@ class UserServiceImplTest {
         val deviceResponseDtoList = listOf(deviceResponseDto1, deviceResponseDto2)
 
         // Stubbing
+        every { userRepository.findById(userId.toString()) } returns createUser().toMono()
         every { userRepository.findDevicesByUserId(userId.toString()) } returns deviceList.toFlux()
         every { deviceMapper.toDto(mongoDevice1) } returns deviceResponseDto1
         every { deviceMapper.toDto(mongoDevice2) } returns deviceResponseDto2

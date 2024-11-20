@@ -11,7 +11,7 @@ message GetUpdatedDeviceRequest {
   string user_id = 1;
 }
 
-message GetUpdatedDeviceResponse {
+message UpdatedDeviceResponse {
   oneof response {
     Success success = 1;
     Failure failure = 2;

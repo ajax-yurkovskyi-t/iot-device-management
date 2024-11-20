@@ -50,7 +50,9 @@ class UserServiceImpl(
     }
 
     override fun getDevicesByUserId(userId: String): Flux<DeviceResponseDto> {
-        return userRepository.findDevicesByUserId(userId)
+        return userRepository.findById(userId)
+            .switchIfEmpty { Mono.error(EntityNotFoundException("User with id $userId not found")) }
+            .flatMapMany { userRepository.findDevicesByUserId(userId) }
             .map { deviceMapper.toDto(it) }
     }
 

@@ -8,6 +8,7 @@ import com.example.internal.input.reqreply.device.create.proto.CreateDeviceReque
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdRequest
+import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdRequest
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
@@ -114,6 +115,12 @@ object DeviceFixture {
                 seconds = timestamp.epochSecond
                 nanos = timestamp.nano
             }.build()
+        }.build()
+    }
+
+    fun getDevicesByUserIdRequest(userId: String): GetDevicesByUserIdRequest {
+        return GetDevicesByUserIdRequest.newBuilder().apply {
+            this.userId = userId
         }.build()
     }
 

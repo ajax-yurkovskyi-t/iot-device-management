@@ -25,7 +25,7 @@ class NatsClient(
             .map { response -> parser.parseFrom(response.data) }
     }
 
-    fun subscribeByUserId(userId: String): Flux<UpdateDeviceResponse> {
+    fun requestUpdatedDevicesByUserId(userId: String): Flux<UpdateDeviceResponse> {
         val subjectName = NatsSubject.Device.updateByUserId(userId)
         return Flux.create { fluxSink ->
             val subscription = dispatcher.subscribe(subjectName) { message ->

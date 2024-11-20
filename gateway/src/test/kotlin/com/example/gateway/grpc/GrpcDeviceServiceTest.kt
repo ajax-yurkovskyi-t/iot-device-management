@@ -118,7 +118,7 @@ class GrpcDeviceServiceTest {
             )
         } returns existingUserDevices.toMono()
 
-        every { natsClient.subscribeByUserId(grpcGetUpdatedDevicesRequest.userId) } returns updatedDevicesFromNats
+        every { natsClient.requestUpdatedDevicesByUserId(grpcGetUpdatedDevicesRequest.userId) } returns updatedDevicesFromNats
 
         // WHEN
         val result = grpcDeviceService.subscribeToUpdateByUserId(grpcGetUpdatedDevicesRequest)

@@ -18,11 +18,11 @@ class GrpcExceptionHandler {
         val errorInfo = ErrorInfo.newBuilder().apply {
             reason = "entity_not_found"
             domain = "Device"
-            metadata["error_message"] = cause.message ?: "Resource not found"
         }.build()
 
         val status = RpcStatus.newBuilder().apply {
             code = Code.NOT_FOUND.number
+            message = cause.message
             addDetails(Any.pack(errorInfo))
         }.build()
 
@@ -33,11 +33,11 @@ class GrpcExceptionHandler {
     fun handleException(cause: Exception): StatusRuntimeException {
         val errorInfo = ErrorInfo.newBuilder().apply {
             reason = "internal_server_error"
-            metadata["error_message"] = cause.message ?: "An unexpected error occurred"
         }.build()
 
         val status = RpcStatus.newBuilder().apply {
             code = Code.INTERNAL.number
+            message = cause.message
             addDetails(Any.pack(errorInfo))
         }.build()
         return StatusProto.toStatusRuntimeException(status)
