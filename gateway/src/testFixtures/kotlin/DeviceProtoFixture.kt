@@ -4,7 +4,7 @@ import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.grpcapi.reqrep.device.GetUpdatedDeviceRequest
-import com.example.grpcapi.reqrep.device.UpdatedDeviceResponse
+import com.example.grpcapi.reqrep.device.StreamUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesResponse
@@ -17,7 +17,6 @@ import com.example.grpcapi.reqrep.device.CreateDeviceRequest as GrpcCreateDevice
 import com.example.grpcapi.reqrep.device.CreateDeviceResponse as GrpcCreateDeviceResponse
 import com.example.grpcapi.reqrep.device.GetDeviceByIdRequest as GrpcGetDeviceByIdRequest
 import com.example.grpcapi.reqrep.device.GetDeviceByIdResponse as GrpcGetDeviceByIdResponse
-
 
 object DeviceProtoFixture {
 
@@ -79,8 +78,8 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun successfulGetUpdatedDevicesResponse(device: Device): UpdatedDeviceResponse {
-        return UpdatedDeviceResponse.newBuilder().apply {
+    fun successfulGetUpdatedDevicesResponse(device: Device): StreamUpdatedDeviceResponse {
+        return StreamUpdatedDeviceResponse.newBuilder().apply {
             successBuilder.device = device
         }.build()
     }
@@ -164,9 +163,9 @@ object DeviceProtoFixture {
         }.build()
     }
 
-    fun getUpdatedDeviceResponse(devicesList: List<Device>): List<UpdatedDeviceResponse> =
+    fun getUpdatedDeviceResponse(devicesList: List<Device>): List<StreamUpdatedDeviceResponse> =
         devicesList.map { device ->
-            UpdatedDeviceResponse.newBuilder().apply {
+            StreamUpdatedDeviceResponse.newBuilder().apply {
                 successBuilder.device = device
             }.build()
         }

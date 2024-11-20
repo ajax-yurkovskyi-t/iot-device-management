@@ -14,5 +14,5 @@ service DeviceService {
       (reqrep.device.GetDeviceByIdResponse);
 
   rpc subscribeToUpdateByUserId (grpcapi.reqrep.device.GetUpdatedDeviceRequest)
-      returns (stream grpcapi.reqrep.device.UpdatedDeviceResponse);
+      returns (stream grpcapi.reqrep.device.StreamUpdatedDeviceResponse);
 }
