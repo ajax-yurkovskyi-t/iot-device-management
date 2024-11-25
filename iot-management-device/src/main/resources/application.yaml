@@ -4,6 +4,13 @@ spring:
   data:
     mongodb:
       uri: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
+    redis:
+      host: localhost
+      port: 6379
+      timeout:
+        millis: 100
+      ttl:
+        minutes: 3
 
   main:
     web-application-type: reactive

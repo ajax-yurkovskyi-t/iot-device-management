@@ -71,5 +71,12 @@ services:
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
     profiles: [ dev ]
 
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+    profiles: [ dev, test ]
+
 volumes:
   db-data:

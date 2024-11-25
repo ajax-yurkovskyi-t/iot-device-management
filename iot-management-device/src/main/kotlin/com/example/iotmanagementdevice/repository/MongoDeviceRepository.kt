@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Repository
-class DeviceRepositoryImpl(private val mongoTemplate: ReactiveMongoTemplate) : DeviceRepository {
+class MongoDeviceRepository(private val mongoTemplate: ReactiveMongoTemplate) : DeviceRepository {
     override fun findById(deviceId: String): Mono<MongoDevice> {
         val query = Query(Criteria.where(Fields.UNDERSCORE_ID).isEqualTo(deviceId))
         return mongoTemplate.findOne(query, MongoDevice::class.java)

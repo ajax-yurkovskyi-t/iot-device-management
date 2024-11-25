@@ -1,5 +1,7 @@
 package com.example.iotmanagementdevice.model
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
@@ -11,11 +13,13 @@ import java.time.Instant
 @Document(collection = MongoDevice.COLLECTION_NAME)
 data class MongoDevice(
     @Id
+    @JsonSerialize(using = ToStringSerializer::class)
     val id: ObjectId?,
     val name: String?,
     val description: String?,
     val type: String?,
     val statusType: DeviceStatusType?,
+    @JsonSerialize(using = ToStringSerializer::class)
     val userId: ObjectId?,
     @LastModifiedDate
     val updatedAt: Instant? = null,
