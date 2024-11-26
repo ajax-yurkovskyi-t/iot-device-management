@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import java.time.Duration
 
 @Configuration
 class RedisConfiguration(private val redisProperties: RedisProperties) {
@@ -20,7 +19,7 @@ class RedisConfiguration(private val redisProperties: RedisProperties) {
     @Primary
     fun reactiveRedisConnectionFactory(): ReactiveRedisConnectionFactory {
         val lettuceClientConfiguration = LettuceClientConfiguration.builder()
-            .commandTimeout(Duration.ofMillis(redisProperties.timeout.millis))
+            .commandTimeout(redisProperties.timeout)
             .build()
         val serverConfig = RedisStandaloneConfiguration(redisProperties.host, redisProperties.port)
         return LettuceConnectionFactory(serverConfig, lettuceClientConfiguration)

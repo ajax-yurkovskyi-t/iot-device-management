@@ -22,22 +22,24 @@ import java.time.Duration
 @Repository
 @Primary
 class RedisDeviceRepository(
-    @Value("\${spring.data.redis.ttl.minutes}")
-    private val redisExpirationTimeoutInMinutes: Long,
+    @Value("\${spring.data.redis.ttl}")
+    private val redisExpirationTimeoutInMinutes: Duration,
     private val mongoDeviceRepository: MongoDeviceRepository,
     private val reactiveRedisTemplate: ReactiveRedisTemplate<String, ByteArray>,
     private val mapper: ObjectMapper,
 ) : DeviceRepository by mongoDeviceRepository {
 
     override fun save(device: MongoDevice): Mono<MongoDevice> {
-        return mongoDeviceRepository.save(device).doOnSuccess {
-            saveDeviceWithRetries(it)
-        }
+        return mongoDeviceRepository.save(device)
+            .doOnSuccess {
+                saveDeviceWithRetries(it)
+            }
     }
 
     override fun findById(deviceId: String): Mono<MongoDevice> {
         val key = createDeviceKey(deviceId)
-        return reactiveRedisTemplate.opsForValue().get(key)
+        return reactiveRedisTemplate.opsForValue()
+            .get(key)
             .handle { item, sink ->
                 if (item.isEmpty()) {
                     sink.error(EntityNotFoundException("Device with id $deviceId not found"))
@@ -58,24 +60,28 @@ class RedisDeviceRepository(
 
     override fun deleteById(deviceId: String): Mono<Unit> {
         val key = createDeviceKey(deviceId)
-        return mongoDeviceRepository.deleteById(deviceId)
+        return mongoDeviceRepository
+            .deleteById(deviceId)
             .flatMap {
                 reactiveRedisTemplate.unlink(key)
                     .onErrorResume(::isErrorFromRedis) {
                         log.warn("Redis failed to remove user from cache", it)
                         Mono.empty()
-                    }.thenReturn(Unit)
-            }.thenReturn(Unit)
+                    }
+                    .thenReturn(Unit)
+            }
     }
 
     private fun saveDeviceToRedis(device: MongoDevice): Mono<MongoDevice> {
         val key = createDeviceKey(device.id.toString())
         val byteArray = mapper.writeValueAsBytes(device)
-        return reactiveRedisTemplate.opsForValue().set(
-            key,
-            byteArray,
-            Duration.ofMinutes(redisExpirationTimeoutInMinutes)
-        ).thenReturn(device)
+        return reactiveRedisTemplate.opsForValue()
+            .set(
+                key,
+                byteArray,
+                redisExpirationTimeoutInMinutes,
+            )
+            .thenReturn(device)
     }
 
     private fun saveDeviceWithRetries(device: MongoDevice) {
@@ -95,18 +101,23 @@ class RedisDeviceRepository(
 
     private fun findInMongoAndWriteToRedis(deviceId: String): Mono<MongoDevice> {
         val key = createDeviceKey(deviceId)
-        return mongoDeviceRepository.findById(deviceId).flatMap {
-            saveDeviceToRedis(it)
-        }
+        return mongoDeviceRepository.findById(deviceId)
+            .flatMap {
+                saveDeviceToRedis(it)
+            }
             .switchIfEmpty {
                 reactiveRedisTemplate.opsForValue()
-                    .set(key, byteArrayOf(), Duration.ofMinutes(redisExpirationTimeoutInMinutes))
+                    .set(
+                        key,
+                        byteArrayOf(),
+                        redisExpirationTimeoutInMinutes,
+                    )
                     .then(Mono.empty())
             }
     }
 
     private fun isErrorFromRedis(throwable: Throwable): Boolean {
-        return redisErrors.any { it.isInstance(throwable) }
+        return throwable::class in redisErrors
     }
 
     companion object {
@@ -123,7 +134,7 @@ class RedisDeviceRepository(
         )
 
         fun createDeviceKey(key: String): String {
-            return "$KEY_PREFIX$key"
+            return "$KEY_PREFIX::$key"
         }
     }
 }

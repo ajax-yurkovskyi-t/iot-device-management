@@ -1,14 +1,12 @@
 package com.example.iotmanagementdevice.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.time.Duration
 
 @ConfigurationProperties(prefix = "spring.data.redis")
 data class RedisProperties(
-    val timeout: Timeout,
-    val ttl: Ttl,
+    val timeout: Duration,
+    val ttl: Duration,
     val port: Int,
     val host: String,
-) {
-    data class Timeout(val millis: Long)
-    data class Ttl(val minutes: Long)
-}
+)
