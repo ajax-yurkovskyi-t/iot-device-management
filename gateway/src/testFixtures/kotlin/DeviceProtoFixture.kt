@@ -103,12 +103,6 @@ object DeviceProtoFixture {
         }.build()
     }
 
-//    fun failureDeviceUpdatedEvent(failureMessage: String): DeviceUpdatedEvent {
-//        return DeviceUpdatedEvent.newBuilder().apply {
-//            failureBuilder.message = failureMessage
-//        }.build()
-//    }
-
     fun failureUpdateDeviceResponse(failureMessage: String): UpdateDeviceResponse {
         return UpdateDeviceResponse.newBuilder().apply {
             failureBuilder.message = failureMessage
