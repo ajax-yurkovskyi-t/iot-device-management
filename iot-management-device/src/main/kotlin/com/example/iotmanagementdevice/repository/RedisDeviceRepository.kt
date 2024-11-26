@@ -60,8 +60,7 @@ class RedisDeviceRepository(
 
     override fun deleteById(deviceId: String): Mono<Unit> {
         val key = createDeviceKey(deviceId)
-        return mongoDeviceRepository
-            .deleteById(deviceId)
+        return mongoDeviceRepository.deleteById(deviceId)
             .flatMap {
                 reactiveRedisTemplate.unlink(key)
                     .onErrorResume(::isErrorFromRedis) {
