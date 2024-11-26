@@ -8,9 +8,9 @@ import DeviceProtoFixture.getUpdatedDevicesRequest
 import DeviceProtoFixture.grpcCreateDeviceRequest
 import DeviceProtoFixture.grpcGetDeviceByIdRequest
 import DeviceProtoFixture.successfulCreateResponse
+import DeviceProtoFixture.successfulDeviceUpdatedEvent
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
 import DeviceProtoFixture.successfulGetDevicesByUserIdResponse
-import DeviceProtoFixture.successfulUpdateResponse
 import com.example.gateway.client.NatsClient
 import com.example.gateway.mapper.grpc.CreateDeviceGrpcMapper
 import com.example.gateway.mapper.grpc.GetDeviceByIdGrpcMapper
@@ -105,7 +105,7 @@ class GrpcDeviceServiceTest {
         val updatedDevices = getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(existingUserDevices)
 
         val updatedDevicesFromNats =
-            listOf(successfulUpdateResponse(deviceProto)).toFlux()
+            listOf(successfulDeviceUpdatedEvent(deviceProto)).toFlux()
 
         val grpcGetUpdatedDevicesRequest = getUpdatedDevicesRequest(userId)
         val grpcGetDevicesByUserIdRequest = getDevicesByUserIdRequest(userId)
@@ -118,7 +118,7 @@ class GrpcDeviceServiceTest {
             )
         } returns existingUserDevices.toMono()
 
-        every { natsClient.requestUpdatedDevicesByUserId(grpcGetUpdatedDevicesRequest.userId) } returns
+        every { natsClient.subscribeToDeviceUpdatesByUserId(grpcGetUpdatedDevicesRequest.userId) } returns
             updatedDevicesFromNats
 
         // WHEN

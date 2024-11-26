@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.kafka.consumer
 
 import com.example.commonmodels.device.DeviceUpdateNotification
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.kafka.producer.DeviceUpdateNotificationProducer
 import com.example.iotmanagementdevice.mapper.DeviceNotificationMapper
 import org.slf4j.LoggerFactory
@@ -24,7 +24,7 @@ class DeviceUpdateProcessor(
         updateDeviceKafkaReceiver.receive()
             .flatMap { record ->
                 Mono.defer {
-                    val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
+                    val updatedDevice = DeviceUpdatedEvent.parser().parseFrom(record.value())
                     val notification: DeviceUpdateNotification =
                         deviceNotificationMapper.toDeviceUpdateNotification(updatedDevice)
 

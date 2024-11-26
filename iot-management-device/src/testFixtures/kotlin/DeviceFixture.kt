@@ -11,7 +11,7 @@ import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdR
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdRequest
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.google.protobuf.Timestamp
 import org.bson.types.ObjectId
@@ -85,7 +85,7 @@ object DeviceFixture {
     fun getAllDevicesRequest(): GetAllDevicesRequest =
         GetAllDevicesRequest.newBuilder().build()
 
-    fun updateDeviceResponse(deviceId: String, userId: String, timestamp: Instant): UpdateDeviceResponse {
+    fun deviceUpdatedEvent(deviceId: String, userId: String, timestamp: Instant): DeviceUpdatedEvent {
         val device = Device.newBuilder().apply {
             id = deviceId
             this.userId = userId
@@ -98,12 +98,8 @@ object DeviceFixture {
             }.build()
         }.build()
 
-        val successResponse = UpdateDeviceResponse.Success.newBuilder().apply {
+        return DeviceUpdatedEvent.newBuilder().apply {
             this.device = device
-        }.build()
-
-        return UpdateDeviceResponse.newBuilder().apply {
-            success = successResponse
         }.build()
     }
 

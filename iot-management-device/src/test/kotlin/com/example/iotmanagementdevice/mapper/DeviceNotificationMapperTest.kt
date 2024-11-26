@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.mapper
 
+import DeviceFixture.deviceUpdatedEvent
 import DeviceFixture.updateDeviceNotification
-import DeviceFixture.updateDeviceResponse
 import com.example.commonmodels.device.DeviceUpdateNotification
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -17,12 +17,12 @@ class DeviceNotificationMapperTest {
         val deviceId = ObjectId().toString()
         val userId = ObjectId().toString()
         val timestamp = Instant.now()
-        val updateDeviceResponse = updateDeviceResponse(deviceId, userId, timestamp)
+        val deviceUpdatedEvent = deviceUpdatedEvent(deviceId, userId, timestamp)
         val updateDeviceNotification = updateDeviceNotification(deviceId, userId, timestamp)
 
         // When
         val result: DeviceUpdateNotification =
-            deviceNotificationMapper.toDeviceUpdateNotification(updateDeviceResponse)
+            deviceNotificationMapper.toDeviceUpdateNotification(deviceUpdatedEvent)
 
         // Then
         assertEquals(updateDeviceNotification, result)

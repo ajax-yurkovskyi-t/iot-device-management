@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package com.example.internal.output.pubsub.device;
+
+import "com/example/commonmodels/device/device.proto";
+
+option java_multiple_files = true;
+
+message DeviceUpdatedEvent {
+  commonmodels.device.Device device = 1;
+}

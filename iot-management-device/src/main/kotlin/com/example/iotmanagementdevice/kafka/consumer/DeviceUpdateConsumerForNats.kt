@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.kafka.consumer
 
 import com.example.internal.NatsSubject.Device.updateByUserId
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import io.nats.client.Connection
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -21,7 +21,7 @@ class DeviceUpdateConsumerForNats(
         updateDeviceForNatsKafkaReceiver.receive()
             .flatMap { record ->
                 Mono.defer {
-                    val updatedDevice = UpdateDeviceResponse.parser().parseFrom(record.value())
+                    val updatedDevice = DeviceUpdatedEvent.parser().parseFrom(record.value())
                     sendUpdate(updatedDevice)
                 }
                     .onErrorResume { error ->
@@ -32,10 +32,10 @@ class DeviceUpdateConsumerForNats(
             }.subscribe()
     }
 
-    private fun sendUpdate(device: UpdateDeviceResponse): Mono<Unit> {
+    private fun sendUpdate(event: DeviceUpdatedEvent): Mono<Unit> {
         return natsConnection.publish(
-            updateByUserId(device.success.device.userId),
-            device.toByteArray()
+            updateByUserId(event.device.userId),
+            event.toByteArray()
         ).toMono()
     }
 

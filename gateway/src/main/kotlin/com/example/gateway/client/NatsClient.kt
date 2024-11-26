@@ -1,7 +1,7 @@
 package com.example.gateway.client
 
 import com.example.internal.NatsSubject
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.google.protobuf.GeneratedMessage
 import com.google.protobuf.Parser
 import io.nats.client.Connection
@@ -25,11 +25,11 @@ class NatsClient(
             .map { response -> parser.parseFrom(response.data) }
     }
 
-    fun requestUpdatedDevicesByUserId(userId: String): Flux<UpdateDeviceResponse> {
+    fun subscribeToDeviceUpdatesByUserId(userId: String): Flux<DeviceUpdatedEvent> {
         val subjectName = NatsSubject.Device.updateByUserId(userId)
         return Flux.create { fluxSink ->
             val subscription = dispatcher.subscribe(subjectName) { message ->
-                val updatedDeviceMessage = UpdateDeviceResponse.parser().parseFrom(message.data)
+                val updatedDeviceMessage = DeviceUpdatedEvent.parser().parseFrom(message.data)
                 fluxSink.next(updatedDeviceMessage)
             }
             fluxSink.onDispose {

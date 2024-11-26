@@ -1,10 +1,10 @@
 package com.example.gateway.mapper.grpc
 
+import com.example.commonmodels.Error
 import com.example.commonmodels.device.Device
-import com.example.core.exception.EntityNotFoundException
 import com.example.grpcapi.reqrep.device.StreamUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,21 +16,16 @@ class GetUpdatedDeviceGrpcMapper {
             GetDevicesByUserIdResponse.ResponseCase.SUCCESS ->
                 mapDeviceListToUpdateDeviceResponseList(response.success.devicesList)
 
-            GetDevicesByUserIdResponse.ResponseCase.FAILURE -> toFailure(response)
+            GetDevicesByUserIdResponse.ResponseCase.FAILURE -> listOf(toFailure(response))
+
             GetDevicesByUserIdResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException("No response case set")
         }
     }
 
-    fun toGetUpdatedDeviceResponse(response: UpdateDeviceResponse): StreamUpdatedDeviceResponse {
-        val message = response.failure.message.orEmpty()
-        return when (response.responseCase!!) {
-            UpdateDeviceResponse.ResponseCase.SUCCESS -> StreamUpdatedDeviceResponse.newBuilder().apply {
-                successBuilder.device = response.success.device
-            }.build()
-
-            UpdateDeviceResponse.ResponseCase.FAILURE -> error(message)
-            UpdateDeviceResponse.ResponseCase.RESPONSE_NOT_SET -> throw RuntimeException("No response case set")
-        }
+    fun toUpdatedDeviceResponse(event: DeviceUpdatedEvent): StreamUpdatedDeviceResponse {
+        return StreamUpdatedDeviceResponse.newBuilder().apply {
+            successBuilder.device = event.device
+        }.build()
     }
 
     private fun mapDeviceListToUpdateDeviceResponseList(devicesList: List<Device>): List<StreamUpdatedDeviceResponse> =
@@ -40,11 +35,14 @@ class GetUpdatedDeviceGrpcMapper {
             }.build()
         }
 
-    private fun toFailure(response: GetDevicesByUserIdResponse): Nothing {
+    private fun toFailure(response: GetDevicesByUserIdResponse): StreamUpdatedDeviceResponse {
         val message = response.failure.message.orEmpty()
-        throw when (response.failure.errorCase!!) {
-            GetDevicesByUserIdResponse.Failure.ErrorCase.USER_NOT_FOUND -> EntityNotFoundException(message)
-            GetDevicesByUserIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> error(message)
-        }
+        return StreamUpdatedDeviceResponse.newBuilder().apply {
+            failureBuilder.message = message
+            when (response.failure.errorCase!!) {
+                GetDevicesByUserIdResponse.Failure.ErrorCase.USER_NOT_FOUND -> failureBuilder.userNotFoundBuilder
+                GetDevicesByUserIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> Error.getDefaultInstance()
+            }
+        }.build()
     }
 }

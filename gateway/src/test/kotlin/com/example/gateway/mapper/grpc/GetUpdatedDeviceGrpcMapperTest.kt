@@ -2,11 +2,10 @@ package com.example.gateway.mapper.grpc
 
 import DeviceProtoFixture.deviceProto
 import DeviceProtoFixture.failureGetDevicesByUserIdResponse
-import DeviceProtoFixture.failureUpdateDeviceResponse
+import DeviceProtoFixture.successfulDeviceUpdatedEvent
 import DeviceProtoFixture.successfulGetUpdatedDevicesResponse
-import DeviceProtoFixture.successfulUpdateResponse
+import com.example.grpcapi.reqrep.device.StreamUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -39,42 +38,38 @@ class GetUpdatedDeviceGrpcMapperTest {
     @Test
     fun `should map successful UpdateDeviceResponse to GetUpdatedDeviceResponse`() {
         // GIVEN
-        val successResponse = successfulUpdateResponse(deviceProto)
+        val successResponse = successfulDeviceUpdatedEvent(deviceProto)
         val successUpdateDeviceResponse = successfulGetUpdatedDevicesResponse(deviceProto)
 
         // WHEN
-        val updateDeviceResponse = getUpdatedDeviceGrpcMapper.toGetUpdatedDeviceResponse(successResponse)
+        val updateDeviceResponse = getUpdatedDeviceGrpcMapper.toUpdatedDeviceResponse(successResponse)
 
         // THEN
         assertEquals(updateDeviceResponse, successUpdateDeviceResponse)
+    }
+
+    @Test
+    fun `should throw RuntimeException when response not set`() {
+        val response = GetDevicesByUserIdResponse.getDefaultInstance()
+
+        // WHEN & THEN
+        val exception = assertThrows<RuntimeException> {
+            getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(response)
+        }
+
+        assertEquals("No response case set", exception.message)
     }
 
     @ParameterizedTest
     @MethodSource("provideGetDevicesByUserIdResponseFailure")
     fun `should throw exception for GetDevicesByUserIdResponse failure response cases`(
         response: GetDevicesByUserIdResponse,
-        expectedMessage: String
+        expectedResponse: List<StreamUpdatedDeviceResponse>
     ) {
         // WHEN & THEN
-        val exception = assertThrows<RuntimeException> {
-            getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(response)
-        }
+        val result = getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(response)
 
-        assertEquals(expectedMessage, exception.message)
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideUpdateDeviceResponseFailure")
-    fun `should throw exception for UpdateDeviceResponse failure response cases`(
-        response: UpdateDeviceResponse,
-        expectedMessage: String
-    ) {
-        // WHEN & THEN
-        val exception = assertThrows<RuntimeException> {
-            getUpdatedDeviceGrpcMapper.toGetUpdatedDeviceResponse(response)
-        }
-
-        assertEquals(expectedMessage, exception.message)
+        assertEquals(expectedResponse, result)
     }
 
     companion object {
@@ -82,34 +77,25 @@ class GetUpdatedDeviceGrpcMapperTest {
         fun provideGetDevicesByUserIdResponseFailure(): List<Arguments> {
             return listOf(
                 Arguments.of(
-                    GetDevicesByUserIdResponse.getDefaultInstance(),
-                    "No response case set"
-                ),
-                Arguments.of(
                     failureGetDevicesByUserIdResponse("Failed to find device by id"),
-                    "Failed to find device by id"
+                    listOf(
+                        StreamUpdatedDeviceResponse.newBuilder().apply {
+                            failureBuilder.message = "Failed to find device by id"
+                        }.build()
+                    )
                 ),
                 Arguments.of(
                     GetDevicesByUserIdResponse.newBuilder().apply {
                         failureBuilder.userNotFoundBuilder
                         failureBuilder.message = "Device not found"
                     }.build(),
-                    "Device not found"
+                    listOf(
+                        StreamUpdatedDeviceResponse.newBuilder().apply {
+                            failureBuilder.userNotFoundBuilder
+                            failureBuilder.message = "Device not found"
+                        }.build()
+                    )
                 )
-            )
-        }
-
-        @JvmStatic
-        fun provideUpdateDeviceResponseFailure(): List<Arguments> {
-            return listOf(
-                Arguments.of(
-                    UpdateDeviceResponse.getDefaultInstance(),
-                    "No response case set"
-                ),
-                Arguments.of(
-                    failureUpdateDeviceResponse("Failed to update device by id"),
-                    "Failed to update device by id"
-                ),
             )
         }
     }

@@ -50,7 +50,7 @@ class DeviceServiceImpl(
                 deviceRepository.save(updatedDevice)
             }
             .flatMap { updatedDevice ->
-                deviceUpdateProducer.sendMessage(updateDeviceMapper.toUpdateDeviceResponse(updatedDevice))
+                deviceUpdateProducer.sendMessage(updateDeviceMapper.toDeviceUpdatedEvent(updatedDevice))
                     .thenReturn(updatedDevice)
                     .onErrorResume { error ->
                         log.error(

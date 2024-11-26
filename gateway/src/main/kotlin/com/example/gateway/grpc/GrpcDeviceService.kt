@@ -42,9 +42,12 @@ class GrpcDeviceService(
                 getUpdatedDeviceGrpcMapper.toUpdateDeviceResponseList(response).toFlux()
             }
 
-            natsClient.requestUpdatedDevicesByUserId(updateDeviceRequest.userId)
-                .map { getUpdatedDeviceGrpcMapper.toGetUpdatedDeviceResponse(it) }
+            natsClient.subscribeToDeviceUpdatesByUserId(updateDeviceRequest.userId)
+                .map { getUpdatedDeviceGrpcMapper.toUpdatedDeviceResponse(it) }
                 .startWith(existingDevices)
+                .takeUntil { updatedDeviceResponse ->
+                    updatedDeviceResponse.hasFailure()
+                }
         }
     }
 

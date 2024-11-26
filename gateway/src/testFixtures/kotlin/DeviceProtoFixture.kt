@@ -13,6 +13,7 @@ import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdR
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdRequest
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.grpcapi.reqrep.device.CreateDeviceRequest as GrpcCreateDeviceRequest
 import com.example.grpcapi.reqrep.device.CreateDeviceResponse as GrpcCreateDeviceResponse
 import com.example.grpcapi.reqrep.device.GetDeviceByIdRequest as GrpcGetDeviceByIdRequest
@@ -78,6 +79,12 @@ object DeviceProtoFixture {
         }.build()
     }
 
+    fun failureGrpcGetDeviceByIdResponse(failureMessage: String): GrpcGetDeviceByIdResponse {
+        return GrpcGetDeviceByIdResponse.newBuilder().apply {
+            failureBuilder.message = failureMessage
+        }.build()
+    }
+
     fun successfulGetUpdatedDevicesResponse(device: Device): StreamUpdatedDeviceResponse {
         return StreamUpdatedDeviceResponse.newBuilder().apply {
             successBuilder.device = device
@@ -89,6 +96,18 @@ object DeviceProtoFixture {
             successBuilder.device = device
         }.build()
     }
+
+    fun successfulDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent {
+        return DeviceUpdatedEvent.newBuilder().apply {
+            this.device = device
+        }.build()
+    }
+
+//    fun failureDeviceUpdatedEvent(failureMessage: String): DeviceUpdatedEvent {
+//        return DeviceUpdatedEvent.newBuilder().apply {
+//            failureBuilder.message = failureMessage
+//        }.build()
+//    }
 
     fun failureUpdateDeviceResponse(failureMessage: String): UpdateDeviceResponse {
         return UpdateDeviceResponse.newBuilder().apply {
