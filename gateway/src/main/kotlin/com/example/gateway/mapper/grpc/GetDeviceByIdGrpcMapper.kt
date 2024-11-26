@@ -1,6 +1,5 @@
 package com.example.gateway.mapper.grpc
 
-import com.example.commonmodels.Error
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdRequest
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import org.springframework.stereotype.Component

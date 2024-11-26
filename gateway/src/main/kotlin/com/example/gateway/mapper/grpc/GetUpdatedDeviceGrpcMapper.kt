@@ -1,6 +1,5 @@
 package com.example.gateway.mapper.grpc
 
-import com.example.commonmodels.Error
 import com.example.commonmodels.device.Device
 import com.example.grpcapi.reqrep.device.StreamUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
