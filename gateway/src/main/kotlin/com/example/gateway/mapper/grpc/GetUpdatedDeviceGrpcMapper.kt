@@ -41,7 +41,7 @@ class GetUpdatedDeviceGrpcMapper {
             failureBuilder.message = message
             when (response.failure.errorCase!!) {
                 GetDevicesByUserIdResponse.Failure.ErrorCase.USER_NOT_FOUND -> failureBuilder.userNotFoundBuilder
-                GetDevicesByUserIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> Error.getDefaultInstance()
+                GetDevicesByUserIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> {}
             }
         }.build()
     }

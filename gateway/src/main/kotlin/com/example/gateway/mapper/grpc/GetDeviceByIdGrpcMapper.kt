@@ -34,7 +34,7 @@ class GetDeviceByIdGrpcMapper {
             failureBuilder.message = message
             when (response.failure.errorCase!!) {
                 GetDeviceByIdResponse.Failure.ErrorCase.DEVICE_NOT_FOUND -> failureBuilder.deviceNotFoundBuilder
-                GetDeviceByIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> Error.getDefaultInstance()
+                GetDeviceByIdResponse.Failure.ErrorCase.ERROR_NOT_SET -> {}
             }
         }.build()
     }
