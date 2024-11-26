@@ -3,6 +3,7 @@ package com.example.iotmanagementdevice.repository
 import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -41,7 +42,7 @@ class RedisDeviceRepository(
                 if (item.isEmpty()) {
                     sink.error(EntityNotFoundException("Device with id $deviceId not found"))
                 } else {
-                    runCatching { mapper.readValue(item, MongoDevice::class.java) }
+                    runCatching { mapper.readValue<MongoDevice>(item) }
                         .onSuccess { sink.next(it) }
                         .onFailure {
                             reactiveRedisTemplate.unlink(key)

@@ -5,6 +5,7 @@ import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.example.iotmanagementdevice.repository.RedisDeviceRepository.Companion.createDeviceKey
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -45,7 +46,7 @@ class RedisDeviceRepositoryTest : AbstractMongoTest {
         redisTemplate.opsForValue().get(key)
             .test()
             .assertNext {
-                assertEquals(savedDevice, objectMapper.readValue(it, MongoDevice::class.java))
+                assertEquals(savedDevice, objectMapper.readValue<MongoDevice>(it))
             }
             .verifyComplete()
 
