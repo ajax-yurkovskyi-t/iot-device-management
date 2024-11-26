@@ -3,7 +3,6 @@ package com.example.iotmanagementdevice.repository
 import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -42,10 +41,14 @@ class RedisDeviceRepository(
                 if (item.isEmpty()) {
                     sink.error(EntityNotFoundException("Device with id $deviceId not found"))
                 } else {
-                    sink.next(item)
+                    runCatching { mapper.readValue(item, MongoDevice::class.java) }
+                        .onSuccess { sink.next(it) }
+                        .onFailure {
+                            reactiveRedisTemplate.unlink(key)
+                            sink.error(it)
+                        }
                 }
             }
-            .map { mapper.readValue<MongoDevice>(it) }
             .switchIfEmpty { findInMongoAndWriteToRedis(deviceId) }
             .onErrorResume(::isErrorFromRedis) {
                 mongoDeviceRepository.findById(deviceId)
@@ -80,7 +83,8 @@ class RedisDeviceRepository(
                 .filter { error -> isErrorFromRedis(error) }
                 .doBeforeRetry { retrySignal ->
                     log.warn(
-                        "Retrying saving device to Redis because of: ${retrySignal.failure().message}"
+                        "Retrying saving device to Redis because of {}:",
+                        retrySignal.failure().message
                     )
                 }
         )
