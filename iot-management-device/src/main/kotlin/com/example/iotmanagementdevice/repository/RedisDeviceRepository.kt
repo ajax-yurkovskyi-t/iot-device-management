@@ -56,7 +56,7 @@ class RedisDeviceRepository(
         val key = createDeviceKey(deviceId)
         return mongoDeviceRepository.deleteById(deviceId)
             .flatMap {
-                reactiveRedisTemplate.opsForValue().delete(key)
+                reactiveRedisTemplate.unlink(key)
                     .onErrorResume(::isErrorFromRedis) {
                         log.warn("Redis failed to remove user from cache", it)
                         Mono.empty()

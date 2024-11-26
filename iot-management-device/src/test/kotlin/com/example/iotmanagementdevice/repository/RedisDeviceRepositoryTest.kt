@@ -3,12 +3,14 @@ package com.example.iotmanagementdevice.repository
 import DeviceFixture.createDevice
 import com.example.core.exception.EntityNotFoundException
 import com.example.iotmanagementdevice.repository.RedisDeviceRepository.Companion.createDeviceKey
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import reactor.kotlin.test.test
 import reactor.kotlin.test.verifyError
+import java.time.Duration
 
 class RedisDeviceRepositoryTest : AbstractMongoTest {
     @Autowired
@@ -17,10 +19,19 @@ class RedisDeviceRepositoryTest : AbstractMongoTest {
     @Autowired
     private lateinit var redisDeviceRepository: DeviceRepository
 
+    @Autowired
+    private lateinit var mongoDeviceRepository: DeviceRepository
+
+    @Autowired
+    private lateinit var reactiveRedisTemplate: ReactiveRedisTemplate<String, ByteArray>
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
+
     @Test
     fun `should find device by id and save cache from it`() {
         // GIVEN
-        val savedDevice = redisDeviceRepository.save(createDevice()).block()!!
+        val savedDevice = mongoDeviceRepository.save(createDevice()).block()!!
         val key = createDeviceKey(savedDevice.id.toString())
 
         // WHEN
@@ -35,6 +46,27 @@ class RedisDeviceRepositoryTest : AbstractMongoTest {
 
         containsDeviceCache.test()
             .expectNext(true)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should find device by id when it is already cached`() {
+        // GIVEN
+        val savedDevice = mongoDeviceRepository.save(createDevice()).block()!!
+        val key = createDeviceKey(savedDevice.id.toString())
+
+        reactiveRedisTemplate.opsForValue().set(
+            key,
+            objectMapper.writeValueAsBytes(savedDevice),
+            ttl
+        ).block()!!
+
+        // WHEN
+        val device = redisDeviceRepository.findById(savedDevice.id.toString())
+
+        // THEN
+        device.test()
+            .expectNext(savedDevice)
             .verifyComplete()
     }
 
@@ -99,5 +131,9 @@ class RedisDeviceRepositoryTest : AbstractMongoTest {
         doesCacheContainsDevice.test()
             .expectNext(false)
             .verifyComplete()
+    }
+
+    companion object {
+        private val ttl = Duration.ofMinutes(3)
     }
 }
