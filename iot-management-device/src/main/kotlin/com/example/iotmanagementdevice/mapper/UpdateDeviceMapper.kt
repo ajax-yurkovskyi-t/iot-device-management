@@ -1,11 +1,12 @@
 package com.example.iotmanagementdevice.mapper
 
+import com.example.commonmodels.Error
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
 import com.example.core.exception.EntityNotFoundException
-import com.example.internal.commonmodels.Error
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.google.protobuf.Timestamp
 import org.bson.types.ObjectId
@@ -29,8 +30,8 @@ abstract class UpdateDeviceMapper {
     @Mapping(target = "success.device", source = "deviceResponseDto")
     abstract fun toUpdateDeviceResponse(deviceResponseDto: DeviceResponseDto): UpdateDeviceResponse
 
-    @Mapping(target = "success.device", source = "mongoDevice")
-    abstract fun toUpdateDeviceResponse(mongoDevice: MongoDevice): UpdateDeviceResponse
+    @Mapping(target = "device", source = "mongoDevice")
+    abstract fun toDeviceUpdatedEvent(mongoDevice: MongoDevice): DeviceUpdatedEvent
 
     fun toFailureUpdateDeviceResponse(throwable: Throwable): UpdateDeviceResponse {
         return UpdateDeviceResponse.newBuilder().apply {

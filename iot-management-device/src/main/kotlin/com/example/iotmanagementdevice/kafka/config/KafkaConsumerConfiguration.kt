@@ -22,6 +22,13 @@ class KafkaConsumerConfiguration(
         )
     }
 
+    @Bean
+    fun updateDeviceForNatsKafkaReceiver(): KafkaReceiver<String, ByteArray> {
+        return KafkaReceiver.create(
+            createKafkaReceiverProperties(UPDATE, DEVICE_UPDATE_FOR_NATS_GROUP)
+        )
+    }
+
     private fun createKafkaReceiverProperties(
         topic: String,
         consumerGroup: String
@@ -42,5 +49,6 @@ class KafkaConsumerConfiguration(
 
     companion object {
         const val DEVICE_UPDATE_GROUP = "deviceUpdateGroup"
+        const val DEVICE_UPDATE_FOR_NATS_GROUP = "deviceUpdateForNatsGroup"
     }
 }

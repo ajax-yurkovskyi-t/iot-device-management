@@ -1,15 +1,17 @@
+import com.example.commonmodels.device.Device
+import com.example.commonmodels.device.DeviceUpdateNotification
 import com.example.core.dto.DeviceStatusType
 import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
-import com.example.internal.commonmodels.Device
-import com.example.internal.commonmodels.DeviceUpdateNotification
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdRequest
+import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdRequest
+import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.model.MongoDevice
 import com.google.protobuf.Timestamp
 import org.bson.types.ObjectId
@@ -83,7 +85,7 @@ object DeviceFixture {
     fun getAllDevicesRequest(): GetAllDevicesRequest =
         GetAllDevicesRequest.newBuilder().build()
 
-    fun updateDeviceResponse(deviceId: String, userId: String, timestamp: Instant): UpdateDeviceResponse {
+    fun deviceUpdatedEvent(deviceId: String, userId: String, timestamp: Instant): DeviceUpdatedEvent {
         val device = Device.newBuilder().apply {
             id = deviceId
             this.userId = userId
@@ -96,12 +98,8 @@ object DeviceFixture {
             }.build()
         }.build()
 
-        val successResponse = UpdateDeviceResponse.Success.newBuilder().apply {
+        return DeviceUpdatedEvent.newBuilder().apply {
             this.device = device
-        }.build()
-
-        return UpdateDeviceResponse.newBuilder().apply {
-            success = successResponse
         }.build()
     }
 
@@ -114,5 +112,33 @@ object DeviceFixture {
                 nanos = timestamp.nano
             }.build()
         }.build()
+    }
+
+    fun getDevicesByUserIdRequest(userId: String): GetDevicesByUserIdRequest {
+        return GetDevicesByUserIdRequest.newBuilder().apply {
+            this.userId = userId
+        }.build()
+    }
+
+    fun getDevicesByUserIdResponse(list: List<DeviceResponseDto>): GetDevicesByUserIdResponse {
+        return GetDevicesByUserIdResponse.newBuilder().apply {
+            successBuilder.addAllDevices(
+                list.map { dto ->
+                    Device.newBuilder().apply {
+                        name = dto.name
+                        type = dto.type
+                        description = dto.description
+                        statusType = mapStatusType(dto.statusType!!)
+                    }.build()
+                }
+            )
+        }.build()
+    }
+
+    private fun mapStatusType(statusType: DeviceStatusType): Device.StatusType {
+        return when (statusType) {
+            DeviceStatusType.ONLINE -> Device.StatusType.STATUS_TYPE_ONLINE
+            DeviceStatusType.OFFLINE -> Device.StatusType.STATUS_TYPE_OFFLINE
+        }
     }
 }

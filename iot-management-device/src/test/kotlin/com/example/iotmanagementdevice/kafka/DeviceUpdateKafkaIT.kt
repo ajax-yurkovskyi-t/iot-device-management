@@ -2,8 +2,8 @@ package com.example.iotmanagementdevice.kafka
 
 import DeviceFixture.createDevice
 import DeviceFixture.createDeviceUpdateRequestDto
+import com.example.commonmodels.device.DeviceUpdateNotification
 import com.example.internal.KafkaTopic.KafkaDeviceUpdateEvents.NOTIFY
-import com.example.internal.commonmodels.DeviceUpdateNotification
 import com.example.iotmanagementdevice.repository.AbstractMongoTest
 import com.example.iotmanagementdevice.service.device.DeviceService
 import org.apache.kafka.clients.consumer.ConsumerConfig

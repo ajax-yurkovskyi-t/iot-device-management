@@ -1,16 +1,16 @@
 package com.example.iotmanagementdevice.mapper
 
-import com.example.internal.commonmodels.DeviceUpdateNotification
-import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
+import com.example.commonmodels.device.DeviceUpdateNotification
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import org.springframework.stereotype.Component
 
 @Component
 class DeviceNotificationMapper {
-    fun toDeviceUpdateNotification(response: UpdateDeviceResponse): DeviceUpdateNotification {
+    fun toDeviceUpdateNotification(event: DeviceUpdatedEvent): DeviceUpdateNotification {
         return DeviceUpdateNotification.newBuilder().apply {
-            deviceId = response.success.device.id
-            userId = response.success.device.userId
-            timestamp = response.success.device.updatedAt
+            deviceId = event.device.id
+            userId = event.device.userId
+            timestamp = event.device.updatedAt
         }.build()
     }
 }

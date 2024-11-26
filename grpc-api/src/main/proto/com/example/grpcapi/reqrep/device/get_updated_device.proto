@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package com.example.grpcapi.reqrep.device;
+
+import "com/example/commonmodels/device/device.proto";
+import "com/example/commonmodels/error.proto";
+
+option java_multiple_files = true;
+
+message GetUpdatedDeviceRequest {
+  string user_id = 1;
+}
+
+message StreamUpdatedDeviceResponse {
+  oneof response {
+    Success success = 1;
+    Failure failure = 2;
+  }
+
+  message Success {
+    commonmodels.device.Device device = 1;
+  }
+
+  message Failure {
+    string message = 100;
+    oneof error {
+      commonmodels.Error user_not_found = 1;
+    }
+  }
+}

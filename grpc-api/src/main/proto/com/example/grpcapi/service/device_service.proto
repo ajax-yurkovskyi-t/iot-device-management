@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package com.example.grpcapi.service;
+
+import "com/example/grpcapi/reqrep/device/get_by_id.proto";
+import "com/example/grpcapi/reqrep/device/get_updated_device.proto";
+import "com/example/grpcapi/reqrep/device/create.proto";
+
+service DeviceService {
+  rpc createDevice(grpcapi.reqrep.device.CreateDeviceRequest) returns
+      (grpcapi.reqrep.device.CreateDeviceResponse);
+
+  rpc getDeviceById(grpcapi.reqrep.device.GetDeviceByIdRequest) returns
+      (reqrep.device.GetDeviceByIdResponse);
+
+  rpc subscribeToUpdateByUserId (grpcapi.reqrep.device.GetUpdatedDeviceRequest)
+      returns (stream grpcapi.reqrep.device.StreamUpdatedDeviceResponse);
+}
