@@ -5,19 +5,22 @@ import DeviceFixture.deleteDeviceRequest
 import com.example.internal.NatsSubject
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceResponse
 import com.example.iotmanagementdevice.mapper.DeleteDeviceMapper
+import com.example.iotmanagementdevice.repository.AbstractMongoTest
 import com.example.iotmanagementdevice.repository.DeviceRepository
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import reactor.kotlin.test.test
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 
-class DeleteDeviceNatsControllerTest : AbstractNatsControllerTest() {
+class DeleteDeviceNatsControllerTest : AbstractMongoTest {
     @Autowired
-    @Qualifier("mongoDeviceRepository")
     private lateinit var deviceRepository: DeviceRepository
 
     @Autowired
     private lateinit var deleteDeviceMapper: DeleteDeviceMapper
+
+    @Autowired
+    private lateinit var natsMessagePublisher: NatsMessagePublisher
 
     @Test
     fun `should delete device`() {
@@ -25,13 +28,15 @@ class DeleteDeviceNatsControllerTest : AbstractNatsControllerTest() {
         val device = deviceRepository.save(createDevice()).block()!!
 
         // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             NatsSubject.Device.DELETE,
             deleteDeviceRequest(device.id.toString()),
             DeleteDeviceResponse.parser()
         )
 
         // THEN
-        assertEquals(deleteDeviceMapper.toSuccessDeleteResponse(), actual)
+        actual.test()
+            .expectNext(deleteDeviceMapper.toSuccessDeleteResponse())
+            .verifyComplete()
     }
 }

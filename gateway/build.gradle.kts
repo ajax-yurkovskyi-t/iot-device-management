@@ -13,7 +13,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.0")
     implementation("org.springframework.boot:spring-boot-starter-web:3.3.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.nats:jnats:2.16.14")
+    implementation("systems.ajax:nats-spring-boot-starter:4.1.0.186.MASTER-SNAPSHOT")
     implementation("io.projectreactor:reactor-core:3.6.10")
     implementation("org.springframework.boot:spring-boot-starter-validation:3.3.2")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.2")

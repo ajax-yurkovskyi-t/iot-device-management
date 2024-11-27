@@ -7,16 +7,16 @@ import com.example.internal.NatsSubject
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.mapper.GetDeviceByIdMapper
+import com.example.iotmanagementdevice.repository.AbstractMongoTest
 import com.example.iotmanagementdevice.repository.DeviceRepository
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import reactor.kotlin.test.test
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 
-class GetDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
+class GetDeviceByIdNatsControllerTest : AbstractMongoTest {
     @Autowired
-    @Qualifier("mongoDeviceRepository")
     private lateinit var deviceRepository: DeviceRepository
 
     @Autowired
@@ -25,6 +25,9 @@ class GetDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
     private lateinit var deviceMapper: DeviceMapper
 
+    @Autowired
+    private lateinit var natsMessagePublisher: NatsMessagePublisher
+
     @Test
     fun `should return existing device`() {
         // GIVEN
@@ -32,14 +35,16 @@ class GetDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
         val deviceDto = deviceMapper.toDto(device)
 
         // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             NatsSubject.Device.GET_BY_ID,
             getDeviceByIdRequest(device.id.toString()),
             GetDeviceByIdResponse.parser()
         )
 
         // THEN
-        assertEquals(getDeviceByIdMapper.toGetDeviceByIdResponse(deviceDto), actual)
+        actual.test()
+            .expectNext(getDeviceByIdMapper.toGetDeviceByIdResponse(deviceDto))
+            .verifyComplete()
     }
 
     @Test
@@ -48,20 +53,21 @@ class GetDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
         val invalidId = ObjectId().toString()
 
         // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             NatsSubject.Device.GET_BY_ID,
             getDeviceByIdRequest(invalidId),
             GetDeviceByIdResponse.parser()
         )
 
         // THEN
-        assertEquals(
-            getDeviceByIdMapper.toFailureGetDeviceByIdResponse(
-                EntityNotFoundException(
-                    "Device with id $invalidId not found"
+        actual.test()
+            .expectNext(
+                getDeviceByIdMapper.toFailureGetDeviceByIdResponse(
+                    EntityNotFoundException(
+                        "Device with id $invalidId not found"
+                    )
                 )
-            ),
-            actual
-        )
+            )
+            .verifyComplete()
     }
 }

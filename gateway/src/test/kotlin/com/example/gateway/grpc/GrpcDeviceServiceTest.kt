@@ -11,32 +11,39 @@ import DeviceProtoFixture.successfulCreateResponse
 import DeviceProtoFixture.successfulDeviceUpdatedEvent
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
 import DeviceProtoFixture.successfulGetDevicesByUserIdResponse
-import com.example.gateway.client.NatsClient
 import com.example.gateway.mapper.grpc.CreateDeviceGrpcMapper
 import com.example.gateway.mapper.grpc.GetDeviceByIdGrpcMapper
 import com.example.gateway.mapper.grpc.GetUpdatedDeviceGrpcMapper
+import com.example.internal.NatsSubject
 import com.example.internal.NatsSubject.Device.CREATE
 import com.example.internal.NatsSubject.Device.GET_BY_ID
 import com.example.internal.NatsSubject.Device.GET_BY_USER_ID
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
 import com.example.internal.input.reqreply.device.get_by_id.proto.GetDeviceByIdResponse
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
+import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.nats.client.Message
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.test.test
+import systems.ajax.nats.handler.api.NatsHandlerManager
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 import kotlin.test.assertTrue
 
 @ExtendWith(MockKExtension::class)
 class GrpcDeviceServiceTest {
     @MockK
-    private lateinit var natsClient: NatsClient
+    private lateinit var natsMessagePublisher: NatsMessagePublisher
+
+    @MockK
+    private lateinit var natsHandlerManager: NatsHandlerManager
 
     private val createDeviceGrpcMapper = CreateDeviceGrpcMapper()
     private val getDeviceByIdGrpcMapper = GetDeviceByIdGrpcMapper()
@@ -54,7 +61,7 @@ class GrpcDeviceServiceTest {
         val grpcCreateDeviceResponse = createDeviceGrpcMapper.toGrpc(createDeviceResponse)
 
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 CREATE,
                 createDeviceRequest,
                 CreateDeviceResponse.parser()
@@ -79,7 +86,7 @@ class GrpcDeviceServiceTest {
         val grpcGetDeviceResponse = getDeviceByIdGrpcMapper.toGrpc(getDeviceResponse)
 
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 GET_BY_ID,
                 getDeviceByIdRequest(grpcGetDeviceRequest.id),
                 GetDeviceByIdResponse.parser()
@@ -111,15 +118,19 @@ class GrpcDeviceServiceTest {
         val grpcGetDevicesByUserIdRequest = getDevicesByUserIdRequest(userId)
 
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 GET_BY_USER_ID,
                 grpcGetDevicesByUserIdRequest,
                 GetDevicesByUserIdResponse.parser()
             )
         } returns existingUserDevices.toMono()
 
-        every { natsClient.subscribeToDeviceUpdatesByUserId(grpcGetUpdatedDevicesRequest.userId) } returns
-            updatedDevicesFromNats
+        every {
+            natsHandlerManager.subscribe(
+                NatsSubject.Device.updateByUserId(grpcGetUpdatedDevicesRequest.userId),
+                any<(Message) -> DeviceUpdatedEvent>()
+            )
+        } returns updatedDevicesFromNats
 
         // WHEN
         val result = grpcDeviceService.subscribeToUpdateByUserId(grpcGetUpdatedDevicesRequest)
