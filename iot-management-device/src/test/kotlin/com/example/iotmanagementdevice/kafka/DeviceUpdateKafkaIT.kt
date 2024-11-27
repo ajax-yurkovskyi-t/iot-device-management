@@ -6,7 +6,7 @@ import com.example.commonmodels.device.DeviceUpdateNotification
 import com.example.internal.KafkaTopic.KafkaDeviceUpdateEvents.NOTIFY
 import com.example.iotmanagementdevice.repository.AbstractMongoTest
 import com.example.iotmanagementdevice.service.device.DeviceService
-import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,9 +40,10 @@ class DeviceUpdateKafkaIT : AbstractMongoTest {
         val notification = result.awaitFirst({
             it.deviceId == savedDevice.id.toString()
         })
-        assertThat(notification)
-            .withFailMessage("Expected a DeviceUpdateNotification with deviceId ${savedDevice.id} not to be null")
-            .isNotNull
+        assertNotNull(
+            notification,
+            "Expected a DeviceUpdateNotification with deviceId ${savedDevice.id} not to be null"
+        )
     }
 
     companion object {
