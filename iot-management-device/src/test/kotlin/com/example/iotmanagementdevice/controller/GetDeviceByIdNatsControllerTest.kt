@@ -12,9 +12,11 @@ import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 class GetDeviceByIdNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
+    @Qualifier("mongoDeviceRepository")
     private lateinit var deviceRepository: DeviceRepository
 
     @Autowired

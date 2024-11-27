@@ -10,9 +10,11 @@ import com.example.iotmanagementdevice.repository.DeviceRepository
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 class GetAllDevicesNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
+    @Qualifier("mongoDeviceRepository")
     private lateinit var deviceRepository: DeviceRepository
 
     @Autowired

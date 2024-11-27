@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import reactor.kotlin.test.test
 import reactor.kotlin.test.verifyError
 
@@ -18,7 +19,8 @@ class UserRepositoryImplTest : AbstractMongoTest {
     private lateinit var userRepositoryImpl: UserRepositoryImpl
 
     @Autowired
-    private lateinit var deviceRepositoryImpl: DeviceRepositoryImpl
+    @Qualifier("mongoDeviceRepository")
+    private lateinit var deviceRepository: DeviceRepository
 
     @Autowired
     private lateinit var userMapper: UserMapper
@@ -52,8 +54,8 @@ class UserRepositoryImplTest : AbstractMongoTest {
             device2.copy(userId = user.id)
         )
 
-        deviceRepositoryImpl.save(device1).block()
-        deviceRepositoryImpl.save(device2).block()
+        deviceRepository.save(device1).block()
+        deviceRepository.save(device2).block()
 
         // Assign devices to user
         userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), device1.id!!.toString()).block()
@@ -127,13 +129,13 @@ class UserRepositoryImplTest : AbstractMongoTest {
         val device = UserFixture.createDevice()
 
         userRepositoryImpl.save(user).block()
-        deviceRepositoryImpl.save(device).block()
+        deviceRepository.save(device).block()
 
         // When
         userRepositoryImpl.assignDeviceToUser(user.id!!.toString(), device.id!!.toString()).block()
 
         // Then
-        deviceRepositoryImpl.findById(device.id!!.toString()).test()
+        deviceRepository.findById(device.id!!.toString()).test()
             .expectNextMatches { it.userId == user.id }
             .verifyComplete()
     }

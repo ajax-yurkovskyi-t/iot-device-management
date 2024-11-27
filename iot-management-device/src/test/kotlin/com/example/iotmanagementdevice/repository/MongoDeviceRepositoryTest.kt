@@ -5,19 +5,19 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.kotlin.test.test
 
-class DeviceRepositoryImplTest : AbstractMongoTest {
+class MongoDeviceRepositoryTest : AbstractMongoTest {
 
     @Autowired
-    private lateinit var deviceRepositoryImpl: DeviceRepositoryImpl
+    private lateinit var mongoDeviceRepository: MongoDeviceRepository
 
     @Test
     fun `should find device by id when saved`() {
         // Given
         val device = DeviceFixture.createDevice()
-        deviceRepositoryImpl.save(device).block()
+        mongoDeviceRepository.save(device).block()
 
         // When
-        val foundDevice = deviceRepositoryImpl.findById(device.id!!.toString())
+        val foundDevice = mongoDeviceRepository.findById(device.id!!.toString())
 
         // Then
         foundDevice.test()
@@ -36,11 +36,11 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
             .copy(name = "Device1", description = "First test device", type = "TypeB")
         val device2 = DeviceFixture.createDevice()
             .copy(name = "Device2", description = "Second test device", type = "TypeC")
-        deviceRepositoryImpl.save(device1).block()
-        deviceRepositoryImpl.save(device2).block()
+        mongoDeviceRepository.save(device1).block()
+        mongoDeviceRepository.save(device2).block()
 
         // When
-        val devices = deviceRepositoryImpl.findAll().collectList()
+        val devices = mongoDeviceRepository.findAll().collectList()
 
         // Then
         devices.test()
@@ -56,13 +56,13 @@ class DeviceRepositoryImplTest : AbstractMongoTest {
     fun `should not find device when deleted`() {
         // Given
         val device = DeviceFixture.createDevice()
-        deviceRepositoryImpl.save(device).block()
+        mongoDeviceRepository.save(device).block()
 
         // When
-        deviceRepositoryImpl.deleteById(device.id!!.toString()).block()
+        mongoDeviceRepository.deleteById(device.id!!.toString()).block()
 
         // Then
-        deviceRepositoryImpl.findById(device.id!!.toString())
+        mongoDeviceRepository.findById(device.id!!.toString())
             .test()
             .verifyComplete()
     }
