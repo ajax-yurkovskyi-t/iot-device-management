@@ -20,7 +20,10 @@ jwt:
   expiration: 300000000
   secret: P23wHHMjD4anZ+9DlEYXmcDf481v0Ptmcq9LzVtBcLjR79e5wD1MyEZgOI2a8Cw9
 
-nats.uri: ${NATS_URI}
+nats:
+  spring:
+    io.nats.client:
+      servers: ${NATS_URI}
 
 server:
   port: 8081

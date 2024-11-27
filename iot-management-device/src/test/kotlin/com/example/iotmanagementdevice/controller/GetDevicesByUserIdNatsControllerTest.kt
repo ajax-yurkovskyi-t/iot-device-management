@@ -8,14 +8,16 @@ import com.example.internal.NatsSubject.Device.GET_BY_USER_ID
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.mapper.GetDevicesByUserIdMapper
+import com.example.iotmanagementdevice.repository.AbstractMongoTest
 import com.example.iotmanagementdevice.repository.DeviceRepository
 import com.example.iotmanagementdevice.repository.UserRepository
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import reactor.kotlin.test.test
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 
-class GetDevicesByUserIdNatsControllerTest : AbstractNatsControllerTest() {
+class GetDevicesByUserIdNatsControllerTest : AbstractMongoTest {
 
     @Autowired
     private lateinit var deviceRepository: DeviceRepository
@@ -29,6 +31,9 @@ class GetDevicesByUserIdNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
     private lateinit var deviceMapper: DeviceMapper
 
+    @Autowired
+    private lateinit var natsMessagePublisher: NatsMessagePublisher
+
     @Test
     fun `should return existing user devices`() {
         // GIVEN
@@ -37,14 +42,16 @@ class GetDevicesByUserIdNatsControllerTest : AbstractNatsControllerTest() {
         val deviceDto = deviceMapper.toDto(device)
 
         // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             GET_BY_USER_ID,
             getDevicesByUserIdRequest(user.id.toString()),
             GetDevicesByUserIdResponse.parser()
         )
 
         // THEN
-        assertEquals(getDevicesByUserIdMapper.toGetDevicesByUserIdResponse(listOf(deviceDto)), actual)
+        actual.test()
+            .expectNext(getDevicesByUserIdMapper.toGetDevicesByUserIdResponse(listOf(deviceDto)))
+            .verifyComplete()
     }
 
     @Test
@@ -53,20 +60,21 @@ class GetDevicesByUserIdNatsControllerTest : AbstractNatsControllerTest() {
         val invalidId = ObjectId().toString()
 
         // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             GET_BY_USER_ID,
             getDevicesByUserIdRequest(invalidId),
             GetDevicesByUserIdResponse.parser()
         )
 
         // THEN
-        assertEquals(
-            getDevicesByUserIdMapper.toFailure(
-                EntityNotFoundException(
-                    "User with id $invalidId not found"
+        actual.test()
+            .expectNext(
+                getDevicesByUserIdMapper.toFailure(
+                    EntityNotFoundException(
+                        "User with id $invalidId not found"
+                    )
                 )
-            ),
-            actual
-        )
+            )
+            .verifyComplete()
     }
 }

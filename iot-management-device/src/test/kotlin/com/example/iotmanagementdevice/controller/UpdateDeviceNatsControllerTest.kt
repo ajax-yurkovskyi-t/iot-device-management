@@ -7,13 +7,15 @@ import com.example.internal.NatsSubject
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.mapper.DeviceMapper
 import com.example.iotmanagementdevice.mapper.UpdateDeviceMapper
+import com.example.iotmanagementdevice.repository.AbstractMongoTest
 import com.example.iotmanagementdevice.repository.DeviceRepository
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import reactor.kotlin.test.test
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 
-class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
+class UpdateDeviceNatsControllerTest : AbstractMongoTest {
     @Autowired
     private lateinit var deviceRepository: DeviceRepository
 
@@ -23,6 +25,9 @@ class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
     @Autowired
     private lateinit var deviceMapper: DeviceMapper
 
+    @Autowired
+    private lateinit var natsMessagePublisher: NatsMessagePublisher
+
     @Test
     fun `should return updated device`() {
         // GIVEN
@@ -30,14 +35,16 @@ class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
         val deviceDto = deviceMapper.toDto(device)
 
         // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             NatsSubject.Device.UPDATE,
             updateDeviceRequest(device.id.toString()),
             UpdateDeviceResponse.parser()
         )
 
         // THEN
-        assertEquals(updateDeviceMapper.toUpdateDeviceResponse(deviceDto), actual)
+        actual.test()
+            .expectNext(updateDeviceMapper.toUpdateDeviceResponse(deviceDto))
+            .verifyComplete()
     }
 
     @Test
@@ -45,20 +52,21 @@ class UpdateDeviceNatsControllerTest : AbstractNatsControllerTest() {
         val invalidId = ObjectId().toString()
 
         // GIVEN // WHEN
-        val actual = doRequest(
+        val actual = natsMessagePublisher.request(
             NatsSubject.Device.UPDATE,
             updateDeviceRequest(invalidId),
             UpdateDeviceResponse.parser()
         )
 
         // THEN
-        assertEquals(
-            updateDeviceMapper.toFailureUpdateDeviceResponse(
-                EntityNotFoundException(
-                    "Device with id $invalidId not found"
+        actual.test()
+            .expectNext(
+                updateDeviceMapper.toFailureUpdateDeviceResponse(
+                    EntityNotFoundException(
+                        "Device with id $invalidId not found"
+                    )
                 )
-            ),
-            actual
-        )
+            )
+            .verifyComplete()
     }
 }

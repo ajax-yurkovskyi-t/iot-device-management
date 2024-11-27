@@ -3,33 +3,34 @@ package com.example.iotmanagementdevice.controller.nats.device
 import com.example.internal.NatsSubject.Device.CREATE
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceResponse
-import com.example.iotmanagementdevice.controller.nats.NatsController
 import com.example.iotmanagementdevice.mapper.CreateDeviceMapper
 import com.example.iotmanagementdevice.service.device.DeviceService
 import com.google.protobuf.Parser
-import io.nats.client.Connection
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
+import systems.ajax.nats.handler.api.ProtoNatsMessageHandler
 
 @Component
 class CreateDeviceNatsController(
-    override val connection: Connection,
     private val deviceService: DeviceService,
     private val createDeviceMapper: CreateDeviceMapper,
-) : NatsController<CreateDeviceRequest, CreateDeviceResponse> {
+) : ProtoNatsMessageHandler<CreateDeviceRequest, CreateDeviceResponse> {
 
-    override val queueGroup: String = DEVICE_QUEUE_GROUP
-    override val subject = CREATE
+    override val log: Logger = LoggerFactory.getLogger(CreateDeviceNatsController::class.java)
     override val parser: Parser<CreateDeviceRequest> = CreateDeviceRequest.parser()
-    override val responseType: CreateDeviceResponse = CreateDeviceResponse.getDefaultInstance()
+    override val queue: String = "deviceQueueGroup"
+    override val subject: String = CREATE
 
-    override fun handle(request: CreateDeviceRequest): Mono<CreateDeviceResponse> {
-        return deviceService.create(createDeviceMapper.toDeviceCreateRequestDto(request))
+    override fun doOnUnexpectedError(inMsg: CreateDeviceRequest?, e: Exception): Mono<CreateDeviceResponse> {
+        return createDeviceMapper.toFailureCreateDeviceResponse(e).toMono()
+    }
+
+    override fun doHandle(inMsg: CreateDeviceRequest): Mono<CreateDeviceResponse> {
+        return deviceService.create(createDeviceMapper.toDeviceCreateRequestDto(inMsg))
             .map { createDeviceMapper.toCreateDeviceResponse(it) }
-            .onErrorResume { throwable ->
-                createDeviceMapper.toFailureCreateDeviceResponse(throwable).toMono()
-            }
     }
 
     companion object {
