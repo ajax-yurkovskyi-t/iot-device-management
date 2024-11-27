@@ -17,7 +17,6 @@ class DeviceUpdateNotificationProducer(
             NOTIFY,
             notification.userId,
             notification.toByteArray()
-
         ).then(Unit.toMono())
     }
 }
