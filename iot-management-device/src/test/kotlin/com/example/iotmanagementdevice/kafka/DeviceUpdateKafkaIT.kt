@@ -40,7 +40,9 @@ class DeviceUpdateKafkaIT : AbstractMongoTest {
         val notification = result.awaitFirst({
             it.deviceId == savedDevice.id.toString()
         })
-        assertThat(notification).isNotNull
+        assertThat(notification)
+            .withFailMessage("Expected a DeviceUpdateNotification with deviceId ${savedDevice.id} not to be null")
+            .isNotNull
     }
 
     companion object {

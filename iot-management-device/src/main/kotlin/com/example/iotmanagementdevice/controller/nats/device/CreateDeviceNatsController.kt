@@ -21,7 +21,7 @@ class CreateDeviceNatsController(
 
     override val log: Logger = LoggerFactory.getLogger(CreateDeviceNatsController::class.java)
     override val parser: Parser<CreateDeviceRequest> = CreateDeviceRequest.parser()
-    override val queue: String = "deviceQueueGroup"
+    override val queue: String = DEVICE_QUEUE_GROUP
     override val subject: String = CREATE
 
     override fun doOnUnexpectedError(inMsg: CreateDeviceRequest?, e: Exception): Mono<CreateDeviceResponse> {
