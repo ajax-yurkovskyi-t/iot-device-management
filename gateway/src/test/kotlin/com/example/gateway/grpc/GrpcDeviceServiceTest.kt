@@ -26,7 +26,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.nats.client.Message
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -126,9 +125,9 @@ class GrpcDeviceServiceTest {
         } returns existingUserDevices.toMono()
 
         every {
-            natsHandlerManager.subscribe(
+            natsHandlerManager.subscribe<DeviceUpdatedEvent>(
                 NatsSubject.Device.updateByUserId(grpcGetUpdatedDevicesRequest.userId),
-                any<(Message) -> DeviceUpdatedEvent>()
+                any()
             )
         } returns updatedDevicesFromNats
 

@@ -9,7 +9,6 @@ allprojects {
     repositories {
         mavenCentral()
 
-
         maven {
             credentials(AwsCredentials::class.java) {
                 accessKey = extra["AWS_ACCESS_KEY_ID"].toString()

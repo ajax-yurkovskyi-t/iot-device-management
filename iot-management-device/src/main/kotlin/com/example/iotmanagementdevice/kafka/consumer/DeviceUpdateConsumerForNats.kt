@@ -26,9 +26,7 @@ class DeviceUpdateConsumerForNats(
         return publisher.publish(
             updateByUserId(kafkaEvent.data.device.userId),
             kafkaEvent.data
-        ).doOnSuccess {
-            kafkaEvent.ack()
-        }
+        ).doFinally { kafkaEvent.ack() }
     }
 
     companion object {

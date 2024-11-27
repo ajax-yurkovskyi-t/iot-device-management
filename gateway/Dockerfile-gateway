@@ -1,4 +1,4 @@
-FROM amazoncorretto:21
+FROM amazoncorretto:17
 WORKDIR /workspace/app
 COPY build/libs/*.jar ./gateway.jar
 EXPOSE 8080

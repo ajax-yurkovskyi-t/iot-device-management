@@ -26,9 +26,7 @@ class DeviceUpdateProcessor(
     override fun handle(kafkaEvent: KafkaEvent<DeviceUpdatedEvent>): Mono<Unit> {
         val notification = deviceNotificationMapper.toDeviceUpdateNotification(kafkaEvent.data)
         return notificationProducer.sendMessage(notification)
-            .doOnSuccess {
-                kafkaEvent.ack()
-            }
+            .doFinally { kafkaEvent.ack() }
     }
 
     companion object {
