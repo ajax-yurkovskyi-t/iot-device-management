@@ -24,7 +24,6 @@ dependencies {
     kapt("org.mapstruct:mapstruct-processor:1.6.0")
     testImplementation("systems.ajax:kafka-mock:3.0.3.170.MASTER-SNAPSHOT")
     testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("com.h2database:h2")
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mongodb:1.19.0")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
