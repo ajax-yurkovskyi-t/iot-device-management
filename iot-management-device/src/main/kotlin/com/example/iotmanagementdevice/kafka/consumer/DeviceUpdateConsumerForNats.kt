@@ -1,45 +1,35 @@
 package com.example.iotmanagementdevice.kafka.consumer
 
+import com.example.internal.KafkaTopic
 import com.example.internal.NatsSubject.Device.updateByUserId
 import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
-import io.nats.client.Connection
-import org.slf4j.LoggerFactory
-import org.springframework.boot.context.event.ApplicationReadyEvent
-import org.springframework.context.event.EventListener
+import com.google.protobuf.Parser
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import reactor.kafka.receiver.KafkaReceiver
-import reactor.kotlin.core.publisher.toMono
+import systems.ajax.kafka.handler.KafkaEvent
+import systems.ajax.kafka.handler.KafkaHandler
+import systems.ajax.kafka.handler.subscription.topic.TopicSingle
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 
 @Component
 class DeviceUpdateConsumerForNats(
-    private val updateDeviceForNatsKafkaReceiver: KafkaReceiver<String, ByteArray>,
-    private val natsConnection: Connection,
-) {
-    @EventListener(ApplicationReadyEvent::class)
-    fun consumeMessages() {
-        updateDeviceForNatsKafkaReceiver.receive()
-            .flatMap { record ->
-                Mono.defer {
-                    val updatedDevice = DeviceUpdatedEvent.parser().parseFrom(record.value())
-                    sendUpdate(updatedDevice)
-                }
-                    .onErrorResume { error ->
-                        log.error("Failed to process a device update message", error)
-                        Mono.empty()
-                    }
-                    .doFinally { record.receiverOffset().acknowledge() }
-            }.subscribe()
-    }
+    private val publisher: NatsMessagePublisher,
+) : KafkaHandler<DeviceUpdatedEvent, TopicSingle> {
 
-    private fun sendUpdate(event: DeviceUpdatedEvent): Mono<Unit> {
-        return natsConnection.publish(
-            updateByUserId(event.device.userId),
-            event.toByteArray()
-        ).toMono()
+    override val groupId: String = DEVICE_UPDATE_FOR_NATS_GROUP
+
+    override val parser: Parser<DeviceUpdatedEvent> = DeviceUpdatedEvent.parser()
+
+    override val subscriptionTopics: TopicSingle = TopicSingle(KafkaTopic.KafkaDeviceUpdateEvents.UPDATE)
+
+    override fun handle(kafkaEvent: KafkaEvent<DeviceUpdatedEvent>): Mono<Unit> {
+        return publisher.publish(
+            updateByUserId(kafkaEvent.data.device.userId),
+            kafkaEvent.data
+        ).doFinally { kafkaEvent.ack() }
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger(DeviceUpdateConsumerForNats::class.java)
+        const val DEVICE_UPDATE_FOR_NATS_GROUP = "deviceUpdateForNatsGroup"
     }
 }

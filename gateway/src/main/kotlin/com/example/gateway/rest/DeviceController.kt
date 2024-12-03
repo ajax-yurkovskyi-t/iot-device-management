@@ -3,7 +3,6 @@ package com.example.gateway.rest
 import com.example.core.dto.request.DeviceCreateRequestDto
 import com.example.core.dto.request.DeviceUpdateRequestDto
 import com.example.core.dto.response.DeviceResponseDto
-import com.example.gateway.client.NatsClient
 import com.example.gateway.mapper.CreateDeviceMapper
 import com.example.gateway.mapper.DeleteDeviceMapper
 import com.example.gateway.mapper.GetAllDevicesMapper
@@ -34,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 
 @RestController
 @RequestMapping("/devices")
@@ -43,13 +43,13 @@ class DeviceController(
     private val updateDeviceMapper: UpdateDeviceMapper,
     private val getAllDevicesMapper: GetAllDevicesMapper,
     private val deleteDeviceMapper: DeleteDeviceMapper,
-    private val natsClient: NatsClient,
+    private val natsMessagePublisher: NatsMessagePublisher,
 ) {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun getDeviceById(@PathVariable(name = "id") id: String): Mono<DeviceResponseDto> {
-        return natsClient.request(
+        return natsMessagePublisher.request(
             GET_BY_ID,
             GetDeviceByIdRequest.newBuilder().setId(id).build(),
             GetDeviceByIdResponse.parser()
@@ -61,7 +61,7 @@ class DeviceController(
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@Valid @RequestBody requestDto: DeviceCreateRequestDto): Mono<DeviceResponseDto> {
         val payload = createDeviceMapper.toCreateRequestProto(requestDto)
-        return natsClient.request(CREATE, payload, CreateDeviceResponse.parser())
+        return natsMessagePublisher.request(CREATE, payload, CreateDeviceResponse.parser())
             .map { createDeviceMapper.toDto(it) }
     }
 
@@ -71,14 +71,14 @@ class DeviceController(
         @Valid @RequestBody requestDto: DeviceUpdateRequestDto
     ): Mono<DeviceResponseDto> {
         val payload = updateDeviceMapper.toUpdateRequestProto(requestDto, id)
-        return natsClient.request(UPDATE, payload, UpdateDeviceResponse.parser())
+        return natsMessagePublisher.request(UPDATE, payload, UpdateDeviceResponse.parser())
             .map { updateDeviceMapper.toDto(it) }
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteById(@PathVariable id: String): Mono<Unit> {
-        return natsClient.request(
+        return natsMessagePublisher.request(
             DELETE,
             DeleteDeviceRequest.newBuilder().setId(id).build(),
             DeleteDeviceResponse.parser()
@@ -88,7 +88,7 @@ class DeviceController(
 
     @GetMapping
     fun getAll(): Mono<List<DeviceResponseDto>> {
-        return natsClient.request(
+        return natsMessagePublisher.request(
             GET_ALL,
             GetAllDevicesRequest.newBuilder().build(),
             GetAllDevicesResponse.parser()

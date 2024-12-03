@@ -10,7 +10,6 @@ import DeviceProtoFixture.successfulGetAllDevicesResponse
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
 import DeviceProtoFixture.successfulUpdateResponse
 import com.example.core.dto.response.DeviceResponseDto
-import com.example.gateway.client.NatsClient
 import com.example.gateway.mapper.CreateDeviceMapper
 import com.example.gateway.mapper.DeleteDeviceMapper
 import com.example.gateway.mapper.GetAllDevicesMapper
@@ -37,6 +36,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import reactor.kotlin.core.publisher.toMono
+import systems.ajax.nats.publisher.api.NatsMessagePublisher
 import kotlin.test.Test
 
 @WebFluxTest(DeviceController::class)
@@ -46,7 +46,7 @@ class DeviceControllerTest {
     private lateinit var webTestClient: WebTestClient
 
     @MockkBean
-    private lateinit var natsClient: NatsClient
+    private lateinit var natsMessagePublisher: NatsMessagePublisher
 
     @MockkBean
     private lateinit var createDeviceMapper: CreateDeviceMapper
@@ -70,7 +70,7 @@ class DeviceControllerTest {
         val response = successfulGetDeviceByIdResponse(deviceProto)
 
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 GET_BY_ID, getDeviceByIdRequest(deviceId), GetDeviceByIdResponse.parser()
             )
         } returns response.toMono()
@@ -91,7 +91,7 @@ class DeviceControllerTest {
         val response = successfulCreateResponse(deviceProto)
         // GIVEN
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 CREATE, createDeviceMapper.toCreateRequestProto(deviceCreateRequestDto), CreateDeviceResponse.parser()
             )
         } returns response.toMono()
@@ -115,7 +115,7 @@ class DeviceControllerTest {
         val response = successfulUpdateResponse(deviceProto)
 
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 UPDATE,
                 updateDeviceMapper.toUpdateRequestProto(deviceUpdateRequestDto, deviceId),
                 UpdateDeviceResponse.parser()
@@ -140,7 +140,10 @@ class DeviceControllerTest {
         val response = successfulGetAllDevicesResponse(listOf(deviceProto))
 
         every {
-            natsClient.request(GET_ALL, GetAllDevicesRequest.getDefaultInstance(), GetAllDevicesResponse.parser())
+            natsMessagePublisher.request(
+                GET_ALL, GetAllDevicesRequest.getDefaultInstance(),
+                GetAllDevicesResponse.parser()
+            )
         } returns response.toMono()
 
         every { getAllDevicesMapper.toDto(response) } returns listOf(deviceResponseDto)
@@ -161,7 +164,7 @@ class DeviceControllerTest {
         val deleteResponse = DeleteDeviceResponse.getDefaultInstance()
 
         every {
-            natsClient.request(
+            natsMessagePublisher.request(
                 DELETE, DeleteDeviceRequest.newBuilder().setId(deviceId).build(), DeleteDeviceResponse.parser()
             )
         } returns deleteResponse.toMono()
