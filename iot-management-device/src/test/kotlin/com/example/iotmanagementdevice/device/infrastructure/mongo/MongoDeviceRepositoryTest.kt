@@ -1,9 +1,13 @@
 package com.example.iotmanagementdevice.device.infrastructure.mongo
 
 import com.example.iotmanagementdevice.device.DeviceFixture.createDevice
+import com.example.iotmanagementdevice.device.DeviceFixture.createDeviceCreate
+import com.example.iotmanagementdevice.device.domain.Device
 import com.example.iotmanagementdevice.device.infrastructure.mongo.repository.MongoDeviceRepository
 import com.example.iotmanagementdevice.utils.AbstractMongoTest
 import org.assertj.core.api.Assertions.assertThat
+import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.kotlin.test.test
@@ -28,6 +32,34 @@ class MongoDeviceRepositoryTest : AbstractMongoTest {
                 assertThat(found).usingRecursiveComparison()
                     .ignoringFields("updatedAt")
                     .isEqualTo(device)
+            }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should find user by id when saved `() {
+        // Given
+        val createDevice = createDeviceCreate()
+        val expectedDevice = Device(
+            id = ObjectId().toString(),
+            name = createDevice.name,
+            description = createDevice.description,
+            type = createDevice.type,
+            statusType = createDevice.statusType,
+            userId = ObjectId().toString(),
+            updatedAt = null,
+        )
+
+        // When
+        val savedDevice = deviceRepository.save(createDevice)
+
+        // Then
+        savedDevice.test()
+            .assertNext { device ->
+                assertEquals(
+                    expectedDevice.copy(id = device.id, userId = device.userId),
+                    device
+                )
             }
             .verifyComplete()
     }

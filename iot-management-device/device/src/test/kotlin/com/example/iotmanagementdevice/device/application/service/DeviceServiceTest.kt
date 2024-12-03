@@ -3,6 +3,7 @@ package com.example.iotmanagementdevice.device.application.service
 import com.example.core.exception.EntityNotFoundException
 import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.device.DeviceFixture
+import com.example.iotmanagementdevice.device.DeviceFixture.createDeviceCreate
 import com.example.iotmanagementdevice.device.application.mapper.DeviceUpdateEventMapper
 import com.example.iotmanagementdevice.device.application.port.output.DeviseRepositoryOutPort
 import com.example.iotmanagementdevice.device.application.port.output.UpdateDeviceMessageProducerOutPort
@@ -46,11 +47,14 @@ class DeviceServiceTest {
 
     @Test
     fun `should create a new device`() {
+        // Given
+        val createDevice = createDeviceCreate()
+
         // Stubbing
-        every { deviceRepositoryOutPort.save(device) } returns device.toMono()
+        every { deviceRepositoryOutPort.save(createDevice) } returns device.toMono()
 
         // When
-        val createdDevice = deviceService.create(device)
+        val createdDevice = deviceService.create(createDevice)
 
         // Then
         createdDevice.test()
@@ -58,7 +62,7 @@ class DeviceServiceTest {
             .verifyComplete()
 
         verify {
-            deviceRepositoryOutPort.save(device)
+            deviceRepositoryOutPort.save(createDevice)
         }
     }
 

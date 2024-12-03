@@ -5,6 +5,7 @@ import com.example.iotmanagementdevice.role.application.output.RoleRepositoryOut
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.user.UserFixture.createRole
 import com.example.iotmanagementdevice.user.UserFixture.createUser
+import com.example.iotmanagementdevice.user.UserFixture.createUserCreate
 import com.example.iotmanagementdevice.user.application.port.output.UserRepositoryOutPort
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -42,6 +43,7 @@ class UserServiceTest {
         // Given
         val role = createRole()
         val user = createUser()
+        val userCreate = createUserCreate()
         val encodedPassword = "encodedPassword"
 
         // Stubbing
@@ -49,13 +51,13 @@ class UserServiceTest {
         every { roleRepositoryOutPort.findByRoleName(Role.RoleName.USER) } returns role.toMono()
         every {
             userRepositoryOutPort.save(
-                user.copy
+                userCreate.copy
                     (roles = mutableSetOf(role))
             )
         } returns user.toMono()
 
         // When
-        val registeredUser = userService.register(user)
+        val registeredUser = userService.register(userCreate)
 
         // Then
         registeredUser.test()
@@ -63,7 +65,7 @@ class UserServiceTest {
             .verifyComplete()
 
         verify { roleRepositoryOutPort.findByRoleName(Role.RoleName.USER) }
-        verify { userRepositoryOutPort.save(user.copy(roles = mutableSetOf(role))) } // Verify save includes role
+        verify { userRepositoryOutPort.save(userCreate.copy(roles = mutableSetOf(role))) } // Verify save includes role
     }
 
     @Test
@@ -161,7 +163,7 @@ class UserServiceTest {
         // Stubbing
         every { userRepositoryOutPort.findById(userId.toString()) } returns user.toMono()
         every { passwordEncoder.encode(any()) } returns encodedNewPassword
-        every { userRepositoryOutPort.save(any()) } returns updatedUser.toMono()
+        every { userRepositoryOutPort.save(updatedUser) } returns updatedUser.toMono()
 
         // When
         val updatedUserResult = userService.update(userId.toString(), updatedUser)
@@ -173,7 +175,7 @@ class UserServiceTest {
 
         verify { userRepositoryOutPort.findById(userId.toString()) }
         verify { passwordEncoder.encode(any()) }
-        verify { userRepositoryOutPort.save(any()) }
+        verify { userRepositoryOutPort.save(updatedUser) }
     }
 
     @Test

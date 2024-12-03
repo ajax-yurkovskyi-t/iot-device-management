@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test
 
 class GetDevicesByUserIdMapperTest {
     private val enumMapper = EnumMapperImpl()
-    private val getDevicesByUserIdMapper = GetDevicesByUserIdMapperImpl(enumMapper)
+    private val instantMapper =
+        InstantToTimestampMapperImpl()
+    private val getDevicesByUserIdMapper = GetDevicesByUserIdMapperImpl(instantMapper, enumMapper)
 
     @Test
     fun `should map list of DeviceResponseDto to GetDevicesByUserIdResponse`() {

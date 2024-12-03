@@ -1,5 +1,6 @@
 package com.example.iotmanagementdevice.role.infrastructure.mongo.mapper
 
+import com.example.iotmanagementdevice.role.domain.CreateRole
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.role.infrastructure.mongo.entity.MongoRole
 import org.bson.types.ObjectId
@@ -16,6 +17,7 @@ import org.mapstruct.NullValueCheckStrategy
 abstract class RoleMapper {
     abstract fun toDomain(mongoRole: MongoRole): Role
     abstract fun toEntity(role: Role): MongoRole
+    abstract fun toEntity(role: CreateRole): MongoRole
 
     fun mapObjectIdToString(objectId: ObjectId): String {
         return objectId.toString()

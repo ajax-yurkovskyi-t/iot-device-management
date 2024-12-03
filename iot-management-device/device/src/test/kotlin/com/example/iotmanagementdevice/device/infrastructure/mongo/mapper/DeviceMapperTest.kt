@@ -11,21 +11,27 @@ class DeviceMapperTest {
 
     @Test
     fun `should map mongo device to device`() {
+        // Given
         val device = createDevice()
         val mongoDevice = createMongoDevice(device)
 
+        // When
         val result = deviceMapper.toDomain(mongoDevice)
 
+        // Then
         assertEquals(device, result)
     }
 
     @Test
     fun `should map device to mongo device`() {
+        // Given
         val device = createDevice()
         val mongoDevice = createMongoDevice(device)
 
+        // When
         val result = deviceMapper.toEntity(device)
 
+        // Then
         assertEquals(mongoDevice, result)
     }
 }

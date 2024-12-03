@@ -1,9 +1,11 @@
 package com.example.iotmanagementdevice.role.infrastructure.mongo
 
+import com.example.iotmanagementdevice.role.domain.CreateRole
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.role.infrastructure.mongo.repository.MongoRoleRepository
 import com.example.iotmanagementdevice.utils.AbstractMongoTest
 import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.kotlin.test.test
@@ -25,6 +27,29 @@ class RoleRepositoryImplTest : AbstractMongoTest {
         // Then
         foundRole.test()
             .expectNext(role)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should find user by id when saved `() {
+        // Given
+        val createRole = CreateRole(Role.RoleName.USER)
+        val expectedRole = Role(
+            id = ObjectId().toString(),
+            roleName = createRole.roleName
+        )
+
+        // When
+        val savedUser = roleRepository.save(createRole)
+
+        // Then
+        savedUser.test()
+            .assertNext { role ->
+                assertEquals(
+                    expectedRole.copy(id = role.id),
+                    role
+                )
+            }
             .verifyComplete()
     }
 

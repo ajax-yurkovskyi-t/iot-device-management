@@ -1,4 +1,4 @@
-package com.example.gateway.infrastructure.rest.configuration
+package com.example.gateway.infrastructure.grpc.configuration
 
 import com.example.core.exception.EntityNotFoundException
 import com.google.protobuf.Any

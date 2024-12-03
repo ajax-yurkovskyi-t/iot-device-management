@@ -1,5 +1,6 @@
 package com.example.iotmanagementdevice.device.infrastructure.mongo.mapper
 
+import com.example.iotmanagementdevice.device.domain.CreateDevice
 import com.example.iotmanagementdevice.device.domain.Device
 import com.example.iotmanagementdevice.device.infrastructure.mongo.entity.MongoDevice
 import org.bson.types.ObjectId
@@ -17,6 +18,8 @@ abstract class DeviceMapper {
     abstract fun toDomain(mongoDevice: MongoDevice): Device
 
     abstract fun toEntity(device: Device): MongoDevice
+
+    abstract fun toEntity(createDevice: CreateDevice): MongoDevice
 
     fun mapObjectIdToString(objectId: ObjectId): String {
         return objectId.toString()

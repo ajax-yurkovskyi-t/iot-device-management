@@ -5,6 +5,7 @@ import com.example.iotmanagementdevice.device.application.mapper.DeviceUpdateEve
 import com.example.iotmanagementdevice.device.application.port.input.DeviceServiceInPort
 import com.example.iotmanagementdevice.device.application.port.output.DeviseRepositoryOutPort
 import com.example.iotmanagementdevice.device.application.port.output.UpdateDeviceMessageProducerOutPort
+import com.example.iotmanagementdevice.device.domain.CreateDevice
 import com.example.iotmanagementdevice.device.domain.Device
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -20,7 +21,7 @@ class DeviceService(
     private val deviceUpdateEventMapper: DeviceUpdateEventMapper,
 ) : DeviceServiceInPort {
 
-    override fun create(newDevice: Device): Mono<Device> {
+    override fun create(newDevice: CreateDevice): Mono<Device> {
         return deviceRepositoryOutPort.save(newDevice)
     }
 

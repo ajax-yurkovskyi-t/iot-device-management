@@ -1,6 +1,7 @@
 package com.example.iotmanagementdevice.role.infrastructure.mongo.repository
 
 import com.example.iotmanagementdevice.role.application.output.RoleRepositoryOutPort
+import com.example.iotmanagementdevice.role.domain.CreateRole
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.role.infrastructure.mongo.entity.MongoRole
 import com.example.iotmanagementdevice.role.infrastructure.mongo.mapper.RoleMapper
@@ -29,6 +30,10 @@ class MongoRoleRepository(
             .map { roleMapper.toDomain(it) }
 
     override fun save(role: Role): Mono<Role> =
+        mongoTemplate.save(roleMapper.toEntity(role))
+            .map { roleMapper.toDomain(it) }
+
+    override fun save(role: CreateRole): Mono<Role> =
         mongoTemplate.save(roleMapper.toEntity(role))
             .map { roleMapper.toDomain(it) }
 

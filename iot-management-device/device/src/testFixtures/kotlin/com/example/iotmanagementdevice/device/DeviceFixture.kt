@@ -2,10 +2,6 @@ package com.example.iotmanagementdevice.device
 
 import com.example.commonmodels.device.Device
 import com.example.commonmodels.device.DeviceUpdateNotification
-import com.example.core.dto.DeviceStatusType
-import com.example.core.dto.request.DeviceCreateRequestDto
-import com.example.core.dto.request.DeviceUpdateRequestDto
-import com.example.core.dto.response.DeviceResponseDto
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest
 import com.example.internal.input.reqreply.device.delete.proto.DeleteDeviceRequest
 import com.example.internal.input.reqreply.device.get_all.proto.GetAllDevicesRequest
@@ -14,6 +10,7 @@ import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevice
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
+import com.example.iotmanagementdevice.device.domain.CreateDevice
 import com.example.iotmanagementdevice.device.infrastructure.mongo.entity.MongoDevice
 import com.google.protobuf.Timestamp
 import org.bson.types.ObjectId
@@ -29,6 +26,15 @@ object DeviceFixture {
             statusType = DomainDevice.DeviceStatusType.ONLINE,
             userId = ObjectId().toString(),
             updatedAt = null
+        )
+    }
+
+    fun createDeviceCreate(): CreateDevice {
+        return CreateDevice(
+            name = "Device1",
+            description = "A test device",
+            type = "Sensor",
+            statusType = DomainDevice.DeviceStatusType.ONLINE,
         )
     }
 

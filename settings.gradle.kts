@@ -10,7 +10,7 @@ include(
     "internal-api",
     "iot-management-device",
     "iot-management-device:device",
-    "iot-management-device:user",
+    "iot-management-device:migration",
     "iot-management-device:role",
-    "iot-management-device:migration"
+    "iot-management-device:user",
 )

@@ -12,21 +12,27 @@ class UserMapperTest {
 
     @Test
     fun `should map mongo user to user`() {
+        // Given
         val user = createUser()
         val mongoUser = createMongoUser(user)
 
+        // When
         val result = userMapper.toDomain(mongoUser)
 
+        // Then
         assertEquals(user, result)
     }
 
     @Test
     fun `should map user to mongo user`() {
+        // Given
         val user = createUser()
         val mongoUser = createMongoUser(user)
 
+        // When
         val result = userMapper.toEntity(user)
 
+        // Then
         assertEquals(mongoUser, result)
     }
 }

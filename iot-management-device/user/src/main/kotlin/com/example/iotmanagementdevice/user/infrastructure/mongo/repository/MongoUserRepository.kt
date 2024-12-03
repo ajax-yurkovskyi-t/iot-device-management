@@ -2,6 +2,7 @@ package com.example.iotmanagementdevice.user.infrastructure.mongo.repository
 
 import com.example.iotmanagementdevice.device.infrastructure.mongo.entity.MongoDevice
 import com.example.iotmanagementdevice.user.application.port.output.UserRepositoryOutPort
+import com.example.iotmanagementdevice.user.domain.CreateUser
 import com.example.iotmanagementdevice.user.domain.User
 import com.example.iotmanagementdevice.user.infrastructure.mongo.entity.MongoUser
 import com.example.iotmanagementdevice.user.infrastructure.mongo.mapper.UserMapper
@@ -56,6 +57,10 @@ class MongoUserRepository(
                 }
             }
     }
+
+    override fun save(user: CreateUser): Mono<User> =
+        mongoTemplate.save(userMapper.toEntity(user))
+            .map { userMapper.toDomain(it) }
 
     override fun save(user: User): Mono<User> =
         mongoTemplate.save(userMapper.toEntity(user))

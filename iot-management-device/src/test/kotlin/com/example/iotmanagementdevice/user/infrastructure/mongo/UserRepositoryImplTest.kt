@@ -3,9 +3,11 @@ package com.example.iotmanagementdevice.user.infrastructure.mongo
 import com.example.iotmanagementdevice.device.DeviceFixture.createDevice
 import com.example.iotmanagementdevice.device.infrastructure.mongo.repository.MongoDeviceRepository
 import com.example.iotmanagementdevice.user.UserFixture
+import com.example.iotmanagementdevice.user.domain.User
 import com.example.iotmanagementdevice.user.infrastructure.mongo.repository.MongoUserRepository
 import com.example.iotmanagementdevice.utils.AbstractMongoTest
 import org.bson.types.ObjectId
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -33,6 +35,34 @@ class UserRepositoryImplTest : AbstractMongoTest {
         // Then
         foundUser.test()
             .expectNext(user)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should find user by id when saved `() {
+        // Given
+        val createUser = UserFixture.createUserCreate()
+        val expectedUser = User(
+            id = ObjectId().toString(),
+            name = createUser.name,
+            email = createUser.email,
+            phoneNumber = createUser.phoneNumber,
+            userPassword = createUser.userPassword,
+            roles = createUser.roles,
+            devices = mutableListOf()
+        )
+
+        // When
+        val savedUser = userRepository.save(createUser)
+
+        // Then
+        savedUser.test()
+            .assertNext { user ->
+                assertEquals(
+                    expectedUser.copy(id = user.id),
+                    user
+                )
+            }
             .verifyComplete()
     }
 

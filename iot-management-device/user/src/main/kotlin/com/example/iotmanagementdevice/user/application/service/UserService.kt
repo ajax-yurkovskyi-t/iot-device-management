@@ -5,6 +5,7 @@ import com.example.iotmanagementdevice.role.application.output.RoleRepositoryOut
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.user.application.port.input.UserServiceInPort
 import com.example.iotmanagementdevice.user.application.port.output.UserRepositoryOutPort
+import com.example.iotmanagementdevice.user.domain.CreateUser
 import com.example.iotmanagementdevice.user.domain.User
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -18,7 +19,7 @@ class UserService(
     private val roleRepositoryOutPort: RoleRepositoryOutPort,
     private val passwordEncoder: PasswordEncoder,
 ) : UserServiceInPort {
-    override fun register(newUser: User): Mono<User> {
+    override fun register(newUser: CreateUser): Mono<User> {
         return roleRepositoryOutPort.findByRoleName(Role.RoleName.USER)
             .switchIfEmpty { Mono.error(EntityNotFoundException("Role not found")) }
             .flatMap { userMongoRole ->

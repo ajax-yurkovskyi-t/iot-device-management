@@ -5,20 +5,17 @@ import com.example.core.exception.EntityNotFoundException
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import com.example.iotmanagementdevice.device.domain.Device
-import com.google.protobuf.Timestamp
-import org.bson.types.ObjectId
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
-import java.time.Instant
 
 @Mapper(
     componentModel = "spring",
     injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     implementationPackage = "<PACKAGE_NAME>.impl",
-    uses = [EnumMapper::class]
+    uses = [InstantToTimestampMapper::class, EnumMapper::class]
 )
 abstract class UpdateDeviceMapper {
 
@@ -33,17 +30,6 @@ abstract class UpdateDeviceMapper {
             when (throwable) {
                 is EntityNotFoundException -> failureBuilder.setDeviceNotFound(Error.getDefaultInstance())
             }
-        }.build()
-    }
-
-    fun mapObjectIdToString(objectId: ObjectId): String {
-        return objectId.toString()
-    }
-
-    fun mapInstantToTimestamp(instant: Instant): Timestamp {
-        return Timestamp.newBuilder().apply {
-            seconds = instant.epochSecond
-            nanos = instant.nano
         }.build()
     }
 }

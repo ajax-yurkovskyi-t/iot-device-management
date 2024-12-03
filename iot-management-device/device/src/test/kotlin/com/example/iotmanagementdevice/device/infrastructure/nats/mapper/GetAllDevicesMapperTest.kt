@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test
 
 class GetAllDevicesMapperTest {
     private val enumMapper = EnumMapperImpl()
-    private val getAllDevicesMapper = GetAllDevicesMapperImpl(enumMapper)
+    private val instantMapper =
+        InstantToTimestampMapperImpl()
+    private val getAllDevicesMapper = GetAllDevicesMapperImpl(instantMapper, enumMapper)
 
     @Test
     fun `should return error response`() {

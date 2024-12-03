@@ -12,12 +12,14 @@ class DeviceUpdateEventMapperTest {
 
     @Test
     fun `should map device to device update event`() {
+        // Given
         val device = createDevice().copy(updatedAt = Instant.now())
-
-        val result = deviceUpdateEventMapper.toDeviceUpdatedEvent(device)
-
         val deviceUpdatedEvent = deviceUpdatedEvent(device)
 
+        // When
+        val result = deviceUpdateEventMapper.toDeviceUpdatedEvent(device)
+
+        // Then
         assertEquals(deviceUpdatedEvent, result)
     }
 }

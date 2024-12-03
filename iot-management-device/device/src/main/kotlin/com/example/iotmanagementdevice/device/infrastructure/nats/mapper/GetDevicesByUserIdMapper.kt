@@ -3,11 +3,9 @@ package com.example.iotmanagementdevice.device.infrastructure.nats.mapper
 import com.example.commonmodels.device.Device
 import com.example.core.exception.EntityNotFoundException
 import com.example.internal.input.reqreply.device.get_by_user_id.proto.GetDevicesByUserIdResponse
-import com.google.protobuf.Timestamp
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
-import java.time.Instant
 import com.example.iotmanagementdevice.device.domain.Device as DomainDevice
 
 @Mapper(
@@ -15,7 +13,7 @@ import com.example.iotmanagementdevice.device.domain.Device as DomainDevice
     injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     implementationPackage = "<PACKAGE_NAME>.impl",
-    uses = [EnumMapper::class]
+    uses = [InstantToTimestampMapper::class, EnumMapper::class]
 )
 abstract class GetDevicesByUserIdMapper {
     abstract fun toProtoDevice(device: DomainDevice): Device
@@ -34,13 +32,6 @@ abstract class GetDevicesByUserIdMapper {
             when (throwable) {
                 is EntityNotFoundException -> failureBuilder.userNotFoundBuilder
             }
-        }.build()
-    }
-
-    fun mapInstantToTimestamp(instant: Instant): Timestamp {
-        return Timestamp.newBuilder().apply {
-            seconds = instant.epochSecond
-            nanos = instant.nano
         }.build()
     }
 }

@@ -1,11 +1,12 @@
 package com.example.iotmanagementdevice.device.application.port.input
 
+import com.example.iotmanagementdevice.device.domain.CreateDevice
 import com.example.iotmanagementdevice.device.domain.Device
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface DeviceServiceInPort {
-    fun create(newDevice: Device): Mono<Device>
+    fun create(newDevice: CreateDevice): Mono<Device>
 
     fun getById(deviceId: String): Mono<Device>
 

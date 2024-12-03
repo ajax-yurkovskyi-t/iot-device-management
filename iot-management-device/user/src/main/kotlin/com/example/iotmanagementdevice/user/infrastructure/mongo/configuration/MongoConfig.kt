@@ -1,4 +1,4 @@
-package com.example.iotmanagementdevice.user.infrastructure.configuration
+package com.example.iotmanagementdevice.user.infrastructure.mongo.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
