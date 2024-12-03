@@ -1,7 +1,0 @@
-junit:
-  jupiter:
-    execution:
-      parallel:
-        enabled: true
-        mode:
-          default: concurrent

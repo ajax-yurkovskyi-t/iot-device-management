@@ -5,7 +5,6 @@ plugins {
     id("io.spring.dependency-management")
 }
 
-
 dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -13,5 +12,6 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test:3.6.10") {
         exclude(module = "mockito-core")
     }
+    testImplementation("com.tngtech.archunit:archunit:1.3.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

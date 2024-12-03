@@ -8,7 +8,7 @@ mongock:
 nats:
   spring:
     io.nats.client:
-      servers: "nats://localhost:4222"
+      servers: nats://localhost:4222
 
 spring:
   kafka:
