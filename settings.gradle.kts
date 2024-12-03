@@ -10,3 +10,7 @@ include(
     "internal-api",
     "iot-management-device"
 )
+include("iot-management-device:device")
+include("iot-management-device:user")
+include("iot-management-device:role")
+include("iot-management-device:migration")
