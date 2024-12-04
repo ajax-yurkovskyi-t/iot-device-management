@@ -1,9 +1,9 @@
 package com.example.gateway.infrastructure.rest.mapper
 
 import com.example.commonmodels.device.Device
-import com.example.core.dto.request.DeviceUpdateRequestDto
-import com.example.core.dto.response.DeviceResponseDto
 import com.example.core.exception.EntityNotFoundException
+import com.example.gateway.infrastructure.rest.dto.request.DeviceUpdateRequestDto
+import com.example.gateway.infrastructure.rest.dto.response.DeviceResponseDto
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceRequest
 import com.example.internal.input.reqreply.device.update.proto.UpdateDeviceResponse
 import org.mapstruct.InjectionStrategy

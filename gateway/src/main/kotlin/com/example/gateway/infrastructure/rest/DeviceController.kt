@@ -1,8 +1,8 @@
 package com.example.gateway.infrastructure.rest
 
-import com.example.core.dto.request.DeviceCreateRequestDto
-import com.example.core.dto.request.DeviceUpdateRequestDto
-import com.example.core.dto.response.DeviceResponseDto
+import com.example.gateway.infrastructure.rest.dto.request.DeviceCreateRequestDto
+import com.example.gateway.infrastructure.rest.dto.request.DeviceUpdateRequestDto
+import com.example.gateway.infrastructure.rest.dto.response.DeviceResponseDto
 import com.example.gateway.infrastructure.rest.mapper.CreateDeviceMapper
 import com.example.gateway.infrastructure.rest.mapper.DeleteDeviceMapper
 import com.example.gateway.infrastructure.rest.mapper.GetAllDevicesMapper

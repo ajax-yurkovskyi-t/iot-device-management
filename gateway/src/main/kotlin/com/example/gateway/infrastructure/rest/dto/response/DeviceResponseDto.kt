@@ -1,6 +1,6 @@
-package com.example.core.dto.response
+package com.example.gateway.infrastructure.rest.dto.response
 
-import com.example.core.dto.DeviceStatusType
+import com.example.gateway.infrastructure.rest.dto.DeviceStatusType
 
 data class DeviceResponseDto(
     val name: String?,

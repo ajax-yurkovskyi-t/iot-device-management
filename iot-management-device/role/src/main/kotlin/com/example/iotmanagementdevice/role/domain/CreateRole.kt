@@ -1,5 +1,5 @@
 package com.example.iotmanagementdevice.role.domain
 
 data class CreateRole(
-    val roleName: Role.RoleName = Role.RoleName.USER,
+    val roleName: Role.RoleName,
 )

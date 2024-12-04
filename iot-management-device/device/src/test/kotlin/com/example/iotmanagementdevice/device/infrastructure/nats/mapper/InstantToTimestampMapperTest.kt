@@ -13,10 +13,10 @@ class InstantToTimestampMapperTest {
     fun `should map Instant to Timestamp`() {
         // Given
         val instant = Instant.ofEpochSecond(EPOCH_SECONDS, NANOS.toLong())
-        val expectedTimestamp = Timestamp.newBuilder()
-            .setSeconds(EPOCH_SECONDS)
-            .setNanos(NANOS)
-            .build()
+        val expectedTimestamp = Timestamp.newBuilder().apply {
+            seconds = EPOCH_SECONDS
+            nanos = NANOS
+        }.build()
 
         // When
         val result = instantMapper.mapInstantToTimestamp(instant)

@@ -1,9 +1,9 @@
-package com.example.core.dto.request
+package com.example.gateway.infrastructure.rest.dto.request
 
-import com.example.core.dto.DeviceStatusType
+import com.example.gateway.infrastructure.rest.dto.DeviceStatusType
 import jakarta.validation.constraints.NotBlank
 
-data class DeviceUpdateRequestDto(
+data class DeviceCreateRequestDto(
     @field:NotBlank(message = "Device name must not be blank.")
     val name: String,
 

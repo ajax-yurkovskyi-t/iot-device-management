@@ -1,4 +1,4 @@
-package com.example.core.dto
+package com.example.gateway.infrastructure.rest.dto
 
 enum class DeviceStatusType {
     ONLINE,

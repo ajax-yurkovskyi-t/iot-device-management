@@ -17,7 +17,7 @@ import org.mapstruct.NullValueCheckStrategy
     uses = [InstantToTimestampMapper::class, EnumMapper::class]
 )
 abstract class CreateDeviceMapper {
-    abstract fun toDomain(request: CreateDeviceRequest): CreateDevice
+    abstract fun toCreateDevice(request: CreateDeviceRequest): CreateDevice
 
     @Mapping(target = "success.device", source = "device")
     abstract fun toCreateDeviceResponse(device: Device): CreateDeviceResponse

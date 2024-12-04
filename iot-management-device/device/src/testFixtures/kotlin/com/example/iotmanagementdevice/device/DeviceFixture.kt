@@ -52,7 +52,7 @@ object DeviceFixture {
 
     fun createDeviceWithoutId(): DomainDevice {
         return DomainDevice(
-            id = null,
+            id = ObjectId().toString(),
             name = "Device1",
             description = "A test device",
             type = "Sensor",

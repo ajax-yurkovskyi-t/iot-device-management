@@ -9,7 +9,7 @@ import DeviceProtoFixture.successfulCreateResponse
 import DeviceProtoFixture.successfulGetAllDevicesResponse
 import DeviceProtoFixture.successfulGetDeviceByIdResponse
 import DeviceProtoFixture.successfulUpdateResponse
-import com.example.core.dto.response.DeviceResponseDto
+import com.example.gateway.infrastructure.rest.dto.response.DeviceResponseDto
 import com.example.gateway.infrastructure.rest.mapper.CreateDeviceMapper
 import com.example.gateway.infrastructure.rest.mapper.DeleteDeviceMapper
 import com.example.gateway.infrastructure.rest.mapper.GetAllDevicesMapper

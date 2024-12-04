@@ -29,7 +29,7 @@ class CreateDeviceNatsController(
     }
 
     override fun doHandle(inMsg: CreateDeviceRequest): Mono<CreateDeviceResponse> {
-        return deviceServiceInPort.create(createDeviceMapper.toDomain(inMsg))
+        return deviceServiceInPort.create(createDeviceMapper.toCreateDevice(inMsg))
             .map { createDeviceMapper.toCreateDeviceResponse(it) }
     }
 

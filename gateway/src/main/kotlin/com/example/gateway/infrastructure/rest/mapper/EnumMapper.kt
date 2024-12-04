@@ -1,7 +1,7 @@
 package com.example.gateway.infrastructure.rest.mapper
 
 import com.example.commonmodels.device.Device
-import com.example.core.dto.DeviceStatusType
+import com.example.gateway.infrastructure.rest.dto.DeviceStatusType
 import org.mapstruct.Mapper
 
 @Mapper(componentModel = "spring")
