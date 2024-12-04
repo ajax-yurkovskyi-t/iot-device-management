@@ -8,5 +8,9 @@ include(
     "gateway",
     "grpc-api",
     "internal-api",
-    "iot-management-device"
+    "iot-management-device",
+    "iot-management-device:device",
+    "iot-management-device:migration",
+    "iot-management-device:role",
+    "iot-management-device:user",
 )

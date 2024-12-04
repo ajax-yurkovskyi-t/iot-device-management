@@ -1,8 +1,8 @@
 import com.example.commonmodels.device.Device
-import com.example.core.dto.DeviceStatusType
-import com.example.core.dto.request.DeviceCreateRequestDto
-import com.example.core.dto.request.DeviceUpdateRequestDto
-import com.example.core.dto.response.DeviceResponseDto
+import com.example.gateway.infrastructure.rest.dto.DeviceStatusType
+import com.example.gateway.infrastructure.rest.dto.request.DeviceCreateRequestDto
+import com.example.gateway.infrastructure.rest.dto.request.DeviceUpdateRequestDto
+import com.example.gateway.infrastructure.rest.dto.response.DeviceResponseDto
 import com.example.grpcapi.reqrep.device.GetUpdatedDeviceRequest
 import com.example.grpcapi.reqrep.device.StreamUpdatedDeviceResponse
 import com.example.internal.input.reqreply.device.create.proto.CreateDeviceRequest

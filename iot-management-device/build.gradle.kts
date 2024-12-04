@@ -1,8 +1,7 @@
 plugins {
-    id("spring-conventions")
+    `spring-conventions`
+    `grpc-conventions`
     kotlin("kapt")
-    `java-test-fixtures`
-    jacoco
 }
 
 dependencies {
@@ -26,6 +25,11 @@ dependencies {
     implementation("io.projectreactor.kafka:reactor-kafka")
     implementation(project(":internal-api"))
     implementation(project(":core"))
+    implementation(project(":internal-api"))
+    implementation(project(":iot-management-device:device"))
+    implementation(project(":iot-management-device:role"))
+    implementation(project(":iot-management-device:user"))
+    implementation(project(":iot-management-device:migration"))
     implementation("systems.ajax:nats-spring-boot-starter:4.1.0.186.MASTER-SNAPSHOT")
     implementation("systems.ajax:kafka-spring-boot-starter:3.0.3.170.MASTER-SNAPSHOT")
     kapt("org.mapstruct:mapstruct-processor:1.6.0")
@@ -36,6 +40,9 @@ dependencies {
     testImplementation("org.testcontainers:mongodb:1.19.0")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation(testFixtures(project(":iot-management-device:device")))
+    testImplementation(testFixtures(project(":iot-management-device:user")))
+    testImplementation(testFixtures(project(":iot-management-device:role")))
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")
 }
