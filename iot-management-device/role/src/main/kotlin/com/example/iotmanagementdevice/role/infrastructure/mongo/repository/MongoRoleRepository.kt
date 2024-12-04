@@ -1,6 +1,6 @@
 package com.example.iotmanagementdevice.role.infrastructure.mongo.repository
 
-import com.example.iotmanagementdevice.role.application.output.RoleRepositoryOutPort
+import com.example.iotmanagementdevice.role.application.port.output.RoleRepositoryOutPort
 import com.example.iotmanagementdevice.role.domain.CreateRole
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.role.infrastructure.mongo.entity.MongoRole

@@ -1,8 +1,8 @@
-package com.example.iotmanagementdevice.device.application.mapper
+package com.example.iotmanagementdevice.device.infrastructure.kafka.mapper
 
 import com.example.iotmanagementdevice.device.DeviceFixture.createDevice
 import com.example.iotmanagementdevice.device.DeviceFixture.deviceUpdatedEvent
-import com.example.iotmanagementdevice.device.application.mapper.impl.DeviceUpdateEventMapperImpl
+import com.example.iotmanagementdevice.device.infrastructure.kafka.mapper.impl.DeviceUpdateEventMapperImpl
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant

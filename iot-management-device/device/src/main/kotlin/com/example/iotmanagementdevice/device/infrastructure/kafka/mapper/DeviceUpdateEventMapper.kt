@@ -1,4 +1,4 @@
-package com.example.iotmanagementdevice.device.application.mapper
+package com.example.iotmanagementdevice.device.infrastructure.kafka.mapper
 
 import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.device.domain.Device

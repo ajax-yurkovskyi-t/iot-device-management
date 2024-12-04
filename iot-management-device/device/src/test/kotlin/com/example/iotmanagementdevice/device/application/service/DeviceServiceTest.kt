@@ -4,10 +4,10 @@ import com.example.core.exception.EntityNotFoundException
 import com.example.internal.output.pubsub.device.DeviceUpdatedEvent
 import com.example.iotmanagementdevice.device.DeviceFixture
 import com.example.iotmanagementdevice.device.DeviceFixture.createDeviceCreate
-import com.example.iotmanagementdevice.device.application.mapper.DeviceUpdateEventMapper
 import com.example.iotmanagementdevice.device.application.port.output.DeviseRepositoryOutPort
 import com.example.iotmanagementdevice.device.application.port.output.UpdateDeviceMessageProducerOutPort
 import com.example.iotmanagementdevice.device.domain.Device
+import com.example.iotmanagementdevice.device.infrastructure.kafka.mapper.DeviceUpdateEventMapper
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK

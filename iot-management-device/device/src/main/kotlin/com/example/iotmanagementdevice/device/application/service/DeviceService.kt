@@ -1,7 +1,6 @@
 package com.example.iotmanagementdevice.device.application.service
 
 import com.example.core.exception.EntityNotFoundException
-import com.example.iotmanagementdevice.device.application.mapper.DeviceUpdateEventMapper
 import com.example.iotmanagementdevice.device.application.port.input.DeviceServiceInPort
 import com.example.iotmanagementdevice.device.application.port.output.DeviseRepositoryOutPort
 import com.example.iotmanagementdevice.device.application.port.output.UpdateDeviceMessageProducerOutPort
@@ -18,7 +17,6 @@ import reactor.kotlin.core.publisher.toMono
 class DeviceService(
     private val deviceRepositoryOutPort: DeviseRepositoryOutPort,
     private val updateDeviceMessageProducerOutPort: UpdateDeviceMessageProducerOutPort,
-    private val deviceUpdateEventMapper: DeviceUpdateEventMapper,
 ) : DeviceServiceInPort {
 
     override fun create(newDevice: CreateDevice): Mono<Device> {
@@ -51,11 +49,7 @@ class DeviceService(
                 deviceRepositoryOutPort.save(updatedDevice)
             }
             .flatMap { updatedDevice ->
-                updateDeviceMessageProducerOutPort.sendUpdateDeviceMessage(
-                    deviceUpdateEventMapper.toDeviceUpdatedEvent(
-                        updatedDevice
-                    )
-                )
+                updateDeviceMessageProducerOutPort.sendUpdateDeviceMessage(updatedDevice)
                     .thenReturn(updatedDevice)
                     .onErrorResume { error ->
                         log.error(

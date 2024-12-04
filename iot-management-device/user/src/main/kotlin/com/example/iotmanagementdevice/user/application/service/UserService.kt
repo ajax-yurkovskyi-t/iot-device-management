@@ -1,7 +1,7 @@
 package com.example.iotmanagementdevice.user.application.service
 
 import com.example.core.exception.EntityNotFoundException
-import com.example.iotmanagementdevice.role.application.output.RoleRepositoryOutPort
+import com.example.iotmanagementdevice.role.application.port.output.RoleRepositoryOutPort
 import com.example.iotmanagementdevice.role.domain.Role
 import com.example.iotmanagementdevice.user.application.port.input.UserServiceInPort
 import com.example.iotmanagementdevice.user.application.port.output.UserRepositoryOutPort

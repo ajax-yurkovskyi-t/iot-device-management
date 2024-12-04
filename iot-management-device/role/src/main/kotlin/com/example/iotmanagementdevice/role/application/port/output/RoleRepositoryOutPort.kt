@@ -1,4 +1,4 @@
-package com.example.iotmanagementdevice.role.application.output
+package com.example.iotmanagementdevice.role.application.port.output
 
 import com.example.iotmanagementdevice.role.domain.CreateRole
 import com.example.iotmanagementdevice.role.domain.Role
