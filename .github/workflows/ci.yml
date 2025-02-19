@@ -59,6 +59,10 @@ jobs:
         with:
           delta-coverage-report: build/reports/coverage-reports/delta-coverage/report.md
 
+      - name: Append Coverage Summary
+        continue-on-error: true
+        uses: gw-kit/delta-coverage-action@main
+
       - name: Add Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2.15.1
         if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
