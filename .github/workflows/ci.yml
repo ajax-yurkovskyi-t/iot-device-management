@@ -55,7 +55,7 @@ jobs:
 
       - name: Add Delta Coverage report
         continue-on-error: true
-        uses: gw-kit/delta-coverage-plugin/actions/delta-coverage-report@2.4.0
+        uses: gw-kit/delta-coverage-plugin/actions/delta-coverage-report@2.5.0
         with:
           delta-coverage-report: build/reports/coverage-reports/delta-coverage/report.md
 
