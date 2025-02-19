@@ -78,7 +78,7 @@ jobs:
                https://api.github.com/repos/${{ github.repository }}/check-runs \
                -d '{
                  "name": "Build Check",
-                 "head_sha": "${{ github.sha }}",
+                 "head_sha": "${{ github.event.pull_request.head.sha }}",
                  "status": "in_progress",
                  "output": {
                    "title": "Build is in progress",
