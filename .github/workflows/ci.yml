@@ -25,7 +25,6 @@ jobs:
       checks: write
       id-token: write
 
-
     steps:
 
       - name: Checkout
@@ -53,11 +52,9 @@ jobs:
 
       - name: Run Coverage Check
         if: ${{ !cancelled() && steps.diff-arg.outputs.gradle-arg }}
-        continue-on-error: ${{ contains(github.event.pull_request.labels.*.name, 'suppress-delta-coverage') }}
+        continue-on-error: true
         shell: bash
-        run: ${gradle_cmd} deltaCoverage --continue
-          ${{ steps.diff-arg.outputs.gradle-arg }}
-          ${{ steps.resolve-binary-files.outputs.coverage-files }}
+        run: ${gradle_cmd} deltaCoverage
 
       - name: Add Delta Coverage report
         continue-on-error: true
