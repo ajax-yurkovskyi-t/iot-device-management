@@ -53,12 +53,6 @@ jobs:
         continue-on-error: true
         run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
 
-      - name: Upload Delta Coverage Report
-        uses: ajax-systems/github-actions/external/actions/upload-artifact@ajax-v3
-        with:
-          name: delta-report
-          path: build/reports/coverage-reports
-
       - name: Add Delta Coverage report
         continue-on-error: true
         uses: gw-kit/delta-coverage-plugin/actions/delta-coverage-report@2.5.0
