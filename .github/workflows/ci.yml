@@ -87,10 +87,5 @@ jobs:
         with:
           suppress-check-failures: ${{ env.suppress_check_failures }}
 
-      - name: Add Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2.15.1
-        if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
-        continue-on-error: true
-        with:
-          check_name: 'General Tests Report'
-          files: '**/build/test-results/**/TEST-*.xml'
+      - name: Run Delta Coverage check
+        run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
