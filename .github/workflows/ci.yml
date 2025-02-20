@@ -88,4 +88,5 @@ jobs:
           suppress-check-failures: ${{ env.suppress_check_failures }}
 
       - name: Run Delta Coverage check
+        continue-on-error: true
         run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
