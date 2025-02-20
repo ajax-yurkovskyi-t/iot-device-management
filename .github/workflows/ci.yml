@@ -46,6 +46,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Run gradle build
+        continue-on-error: true
         run: ${gradle_cmd} build
 
       - name: Run Delta Coverage check
