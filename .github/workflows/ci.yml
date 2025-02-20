@@ -46,7 +46,6 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Run gradle build
-        continue-on-error: true
         run: ${gradle_cmd} build
 
       - name: Run Delta Coverage check
@@ -86,7 +85,3 @@ jobs:
         uses: gw-kit/delta-coverage-action@main
         with:
           suppress-check-failures: ${{ env.suppress_check_failures }}
-
-      - name: Run Delta Coverage check
-        continue-on-error: true
-        run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"

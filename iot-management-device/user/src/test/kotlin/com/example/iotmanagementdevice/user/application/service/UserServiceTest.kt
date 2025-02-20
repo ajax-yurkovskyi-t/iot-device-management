@@ -132,8 +132,6 @@ class UserServiceTest {
         val username = "JohnDoe"
         val userWithUsername = createUser().copy(name = username)
 
-        val mockUser = createUser().copy(name = "username")
-
         // Stubbing
         every { userRepositoryOutPort.findByUserName(username) } returns userWithUsername.toMono()
 
@@ -142,7 +140,7 @@ class UserServiceTest {
 
         // Then
         foundUser.test()
-            .expectNext(mockUser)
+            .expectNext(userWithUsername)
             .verifyComplete()
 
         verify { userRepositoryOutPort.findByUserName(username) }
