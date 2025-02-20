@@ -50,7 +50,7 @@ jobs:
 
       - name: Run Delta Coverage check
         if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
-        continue-on-error: ${{ contains(github.event.pull_request.labels.*.name, 'suppress-delta-coverage') }}
+        continue-on-error: true
         run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
 
       - name: Add Delta Coverage report
@@ -61,6 +61,7 @@ jobs:
 
       - name: Fetch PR Labels
         id: fetch-labels
+        continue-on-error: true
         run: |
           LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
           LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
@@ -70,6 +71,7 @@ jobs:
 
       - name: Check for Suppress Label
         id: check-label
+        continue-on-error: true
         run: |
           if echo "$labels" | grep -q 'suppress-delta-coverage'; then
             echo "suppress_check_failures=true" >> $GITHUB_ENV
