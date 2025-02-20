@@ -23,7 +23,6 @@ jobs:
       pull-requests: write
       contents: read
       checks: write
-      id-token: write
 
     steps:
 
@@ -46,23 +45,22 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-
       - name: Run gradle build
         run: ${gradle_cmd} build
 
-      - name: Run Coverage Check
-        if: ${{ !cancelled() && steps.diff-arg.outputs.gradle-arg }}
-        continue-on-error: true
-        shell: bash
+      - name: Run Delta Coverage check
+        if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
+        continue-on-error: ${{ contains(github.event.pull_request.labels.*.name, 'suppress-delta-coverage') }}
         run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
 
       - name: Add Delta Coverage report
         continue-on-error: true
-        uses: gw-kit/delta-coverage-plugin/actions/delta-coverage-report@2.5.0
+        uses: gw-kit/delta-coverage-plugin/actions/delta-coverage-report@2.4.0
         with:
           delta-coverage-report: build/reports/coverage-reports/delta-coverage/report.md
 
       - name: Append Coverage Summary
+        if: ${{ !cancelled() }}
         continue-on-error: true
         uses: gw-kit/delta-coverage-action@main
 
@@ -73,19 +71,3 @@ jobs:
         with:
           check_name: 'General Tests Report'
           files: '**/build/test-results/**/TEST-*.xml'
-
-      - name: Create Check Run
-        run: |
-          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               https://api.github.com/repos/${{ github.repository }}/check-runs \
-               -d '{
-                 "name": "Build Check",
-                 "head_sha": "${{ github.event.pull_request.head.sha }}",
-                 "status": "in_progress",
-                 "output": {
-                   "title": "Build is in progress",
-                   "summary": "The build has started running."
-                 }
-               }'
-    
