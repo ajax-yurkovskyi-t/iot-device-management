@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("io.github.surpsg.delta-coverage")
+    id("io.github.gw-kit.delta-coverage")
 }
 
 deltaCoverageReport {
@@ -10,7 +10,11 @@ deltaCoverageReport {
         compareWith(targetBranch)
     }
 
-    violationRules.failIfCoverageLessThan(0.6)
+    reportViews {
+        val test by getting {
+            violationRules.failIfCoverageLessThan(0.6)
+        }
+    }
     reports {
         html = true
         markdown = true
