@@ -3,6 +3,11 @@ name: Update Check Run
 on:
   workflow_dispatch:
 
+permissions:
+  actions: write
+  checks: write
+  contents: read
+
 jobs:
   update-check-run:
     runs-on: ubuntu-latest
