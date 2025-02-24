@@ -103,7 +103,7 @@ runs:
           const checkRuns = ${{ steps.list-check-runs.outputs.result }}
           const checkRunName = "${{ inputs.check-run-name }}"
           const checkRun = checkRuns.find(
-            (checkRun) => checkRun.name === checkRunName        
+            (checkRun) => checkRun.name === '📈Test Coverage'     
           );
           return checkRun.id;
 
