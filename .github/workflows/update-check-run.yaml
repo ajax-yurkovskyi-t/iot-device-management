@@ -26,7 +26,7 @@ jobs:
           node-version: '16'
 
       - name: Update check run
-        uses: ./.github/actions/update-check-run
+        uses: ajax-yurkovskyi-t/test-gh-app/.github/actions/update-check-run@feature/empty
         with:
           target-repo: ${{ inputs.target-repo }}
           check-run-name: Test Coverage
