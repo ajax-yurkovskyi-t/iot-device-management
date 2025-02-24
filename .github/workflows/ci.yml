@@ -57,7 +57,7 @@ jobs:
       - name: Create Check Run for Coverage
         run: |
           CHECK_RUN_NAME="Deltasc coverage"
-          CHECK_RUN_CONCLUSION="success"
+          CHECK_RUN_CONCLUSION="failure"
           CHECK_RUN_STATUS="completed"
           CHECK_RUN_OUTPUT="Delta coverage check completed successfully."
 
