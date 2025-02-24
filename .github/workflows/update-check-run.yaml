@@ -2,6 +2,10 @@ name: Update Check Run
 
 on:
   workflow_dispatch:
+    inputs:
+      target-repo:
+        description: 'Target repository name'
+        required: true
 
 permissions:
   actions: write
@@ -24,6 +28,7 @@ jobs:
       - name: Update check run
         uses: ./.github/actions/update-check-run
         with:
+          target-repo: ${{ inputs.target-repo }}
           check-run-name: Test Coverage
           conclusion: success
           title: No title
