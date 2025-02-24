@@ -68,7 +68,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -d '{
               "name": "'"$CHECK_RUN_NAME"'",
-              "head_sha": ${{ github.event.pull_request.head.sha }},
+              "head_sha": "${{ github.event.pull_request.head.sha }}",
               "status": "'"$CHECK_RUN_STATUS"'",
               "conclusion": "'"$CHECK_RUN_CONCLUSION"'",
               "output": {
