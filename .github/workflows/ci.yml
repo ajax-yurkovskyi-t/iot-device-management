@@ -45,7 +45,7 @@ jobs:
               repo: context.repo.repo,
               check_run_id: checkRunId
             });
-            const logsUrl = response.data.output.annotations_url;
+            const logsUrl = response.data.output.summary;
             console.log(`Check Run Logs URL: ${logsUrl}`);
               
             return response.data.output;
