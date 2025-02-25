@@ -62,5 +62,5 @@ jobs:
       - name: Append Coverage Summary
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
+        uses: ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
 
