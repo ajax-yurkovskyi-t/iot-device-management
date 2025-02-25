@@ -45,41 +45,6 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-      - name: Generate a token
-        id: generate-app-token
-        continue-on-error: true
-        uses: actions/create-github-app-token@v1.9.3
-        with:
-          app-id: ${{ secrets.GH_APP_ID }}
-          private-key: ${{ secrets.JAVA_BACKEND_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-
-      - name: Create Check Run for Coverage
-        run: |
-          CHECK_RUN_NAME="Deltasc coverage"
-          CHECK_RUN_CONCLUSION="failure"
-          CHECK_RUN_STATUS="completed"
-          CHECK_RUN_OUTPUT="Delta coverage check completed successfully."
-
-          INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
-
-          curl -X POST \
-            -H "Authorization: token $INSTALLATION_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -d '{
-              "name": "'"$CHECK_RUN_NAME"'",
-              "head_sha": "${{ github.event.pull_request.head.sha }}",
-              "status": "'"$CHECK_RUN_STATUS"'",
-              "conclusion": "'"$CHECK_RUN_CONCLUSION"'",
-              "output": {
-                "title": "'"$CHECK_RUN_NAME"'",
-                "summary": "'"$CHECK_RUN_OUTPUT"'"
-              }
-            }' \
-            https://api.github.com/repos/${{ github.repository }}/check-runs
-      
-      
-
       - name: Run gradle build
         run: ${gradle_cmd} build
 
