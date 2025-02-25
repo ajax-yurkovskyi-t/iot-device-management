@@ -97,4 +97,5 @@ jobs:
       - name: Append Coverage Summary
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses: gw-kit/delta-coverage-action@ajax-yurkovskyi-t:feature/dynamic-label-fetching
+        uses: gw-kit/delta-coverage-action@feature/dynamic-label-fetching
+
