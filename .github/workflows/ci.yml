@@ -46,7 +46,7 @@ jobs:
               check_run_id: checkRunId
             });
             const logsUrl = response.data.output.annotations_url;
-            info(`Check Run Logs URL: ${logsUrl}`);
+            console.log(`Check Run Logs URL: ${logsUrl}`);
               
             return response.data.output;
       - name: Set up JDK 21
