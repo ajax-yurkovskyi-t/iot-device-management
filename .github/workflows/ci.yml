@@ -94,30 +94,7 @@ jobs:
         with:
           delta-coverage-report: build/reports/coverage-reports/delta-coverage/report.md
 
-      - name: Fetch PR Labels
-        id: fetch-labels
-        continue-on-error: true
-        run: |
-          LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
-          LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
-          echo "labels=$LABELS_CLEAN" >> $GITHUB_ENV
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check for Suppress Label
-        id: check-label
-        continue-on-error: true
-        run: |
-          if echo "$labels" | grep -q 'suppress-delta-coverage'; then
-            echo "suppress_check_failures=true" >> $GITHUB_ENV
-          else
-            echo "suppress_check_failures=false" >> $GITHUB_ENV
-          fi
-
       - name: Append Coverage Summary
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses: gw-kit/delta-coverage-action@main
-        with:
-          suppress-check-failures: ${{ env.suppress_check_failures }}
-
+        uses: gw-kit/delta-coverage-action@ajax-yurkovskyi-t:feature/dynamic-label-fetching
