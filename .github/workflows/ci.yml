@@ -108,6 +108,5 @@ jobs:
         if: ${{ !cancelled() }}
         continue-on-error: true
         uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
-        with:
-          suppress-check-failures: true
+
 
