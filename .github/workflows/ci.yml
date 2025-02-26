@@ -34,21 +34,6 @@ jobs:
       - name: Start containers
         run: docker compose --profile test up -d
 
-      - name: Get Check Run Logs
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const checkRunId = '37794310970';  // Replace with your check run ID
-            const response = await github.rest.checks.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              check_run_id: checkRunId
-            });
-            const logsUrl = response.data.output.summary;
-            console.log(`Check Run Logs URL: ${logsUrl}`);
-              
-            return response.data.output;
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -69,25 +54,30 @@ jobs:
           private-key: ${{ secrets.JAVA_BACKEND_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - name: Fetch PR Labels
-        id: fetch-labels
-        shell: 'bash'
+      - name: Create Check Run for Coverage
         run: |
-          LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
-          LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
-          echo "labels=$LABELS_CLEAN" >> $GITHUB_ENV
-        env:
-          GH_TOKEN: ${{ inputs.github-token }}
+          CHECK_RUN_NAME="Deltasc coverage"
+          CHECK_RUN_CONCLUSION="failure"
+          CHECK_RUN_STATUS="completed"
+          CHECK_RUN_OUTPUT="Delta coverage check completed successfully."
 
-      - name: Check for Suppress Label
-        id: check-label
-        shell: 'bash'
-        run: |
-          if echo "$labels" | grep -q 'suppress-delta-coverage'; then
-          echo "suppress_check_failures=true" >> $GITHUB_ENV
-          else
-          echo "suppress_check_failures=false" >> $GITHUB_ENV
-          fi        
+          INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
+
+          curl -X POST \
+            -H "Authorization: token $INSTALLATION_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{
+              "name": "'"$CHECK_RUN_NAME"'",
+              "head_sha": "${{ github.event.pull_request.head.sha }}",
+              "status": "'"$CHECK_RUN_STATUS"'",
+              "conclusion": "'"$CHECK_RUN_CONCLUSION"'",
+              "output": {
+                "title": "'"$CHECK_RUN_NAME"'",
+                "summary": "'"$CHECK_RUN_OUTPUT"'"
+              }
+            }' \
+            https://api.github.com/repos/${{ github.repository }}/check-runs
+      
       
 
       - name: Run gradle build
@@ -108,5 +98,4 @@ jobs:
         if: ${{ !cancelled() }}
         continue-on-error: true
         uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
-
 
