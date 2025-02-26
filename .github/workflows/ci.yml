@@ -59,7 +59,7 @@ jobs:
           CHECK_RUN_NAME="Deltasc coverage"
           CHECK_RUN_CONCLUSION="failure"
           CHECK_RUN_STATUS="completed"
-          CHECK_RUN_OUTPUT="Delta coverage check completed successfully.<!-- metadata: {\"coverage\": \"85.3\", \"threshold\": \"90\"} -->"
+          CHECK_RUN_OUTPUT="Delta coverage check completed successfully\n\n<!-- This is Test Coverage CheckRun -->"
 
           INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
 
