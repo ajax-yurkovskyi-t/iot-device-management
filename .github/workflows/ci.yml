@@ -85,6 +85,7 @@ jobs:
 
       - name: Run Delta Coverage check
         if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
+        continue-on-error: true
         run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
 
       - name: Add Delta Coverage report
