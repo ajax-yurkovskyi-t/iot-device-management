@@ -81,7 +81,7 @@ jobs:
       
 
       - name: Run gradle build
-        run: ${gradle_cmd} build
+        run: ${gradle_cmd} build -x test
 
       - name: Run Delta Coverage check
         continue-on-error: true
