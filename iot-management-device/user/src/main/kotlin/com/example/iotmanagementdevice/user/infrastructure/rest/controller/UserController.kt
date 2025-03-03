@@ -42,6 +42,11 @@ class UserController(
         return Mono.just("user")
     }
 
+    @GetMapping("/test2")
+    fun getUserByString2(): Mono<String> {
+        return Mono.just("user2")
+    }
+
     @PutMapping("{id}")
     fun update(
         @PathVariable id: String,
