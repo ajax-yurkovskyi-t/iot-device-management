@@ -24,6 +24,9 @@ jobs:
       contents: read
       checks: write
 
+    outputs:
+      github-token: ${{ steps.generate-app-token.outputs.token }}
+
     steps:
 
       - name: Checkout
@@ -107,6 +110,6 @@ jobs:
     with:
       required-jobs: "${{ toJson(needs) }}"
       check-runs: "ajax-delta-coverage"
-      github-token: ${{ steps.generate-app-token.outputs.token }}
+      github-token: ${{ needs.build.outputs.github-token }}
     needs:
       - build
