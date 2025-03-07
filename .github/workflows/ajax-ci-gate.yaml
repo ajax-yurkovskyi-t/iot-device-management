@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      required-jobs:
+        description: 'Needs JSON object with the jobs to check for a specific conclusion'
+        type: string
+        required: true
+
+      check-runs:
+        description: 'Check runs input'
+        required: false
+        type: string
+
+    outputs:
+      check-run-id:
+        description: 'The ID of the created check run'
+        value: ${{ jobs.ajax-ci-gate.outputs.check-run-id }}
+
+jobs:
+  ajax-ci-gate:
+    if: ${{ !(github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
+    runs-on: ${{ vars.RUNNER_MICRO_ARM }}
+    outputs:
+      check-run-id: ${{ steps.ajax-ci-gate.outputs.check-run-id }}
+    steps:
+      - id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.JAVA_BACKEND_APP_ID }}
+          private-key: ${{ secrets.JAVA_BACKEND_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+      
+      - id: ajax-ci-gate
+        uses: ajax-yurkovskyi-t/iot-device-management/.github/actions@feature/delta-coverage-test
+        with:
+          needs: ${{ inputs.required-jobs }}
+          check-runs: ${{ inputs.check-runs }}
+          github-token: ${{ steps.generate-token.outputs.token }}

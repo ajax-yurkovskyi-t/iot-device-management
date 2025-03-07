@@ -1,0 +1,207 @@
+name: Ajax CI Gate
+description: Checks if the jobs in `needs` have a specific conclusion and creates a check run with the result.
+
+inputs:
+  needs:
+    description: "Needs JSON object with the jobs to check for a specific conclusion"
+    required: true
+
+  check-runs:
+    description: "Check runs input"
+    required: false
+
+  check-run-name:
+    description: "The name of the resulting check run"
+    required: false
+    default: "Ajax CI Gate"
+
+  expected-conclusion:
+    description: "The expected conclusion for all jobs"
+    required: false
+    default: "success"
+
+  github-token:
+    description: "GitHub API Access Token"
+    default: ${{ github.token }}
+    required: false
+
+  target-repo:
+    description: "Target Repository name (for testing purposes only)"
+    default: ${{ github.repository }}
+    required: false
+
+  target-pr-number:
+    description: "Target Pull Request number (for testing purposes only)"
+    required: false
+
+  head-sha:
+    description: "The SHA of the pull request head."
+    default: ${{ github.event.pull_request.head.sha }}
+    required: false
+
+outputs:
+  check-run-id:
+    description: "The ID of the created check run"
+    value: ${{ steps.create-check-run.outputs.check-run-id }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Read Invisible Metadata from Check Run Summary
+      id: read-invisible-metadata
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const checkRunId = "38367845140";
+          const targetRepo = "${{ inputs.target-repo }}";
+          const [owner, repo] = targetRepo.split('/');
+
+          const checkRun = await github.rest.checks.get({
+          owner: owner,
+          repo: repo,
+          check_run_id: checkRunId
+          });
+
+          const checkRunSummary = checkRun.data.output.summary;
+
+          const failedJobsRegex = /<!-- FAILED_JOBS: \[(.*?)\] -->/;
+          const failedCheckRunsRegex = /<!-- FAILED_CHECK_RUNS: \[(.*?)\] -->/;
+
+          const failedJobsMatch = checkRunSummary.match(failedJobsRegex);
+          const failedCheckRunsMatch = checkRunSummary.match(failedCheckRunsRegex);
+
+          const failedJobs = failedJobsMatch ? failedJobsMatch[1].split(', ') : [];
+          const failedCheckRuns = failedCheckRunsMatch ? failedCheckRunsMatch[1].split(', ') : [];
+
+          core.setOutput("failedJobs", failedJobs);
+          core.setOutput("failedCheckRuns", failedCheckRuns);
+
+          console.log(`Failed Jobs: ${failedJobs}`);
+          console.log(`Failed Check Runs: ${failedCheckRuns}`);
+    
+          
+
+    - name: Use Failed Jobs and Check Runs Metadata
+      shell: bash
+      run: |
+        echo "Failed Jobs: ${{ steps.read-invisible-metadata.outputs.failedJobs }}"
+        echo "Failed Check Runs: ${{ steps.read-invisible-metadata.outputs.failedCheckRuns }}"
+        
+
+    - name: Check Jobs Conclusion
+      id: check-jobs-conclusion
+      uses: actions/github-script@v7
+      env:
+        NEEDS_CONTEXT: ${{ inputs.needs }}
+      with:
+        github-token: ${{ inputs.github-token }}
+        result-encoding: json
+        script: |
+          const needs = JSON.parse(process.env.NEEDS_CONTEXT);
+
+          let checkResult = true;
+          let failedJobs = [];
+          let allJobs = [];
+
+          let expectedMessage = `#### Expected the following job to pass successfully:\n`;
+          let failedJobsMessage = `#### This check run failed because the following jobs were not successful:\n`;
+          
+          for (const job in needs) {
+            allJobs.push(`- ${job}`);
+            if (needs[job].result !== "${{ inputs.expected-conclusion }}") {
+              checkResult = false;
+              failedJobs.push(`- ${job}: ${needs[job].result}`);
+            }
+          }
+
+          expectedMessage += allJobs.join(`\n`);
+
+          if (failedJobs.length > 0) {
+            failedJobsMessage += failedJobs.join(`\n`);
+          } else {
+            failedJobsMessage = `All required jobs passed successfully`;
+          }
+
+          const finalMessage = `${expectedMessage}\n\n${failedJobsMessage}`;
+          const checkTitle = checkResult == true 
+              ? 'All needed jobs passed successfully' 
+              : 'Some needed jobs were not successful';
+
+          // Hidden metadata for failed jobs
+          const failedJobsMetadata = `<!-- FAILED_JOBS: ${JSON.stringify(failedJobs)} -->`;
+
+          core.setOutput("check-result", checkResult);
+          core.setOutput("check-title", checkTitle);
+          core.setOutput("check-summary", finalMessage);
+          core.setOutput("failed-jobs-metadata", failedJobsMetadata);
+
+    - name: Check Runs Conclusion
+      id: check-runs-conclusion
+      if: ${{ inputs.check-runs }}
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        result-encoding: json
+        script: |
+          const externalId = "${{ inputs.check-runs }}";
+          const targetRepo = "${{ inputs.target-repo }}";
+          const [owner, repo] = targetRepo.split('/');
+          const checkRunsResponse = await github.rest.checks.listForRef({ 
+            owner: owner, 
+            repo: repo, 
+            ref: "${{ inputs.head-sha }}"
+          });
+          
+          // Filter check runs based on externalId
+          const filteredCheckRuns = checkRunsResponse.data.check_runs.filter(
+            checkRun => checkRun.external_id === externalId
+          );
+          
+          let failedCheckRuns = [];
+          let output = true;
+          
+          // Loop through filtered check runs and find the failed ones
+          for (const checkRun of filteredCheckRuns) {
+            if (checkRun.conclusion === 'failure') {
+              output = false;
+              // Extract only the name of the failed check run
+              failedCheckRuns.push(checkRun.name);
+            }
+          }
+          
+          let failedCheckRunsMessage = failedCheckRuns.length > 0 
+            ? `#### The following check runs failed:\n${failedCheckRuns.join("\n")}`
+            : "All required check runs passed successfully.";
+          
+          // Create metadata with only the names of the failed check runs (without the status)
+          const failedCheckRunsMetadata = `<!-- FAILED_CHECK_RUNS: ${JSON.stringify(failedCheckRuns)} -->`;
+          
+          // Set the outputs for later use in other steps
+          core.setOutput("checkRunsPassed", output);
+          core.setOutput("failedCheckRunsMessage", failedCheckRunsMessage);
+          core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
+          
+          // Log for debugging
+          console.log(`Failed Check Run Names: ${failedCheckRuns}`);
+    
+    
+
+    - name: Create check run
+      uses: ajax-systems/github-actions/reporting/create-check-run@ajax-v3
+      id: create-check-run
+      with:
+        check-run-name: ${{ inputs.check-run-name }}
+        conclusion: ${{ (steps.check-jobs-conclusion.outputs.check-result == 'true' && (steps.check-runs-conclusion.outputs.checkRunsPassed == 'true' || steps.check-runs-conclusion.outputs.checkRunsPassed == '')) && 'success' || 'failure' }}
+        github-token: ${{ inputs.github-token }}
+        title: ${{ steps.check-jobs-conclusion.outputs.check-title }}
+        summary: |
+          ${{ steps.check-jobs-conclusion.outputs.check-summary }}
+          
+          ${{ steps.check-runs-conclusion.outputs.failedCheckRunsMessage }}
+
+          <!-- HIDDEN METADATA -->
+          ${{ steps.check-jobs-conclusion.outputs.failed-jobs-metadata }}
+          ${{ steps.check-runs-conclusion.outputs.failed-check-runs-metadata }}
+        target-pr-number: ${{ inputs.target-pr-number }}
+        target-repo: ${{ inputs.target-repo }}
