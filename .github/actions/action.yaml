@@ -188,7 +188,7 @@ runs:
     
 
     - name: Create check run
-      uses: ajax-systems/github-actions/reporting/create-check-run@ajax-v3
+      uses: ajax-yurkovskyi-t/iot-device-management/.github/create-check-run@feature/delta-coverage-test
       id: create-check-run
       with:
         check-run-name: ${{ inputs.check-run-name }}
