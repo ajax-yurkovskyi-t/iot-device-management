@@ -18,15 +18,12 @@ on:
 
 jobs:
   ajax-ci-gate:
-    if: ${{ !(github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
     runs-on: ubuntu-latest
     outputs:
       check-run-id: ${{ steps.ajax-ci-gate.outputs.check-run-id }}
+
     permissions:
-      issues: read
-      pull-requests: write
       contents: read
-      checks: write
 
     steps:
 
