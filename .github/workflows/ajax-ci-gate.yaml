@@ -11,6 +11,10 @@ on:
         required: false
         type: string
 
+      github-token:
+        required: true
+        type: string
+
     outputs:
       check-run-id:
         description: 'The ID of the created check run'
@@ -41,4 +45,4 @@ jobs:
         with:
           needs: ${{ inputs.required-jobs }}
           check-runs: ${{ inputs.check-runs }}
-          github-token: ${{ steps.generate-app-token.outputs.token }}
+          github-token: ${{ inputs.github-token }}

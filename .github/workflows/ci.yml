@@ -107,5 +107,6 @@ jobs:
     with:
       required-jobs: "${{ toJson(needs) }}"
       check-runs: "ajax-delta-coverage"
+      github-token: ${{ steps.generate-app-token.outputs.token }}
     needs:
       - build
