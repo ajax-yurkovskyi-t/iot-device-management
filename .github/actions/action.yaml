@@ -47,46 +47,46 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Read Invisible Metadata from Check Run Summary
-      id: read-invisible-metadata
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ inputs.github-token }}
-        script: |
-          const checkRunId = "38367845140";
-          const targetRepo = "${{ inputs.target-repo }}";
-          const [owner, repo] = targetRepo.split('/');
-
-          const checkRun = await github.rest.checks.get({
-          owner: owner,
-          repo: repo,
-          check_run_id: checkRunId
-          });
-
-          const checkRunSummary = checkRun.data.output.summary;
-
-          const failedJobsRegex = /<!-- FAILED_JOBS: \[(.*?)\] -->/;
-          const failedCheckRunsRegex = /<!-- FAILED_CHECK_RUNS: \[(.*?)\] -->/;
-
-          const failedJobsMatch = checkRunSummary.match(failedJobsRegex);
-          const failedCheckRunsMatch = checkRunSummary.match(failedCheckRunsRegex);
-
-          const failedJobs = failedJobsMatch ? failedJobsMatch[1].split(', ') : [];
-          const failedCheckRuns = failedCheckRunsMatch ? failedCheckRunsMatch[1].split(', ') : [];
-
-          core.setOutput("failedJobs", failedJobs);
-          core.setOutput("failedCheckRuns", failedCheckRuns);
-
-          console.log(`Failed Jobs: ${failedJobs}`);
-          console.log(`Failed Check Runs: ${failedCheckRuns}`);
-    
-          
-
-    - name: Use Failed Jobs and Check Runs Metadata
-      shell: bash
-      run: |
-        echo "Failed Jobs: ${{ steps.read-invisible-metadata.outputs.failedJobs }}"
-        echo "Failed Check Runs: ${{ steps.read-invisible-metadata.outputs.failedCheckRuns }}"
+#    - name: Read Invisible Metadata from Check Run Summary
+#      id: read-invisible-metadata
+#      uses: actions/github-script@v7
+#      with:
+#        github-token: ${{ inputs.github-token }}
+#        script: |
+#          const checkRunId = "38367845140";
+#          const targetRepo = "${{ inputs.target-repo }}";
+#          const [owner, repo] = targetRepo.split('/');
+#
+#          const checkRun = await github.rest.checks.get({
+#          owner: owner,
+#          repo: repo,
+#          check_run_id: checkRunId
+#          });
+#
+#          const checkRunSummary = checkRun.data.output.summary;
+#
+#          const failedJobsRegex = /<!-- FAILED_JOBS: \[(.*?)\] -->/;
+#          const failedCheckRunsRegex = /<!-- FAILED_CHECK_RUNS: \[(.*?)\] -->/;
+#
+#          const failedJobsMatch = checkRunSummary.match(failedJobsRegex);
+#          const failedCheckRunsMatch = checkRunSummary.match(failedCheckRunsRegex);
+#
+#          const failedJobs = failedJobsMatch ? failedJobsMatch[1].split(', ') : [];
+#          const failedCheckRuns = failedCheckRunsMatch ? failedCheckRunsMatch[1].split(', ') : [];
+#
+#          core.setOutput("failedJobs", failedJobs);
+#          core.setOutput("failedCheckRuns", failedCheckRuns);
+#
+#          console.log(`Failed Jobs: ${failedJobs}`);
+#          console.log(`Failed Check Runs: ${failedCheckRuns}`);
+#
+#
+#
+#    - name: Use Failed Jobs and Check Runs Metadata
+#      shell: bash
+#      run: |
+#        echo "Failed Jobs: ${{ steps.read-invisible-metadata.outputs.failedJobs }}"
+#        echo "Failed Check Runs: ${{ steps.read-invisible-metadata.outputs.failedCheckRuns }}"
         
 
     - name: Check Jobs Conclusion
