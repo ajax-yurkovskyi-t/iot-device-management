@@ -27,7 +27,7 @@ jobs:
       - name: Generate a token
         id: generate-app-token
         continue-on-error: true
-        uses: actions/create-github-app-token@v1.9.3
+        uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.JAVA_BACKEND_APP_PRIVATE_KEY }}
