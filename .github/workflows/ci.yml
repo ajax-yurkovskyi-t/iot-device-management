@@ -100,12 +100,12 @@ jobs:
         continue-on-error: true
         uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
 
+
   ajax-ci-gate:
     if: always()
     uses: ajax-yurkovskyi-t/iot-device-management/.github/workflows/ajax-ci-gate.yaml@feature/delta-coverage-test
     with:
       required-jobs: "${{ toJson(needs) }}"
       check-runs: "ajax-delta-coverage"
-    secrets: inherit
     needs:
       - build
