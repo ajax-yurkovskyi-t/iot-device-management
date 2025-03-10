@@ -7,7 +7,7 @@ inputs:
     required: true
 
   check-runs:
-    description: "Check runs input"
+    description: "Needs a value for external_id field of check run"
     required: false
 
   check-run-name:
@@ -47,47 +47,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-#    - name: Read Invisible Metadata from Check Run Summary
-#      id: read-invisible-metadata
-#      uses: actions/github-script@v7
-#      with:
-#        github-token: ${{ inputs.github-token }}
-#        script: |
-#          const checkRunId = "38367845140";
-#          const targetRepo = "${{ inputs.target-repo }}";
-#          const [owner, repo] = targetRepo.split('/');
-#
-#          const checkRun = await github.rest.checks.get({
-#          owner: owner,
-#          repo: repo,
-#          check_run_id: checkRunId
-#          });
-#
-#          const checkRunSummary = checkRun.data.output.summary;
-#
-#          const failedJobsRegex = /<!-- FAILED_JOBS: \[(.*?)\] -->/;
-#          const failedCheckRunsRegex = /<!-- FAILED_CHECK_RUNS: \[(.*?)\] -->/;
-#
-#          const failedJobsMatch = checkRunSummary.match(failedJobsRegex);
-#          const failedCheckRunsMatch = checkRunSummary.match(failedCheckRunsRegex);
-#
-#          const failedJobs = failedJobsMatch ? failedJobsMatch[1].split(', ') : [];
-#          const failedCheckRuns = failedCheckRunsMatch ? failedCheckRunsMatch[1].split(', ') : [];
-#
-#          core.setOutput("failedJobs", failedJobs);
-#          core.setOutput("failedCheckRuns", failedCheckRuns);
-#
-#          console.log(`Failed Jobs: ${failedJobs}`);
-#          console.log(`Failed Check Runs: ${failedCheckRuns}`);
-#
-#
-#
-#    - name: Use Failed Jobs and Check Runs Metadata
-#      shell: bash
-#      run: |
-#        echo "Failed Jobs: ${{ steps.read-invisible-metadata.outputs.failedJobs }}"
-#        echo "Failed Check Runs: ${{ steps.read-invisible-metadata.outputs.failedCheckRuns }}"
-        
 
     - name: Check Jobs Conclusion
       id: check-jobs-conclusion
@@ -151,32 +110,46 @@ runs:
             repo: repo, 
             ref: "${{ inputs.head-sha }}"
           });
-          
-          const filteredCheckRuns = checkRunsResponse.data.check_runs.filter(
-          checkRun => externalIds.includes(checkRun.external_id)
-          );
-          
+
+          let checkResult = true;
           let failedCheckRuns = [];
-          let output = true;
-          
+          let allCheckRuns = [];
+
+          let expectedMessage = `#### Expected the following check runs to pass successfully:\n`;
+          let failedCheckRunsMessage = `#### This check run failed because the following check runs were not successful:\n`;
+
+          const filteredCheckRuns = checkRunsResponse.data.check_runs.filter(
+            checkRun => externalIds.includes(checkRun.external_id)
+          );
+
           for (const checkRun of filteredCheckRuns) {
+            allCheckRuns.push(`- ${checkRun.name}`);
             if (checkRun.conclusion === 'failure') {
-              output = false;
-              failedCheckRuns.push(checkRun.name);
+              checkResult = false;
+              failedCheckRuns.push(checkRun.name); // Only the check run name
             }
           }
-          
-          let failedCheckRunsMessage = failedCheckRuns.length > 0 
-            ? `#### The following check runs failed:\n${failedCheckRuns.join("\n")}`
-            : "All required check runs passed successfully.";
-          
+
+          expectedMessage += allCheckRuns.join(`\n`);
+
+          if (failedCheckRuns.length > 0) {
+            failedCheckRunsMessage += failedCheckRuns.map(name => `- ${name}`).join(`\n`);
+          } else {
+            failedCheckRunsMessage = `All required check runs passed successfully`;
+          }
+
+          const finalMessage = `${expectedMessage}\n\n${failedCheckRunsMessage}`;
+          const checkTitle = checkResult 
+              ? 'All needed check runs passed successfully' 
+              : 'Some needed check runs were not successful';
+
           const failedCheckRunsMetadata = `<!-- FAILED_CHECK_RUNS: ${JSON.stringify(failedCheckRuns)} -->`;
-          
-          core.setOutput("checkRunsPassed", output);
-          core.setOutput("failedCheckRunsMessage", failedCheckRunsMessage);
+
+          core.setOutput("checkRunsPassed", checkResult);
+          core.setOutput("checkRunsTitle", checkTitle);
+          core.setOutput("checkRunsSummary", finalMessage);
           core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
-          
-          console.log(`Failed Check Run Names: ${failedCheckRuns}`);
+    
     
 
     - name: Create check run
@@ -192,7 +165,6 @@ runs:
           
           ${{ steps.check-runs-conclusion.outputs.failedCheckRunsMessage }}
 
-          <!-- HIDDEN METADATA -->
           ${{ steps.check-jobs-conclusion.outputs.failed-jobs-metadata }}
           ${{ steps.check-runs-conclusion.outputs.failed-check-runs-metadata }}
         target-pr-number: ${{ inputs.target-pr-number }}
