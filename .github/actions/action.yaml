@@ -63,7 +63,7 @@ runs:
           let failedJobs = [];
           let allJobs = [];
 
-          let expectedMessage = `## Required job list\n`;
+          let expectedMessage = `\n## Required job list\n`;
           let failedJobsMessage = `#### This check run failed because the following jobs were not successful:\n`;
           
           for (const job in needs) {
