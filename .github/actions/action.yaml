@@ -170,7 +170,7 @@ runs:
         check-run-name: ${{ inputs.check-run-name }}
         conclusion: ${{ steps.determine-conclusion.outputs.conclusion }}
         github-token: ${{ inputs.github-token }}
-        title: ' '
+        title: 'Ajax Ci Gate Summary'
         summary: |
           ${{ steps.check-jobs-conclusion.outputs.check-summary }}
           
