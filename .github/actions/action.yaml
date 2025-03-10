@@ -128,7 +128,6 @@ runs:
               ? 'All needed jobs passed successfully' 
               : 'Some needed jobs were not successful';
 
-          // Hidden metadata for failed jobs
           const failedJobsMetadata = `<!-- FAILED_JOBS: ${JSON.stringify(failedJobs)} -->`;
 
           core.setOutput("check-result", checkResult);
@@ -144,7 +143,7 @@ runs:
         github-token: ${{ inputs.github-token }}
         result-encoding: json
         script: |
-          const externalId = "${{ inputs.check-runs }}";
+          const externalIds = "${{ inputs.check-runs }}".split(',').map(id => id.trim());
           const targetRepo = "${{ inputs.target-repo }}";
           const [owner, repo] = targetRepo.split('/');
           const checkRunsResponse = await github.rest.checks.listForRef({ 
@@ -153,19 +152,16 @@ runs:
             ref: "${{ inputs.head-sha }}"
           });
           
-          // Filter check runs based on externalId
           const filteredCheckRuns = checkRunsResponse.data.check_runs.filter(
-            checkRun => checkRun.external_id === externalId
+          checkRun => externalIds.includes(checkRun.external_id)
           );
           
           let failedCheckRuns = [];
           let output = true;
           
-          // Loop through filtered check runs and find the failed ones
           for (const checkRun of filteredCheckRuns) {
             if (checkRun.conclusion === 'failure') {
               output = false;
-              // Extract only the name of the failed check run
               failedCheckRuns.push(checkRun.name);
             }
           }
@@ -174,17 +170,13 @@ runs:
             ? `#### The following check runs failed:\n${failedCheckRuns.join("\n")}`
             : "All required check runs passed successfully.";
           
-          // Create metadata with only the names of the failed check runs (without the status)
           const failedCheckRunsMetadata = `<!-- FAILED_CHECK_RUNS: ${JSON.stringify(failedCheckRuns)} -->`;
           
-          // Set the outputs for later use in other steps
           core.setOutput("checkRunsPassed", output);
           core.setOutput("failedCheckRunsMessage", failedCheckRunsMessage);
           core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
           
-          // Log for debugging
           console.log(`Failed Check Run Names: ${failedCheckRuns}`);
-    
     
 
     - name: Create check run
