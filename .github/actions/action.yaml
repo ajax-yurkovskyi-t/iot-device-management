@@ -146,7 +146,7 @@ runs:
           core.setOutput("checkRunsSummary", finalMessage);
           core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
 
-    - name: Determine Conclusion and Summary
+    - name: Determine Conclusion
       id: determine-conclusion-summary
       uses: actions/github-script@v7
       with:
