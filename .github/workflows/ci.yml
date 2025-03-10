@@ -165,6 +165,6 @@ jobs:
     secrets: inherit
     with:
       required-jobs: "${{ toJson(needs) }}"
-      check-runs: "ajax-delta-coverage, another-check-run"
+      check-runs: "ajax-delta-coverage"
     needs:
       - build
