@@ -63,7 +63,7 @@ runs:
           let failedJobs = [];
           let allJobs = [];
 
-          let expectedMessage = `\n## Required job list\n`;
+          let expectedMessage = `### Required job list\n`;
           let failedJobsMessage = `#### This check run failed because the following jobs were not successful:\n`;
           
           for (const job in needs) {
@@ -115,7 +115,7 @@ runs:
           let failedCheckRuns = [];
           let allCheckRuns = [];
 
-          let expectedMessage = `## Required check run list\n`;
+          let expectedMessage = `### Required check run list\n`;
           let failedCheckRunsMessage = `#### This check run failed because the following check runs were not successful:\n`;
 
           const filteredCheckRuns = checkRunsResponse.data.check_runs.filter(
