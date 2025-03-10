@@ -63,7 +63,7 @@ runs:
           let failedJobs = [];
           let allJobs = [];
 
-          let expectedMessage = `#### Expected the following job to pass successfully:\n`;
+          let expectedMessage = `## Required job list\n`;
           let failedJobsMessage = `#### This check run failed because the following jobs were not successful:\n`;
           
           for (const job in needs) {
@@ -115,7 +115,7 @@ runs:
           let failedCheckRuns = [];
           let allCheckRuns = [];
 
-          let expectedMessage = `#### Expected the following check runs to pass successfully:\n`;
+          let expectedMessage = `## Required check run list\n`;
           let failedCheckRunsMessage = `#### This check run failed because the following check runs were not successful:\n`;
 
           const filteredCheckRuns = checkRunsResponse.data.check_runs.filter(
@@ -147,7 +147,7 @@ runs:
           core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
 
     - name: Determine Conclusion
-      id: determine-conclusion-summary
+      id: determine-conclusion
       uses: actions/github-script@v7
       with:
         github-token: ${{ inputs.github-token }}
@@ -168,7 +168,7 @@ runs:
       id: create-check-run
       with:
         check-run-name: ${{ inputs.check-run-name }}
-        conclusion: ${{ steps.determine-conclusion-summary.outputs.conclusion }}
+        conclusion: ${{ steps.determine-conclusion.outputs.conclusion }}
         github-token: ${{ inputs.github-token }}
         title: ${{ steps.check-jobs-conclusion.outputs.check-title }}
         summary: |
