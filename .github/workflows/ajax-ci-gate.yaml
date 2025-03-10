@@ -6,7 +6,7 @@ on:
         type: string
         required: true
 
-      check-runs:
+      required-check-runs:
         description: "Comma-separated list of external IDs for the check runs to verify their conclusion status"
         required: false
         type: string
@@ -41,5 +41,5 @@ jobs:
         uses: ajax-yurkovskyi-t/iot-device-management/.github/actions@feature/delta-coverage-test
         with:
           needs: ${{ inputs.required-jobs }}
-          check-runs: ${{ inputs.check-runs }}
+          check-runs: ${{ inputs.required-check-runs }}
           github-token: ${{ steps.generate-app-token.outputs.token }}

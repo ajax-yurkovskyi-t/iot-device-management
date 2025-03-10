@@ -155,7 +155,7 @@ jobs:
       - name: Append Coverage Summary
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
+        uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/add-external-id-field
         with:
           github-token: ${{ steps.generate-app-token.outputs.token }}
 
@@ -165,5 +165,6 @@ jobs:
     secrets: inherit
     with:
       required-jobs: "${{ toJson(needs) }}"
+      check-runs: "ajax-delta-coverage, another-check-run"
     needs:
       - build
