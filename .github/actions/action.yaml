@@ -163,7 +163,7 @@ runs:
         summary: |
           ${{ steps.check-jobs-conclusion.outputs.check-summary }}
           
-          ${{ steps.check-runs-conclusion.outputs.check-summary }}
+          ${{ steps.check-runs-conclusion.outputs.checkRunsSummary }}
 
           ${{ steps.check-jobs-conclusion.outputs.failed-jobs-metadata }}
           ${{ steps.check-runs-conclusion.outputs.failed-check-runs-metadata }}
