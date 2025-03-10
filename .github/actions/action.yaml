@@ -1,5 +1,5 @@
 name: Ajax CI Gate
-description: Checks if the jobs in `needs` have a specific conclusion and creates a check run with the result.
+description: Checks if the passed jobs and check runs are successful and creates a check run with the result.
 
 inputs:
   needs:
@@ -7,8 +7,9 @@ inputs:
     required: true
 
   check-runs:
-    description: "Needs a value for external_id field of check run"
+    description: "Comma-separated list of external IDs for the check runs to verify their conclusion status"
     required: false
+    default: 'ajax-delta-coverage'
 
   check-run-name:
     description: "The name of the resulting check run"
@@ -89,6 +90,7 @@ runs:
           core.setOutput("check-result", checkResult);
           core.setOutput("check-summary", finalMessage);
           core.setOutput("failed-jobs-metadata", failedJobsMetadata);
+          
 
     - name: Check Runs Conclusion
       id: check-runs-conclusion
@@ -138,18 +140,18 @@ runs:
 
           const failedCheckRunsMetadata = `<!-- FAILED_CHECK_RUNS: ${JSON.stringify(failedCheckRuns)} -->`;
 
-          core.setOutput("checkRunsPassed", checkResult);
-          core.setOutput("checkRunsSummary", finalMessage);
+          core.setOutput("check-result", checkResult);
+          core.setOutput("check-summary", finalMessage);
           core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
 
-    - name: Determine Conclusion
-      id: determine-conclusion
+    - name: Prepare Check Run Inputs
+      id: prepare-check-run-inputs
       uses: actions/github-script@v7
       with:
         github-token: ${{ inputs.github-token }}
         script: |
           const checkJobsResult = "${{ steps.check-jobs-conclusion.outputs.check-result }}";
-          const checkRunsResult = "${{ steps.check-runs-conclusion.outputs.checkRunsPassed }}";
+          const checkRunsResult = "${{ steps.check-runs-conclusion.outputs.check-result }}";
 
           let conclusion = "failure";
           let title = "Some required checks are not successful";
@@ -168,13 +170,14 @@ runs:
       id: create-check-run
       with:
         check-run-name: ${{ inputs.check-run-name }}
-        conclusion: ${{ steps.determine-conclusion.outputs.conclusion }}
+        conclusion: ${{ steps.prepare-check-run-inputs.outputs.conclusion }}
         github-token: ${{ inputs.github-token }}
-        title: ${{ steps.determine-conclusion.outputs.check-title }}
+        title: ${{ steps.prepare-check-run-inputs.outputs.check-title }}
         summary: |
           ${{ steps.check-jobs-conclusion.outputs.check-summary }}
           
-          ${{ steps.check-runs-conclusion.outputs.checkRunsSummary }}
+          ${{ steps.check-runs-conclusion.outputs.check-summary }}
+          
           ${{ steps.check-jobs-conclusion.outputs.failed-jobs-metadata }}
           ${{ steps.check-runs-conclusion.outputs.failed-check-runs-metadata }}
         target-pr-number: ${{ inputs.target-pr-number }}

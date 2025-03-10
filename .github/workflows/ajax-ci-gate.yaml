@@ -7,7 +7,7 @@ on:
         required: true
 
       check-runs:
-        description: 'Check runs input'
+        description: "Comma-separated list of external IDs for the check runs to verify their conclusion status"
         required: false
         type: string
 
