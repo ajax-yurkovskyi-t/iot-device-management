@@ -83,14 +83,10 @@ runs:
           }
 
           const finalMessage = `${expectedMessage}\n\n${failedJobsMessage}`;
-          const checkTitle = checkResult == true 
-              ? 'All required checks are successful' 
-              : 'Some required checks are not successful';
 
           const failedJobsMetadata = `<!-- FAILED_JOBS: ${JSON.stringify(failedJobs)} -->`;
 
           core.setOutput("check-result", checkResult);
-          core.setOutput("check-title", checkTitle);
           core.setOutput("check-summary", finalMessage);
           core.setOutput("failed-jobs-metadata", failedJobsMetadata);
 
@@ -156,11 +152,15 @@ runs:
           const checkRunsResult = "${{ steps.check-runs-conclusion.outputs.checkRunsPassed }}";
 
           let conclusion = "failure";
+          let title = "Some required checks are not successful";
+          
           if (checkJobsResult === "true" && (checkRunsResult === "true" || !checkRunsResult)) {
             conclusion = "success";
+            title = "All required checks are successful";
           }
 
           core.setOutput("conclusion", conclusion);  
+          core.setOutput("check-title", title);
     
 
     - name: Create check run
@@ -170,12 +170,11 @@ runs:
         check-run-name: ${{ inputs.check-run-name }}
         conclusion: ${{ steps.determine-conclusion.outputs.conclusion }}
         github-token: ${{ inputs.github-token }}
-        title: ${{ steps.check-jobs-conclusion.outputs.check-title }}
+        title: ${{ steps.determine-conclusion.outputs.check-title }}
         summary: |
           ${{ steps.check-jobs-conclusion.outputs.check-summary }}
           
           ${{ steps.check-runs-conclusion.outputs.checkRunsSummary }}
-
           ${{ steps.check-jobs-conclusion.outputs.failed-jobs-metadata }}
           ${{ steps.check-runs-conclusion.outputs.failed-check-runs-metadata }}
         target-pr-number: ${{ inputs.target-pr-number }}
