@@ -126,7 +126,7 @@ runs:
             allCheckRuns.push(`- ${checkRun.name}`);
             if (checkRun.conclusion === 'failure') {
               checkResult = false;
-              failedCheckRuns.push(checkRun.name); // Only the check run name
+              failedCheckRuns.push(checkRun.name);
             }
           }
 
@@ -139,17 +139,28 @@ runs:
           }
 
           const finalMessage = `${expectedMessage}\n\n${failedCheckRunsMessage}`;
-          const checkTitle = checkResult 
-              ? 'All needed check runs passed successfully' 
-              : 'Some needed check runs were not successful';
 
           const failedCheckRunsMetadata = `<!-- FAILED_CHECK_RUNS: ${JSON.stringify(failedCheckRuns)} -->`;
 
           core.setOutput("checkRunsPassed", checkResult);
-          core.setOutput("checkRunsTitle", checkTitle);
           core.setOutput("checkRunsSummary", finalMessage);
           core.setOutput("failed-check-runs-metadata", failedCheckRunsMetadata);
-    
+
+    - name: Determine Conclusion and Summary
+      id: determine-conclusion-summary
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const checkJobsResult = "${{ steps.check-jobs-conclusion.outputs.check-result }}";
+          const checkRunsResult = "${{ steps.check-runs-conclusion.outputs.checkRunsPassed }}";
+
+          let conclusion = "failure";
+          if (checkJobsResult === "true" && (checkRunsResult === "true" || !checkRunsResult)) {
+            conclusion = "success";
+          }
+
+          core.setOutput("conclusion", conclusion);  
     
 
     - name: Create check run
@@ -157,7 +168,7 @@ runs:
       id: create-check-run
       with:
         check-run-name: ${{ inputs.check-run-name }}
-        conclusion: ${{ (steps.check-jobs-conclusion.outputs.check-result == 'true' && (steps.check-runs-conclusion.outputs.checkRunsPassed == 'true' || steps.check-runs-conclusion.outputs.checkRunsPassed == '')) && 'success' || 'failure' }}
+        conclusion: ${{ steps.determine-conclusion-summary.outputs.conclusion }}
         github-token: ${{ inputs.github-token }}
         title: ${{ steps.check-jobs-conclusion.outputs.check-title }}
         summary: |
