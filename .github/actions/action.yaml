@@ -9,7 +9,6 @@ inputs:
   check-runs:
     description: "Comma-separated list of external IDs for the check runs to verify their conclusion status"
     required: false
-    default: 'ajax-delta-coverage'
 
   check-run-name:
     description: "The name of the resulting check run"

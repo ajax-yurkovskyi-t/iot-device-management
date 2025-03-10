@@ -10,6 +10,7 @@ on:
         description: "Comma-separated list of external IDs for the check runs to verify their conclusion status"
         required: false
         type: string
+        default: 'ajax-delta-coverage'
 
     outputs:
       check-run-id:
