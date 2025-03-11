@@ -142,7 +142,6 @@ jobs:
         run: ${gradle_cmd} build -x test
 
       - name: Run Delta Coverage check
-        continue-on-error: true
         if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
         run: ${gradle_cmd} deltaCoverage -PdiffBase="refs/remotes/origin/$GITHUB_BASE_REF"
 
