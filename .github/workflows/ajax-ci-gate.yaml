@@ -20,6 +20,7 @@ on:
 jobs:
   ajax-ci-gate:
     runs-on: ubuntu-latest
+    if: ${{ !(github.ref == 'refs/heads/${{ github.event.repository.default_branch }}' || startsWith(github.ref, 'refs/heads/release/')) }}
     outputs:
       check-run-id: ${{ steps.ajax-ci-gate.outputs.check-run-id }}
 
@@ -40,6 +41,9 @@ jobs:
       - id: ajax-ci-gate
         uses: ajax-yurkovskyi-t/iot-device-management/.github/actions@feature/delta-coverage-test
         with:
-          needs: ${{ inputs.required-jobs }}
-          check-runs: ${{ inputs.required-check-runs }}
+          required-jobs: ${{ inputs.required-jobs }}
+          required-check-runs: ${{ inputs.required-check-runs }}
           github-token: ${{ steps.generate-app-token.outputs.token }}
+
+
+

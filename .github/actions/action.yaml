@@ -2,11 +2,11 @@ name: Ajax CI Gate
 description: Checks if the passed jobs and check runs are successful and creates a check run with the result.
 
 inputs:
-  needs:
+  required-jobs:
     description: "Needs JSON object with the jobs to check for a specific conclusion"
     required: true
 
-  check-runs:
+  required-check-runs:
     description: "Comma-separated list of external IDs for the check runs to verify their conclusion status"
     required: false
 
@@ -81,40 +81,39 @@ runs:
       id: check-jobs-conclusion
       uses: actions/github-script@v7
       env:
-        NEEDS_CONTEXT: ${{ inputs.needs }}
+        REQUIRED_JOBS: ${{ inputs.required-jobs }}
       with:
         github-token: ${{ inputs.github-token }}
         result-encoding: json
         script: |
-          const needs = JSON.parse(process.env.NEEDS_CONTEXT);
-
+          const requiredJobs = JSON.parse(process.env.REQUIRED_JOBS);
+          
           let checkResult = true;
           let failedJobs = [];
           let allJobs = [];
-
+          
           let expectedMessage = `## Required job list\n`;
           let failedJobsMessage = `#### This check run failed because the following jobs were not successful:\n`;
           
-          for (const job in needs) {
+          for (const job in requiredJobs) {
             allJobs.push(`- ${job}`);
-            if (needs[job].result !== "${{ inputs.expected-conclusion }}") {
+            if (requiredJobs[job].result !== "${{ inputs.expected-conclusion }}") {
               checkResult = false;
-              failedJobs.push(`- ${job}: ${needs[job].result}`);
+              failedJobs.push(`- ${job}: ${requiredJobs[job].result}`);
             }
           }
-
+          
           expectedMessage += allJobs.join(`\n`);
-
+          
           if (failedJobs.length > 0) {
             failedJobsMessage += failedJobs.join(`\n`);
           } else {
             failedJobsMessage = `All required jobs passed successfully`;
           }
-
+          
           const finalMessage = `${expectedMessage}\n\n${failedJobsMessage}`;
-
           const failedJobsMetadata = `<!-- FAILED_JOBS: ${JSON.stringify(failedJobs)} -->`;
-
+          
           core.setOutput("check-result", checkResult);
           core.setOutput("check-summary", finalMessage);
           core.setOutput("failed-jobs-metadata", failedJobsMetadata);
@@ -122,13 +121,13 @@ runs:
 
     - name: Check Runs Conclusion
       id: check-runs-conclusion
-      if: ${{ inputs.check-runs }}
+      if: ${{ inputs.required-check-runs }}
       uses: actions/github-script@v7
       with:
         github-token: ${{ inputs.github-token }}
         result-encoding: json
         script: |
-          const externalIds = "${{ inputs.check-runs }}".split(',').map(id => id.trim());
+          const externalIds = "${{ inputs.required-check-runs }}".split(',').map(id => id.trim());
           const targetRepo = "${{ inputs.target-repo }}";
           const [owner, repo] = targetRepo.split('/');
           const checkRunsResponse = await github.rest.checks.listForRef({ 
