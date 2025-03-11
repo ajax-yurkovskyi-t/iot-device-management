@@ -158,6 +158,7 @@ jobs:
         uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/add-external-id-field
         with:
           github-token: ${{ steps.generate-app-token.outputs.token }}
+          external-id: 'ajax-delta-coverage'
 
   ajax-ci-gate:
     if: always()
