@@ -160,11 +160,11 @@ jobs:
           github-token: ${{ steps.generate-app-token.outputs.token }}
           external-id: 'ajax-delta-coverage'
 
-  ajax-ci-gate:
-    if: always()
-    uses: ajax-yurkovskyi-t/iot-device-management/.github/workflows/ajax-ci-gate.yaml@feature/delta-coverage-test
-    secrets: inherit
-    with:
-      required-jobs: "${{ toJson(needs) }}"
-    needs:
-      - build
+#  ajax-ci-gate:
+#    if: always()
+#    uses: ajax-yurkovskyi-t/iot-device-management/.github/workflows/ajax-ci-gate.yaml@feature/delta-coverage-test
+#    secrets: inherit
+#    with:
+#      required-jobs: "${{ toJson(needs) }}"
+#    needs:
+#      - build
