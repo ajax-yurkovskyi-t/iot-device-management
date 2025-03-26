@@ -42,6 +42,11 @@ class UserController(
         return Mono.just("user")
     }
 
+    @GetMapping("/test3")
+    fun getUserByStringg(): Mono<String> {
+        return Mono.just("user3")
+    }
+
     @GetMapping("/test2")
     fun getUserByString2(): Mono<String> {
         return Mono.just("user2")
