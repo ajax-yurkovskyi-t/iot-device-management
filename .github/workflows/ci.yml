@@ -24,6 +24,9 @@ jobs:
       contents: read
       checks: write
 
+    outputs:
+      github-token: ${{ steps.generate-app-token.outputs.token }}
+
     steps:
 
       - name: Checkout
@@ -59,6 +62,7 @@ jobs:
           CHECK_RUN_NAME="Deltasc coverage"
           CHECK_RUN_CONCLUSION="failure"
           CHECK_RUN_STATUS="completed"
+          EXTERNAL_ID="ajax-delta-cov"
           CHECK_RUN_OUTPUT="Delta coverage check completed successfully\n\n<!-- This is Test Coverage CheckRun -->"
 
           INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
@@ -70,6 +74,7 @@ jobs:
               "name": "'"$CHECK_RUN_NAME"'",
               "head_sha": "${{ github.event.pull_request.head.sha }}",
               "status": "'"$CHECK_RUN_STATUS"'",
+              "external_id": "'"$EXTERNAL_ID"'",
               "conclusion": "'"$CHECK_RUN_CONCLUSION"'",
               "output": {
                 "title": "'"$CHECK_RUN_NAME"'",
@@ -77,8 +82,61 @@ jobs:
               }
             }' \
             https://api.github.com/repos/${{ github.repository }}/check-runs
-      
-      
+          
+
+      - name: Create Check Run for Coverage
+        run: |
+          CHECK_RUN_NAME="Another Check Run"
+          CHECK_RUN_CONCLUSION="success"
+          CHECK_RUN_STATUS="completed"
+          EXTERNAL_ID="another-check-run"
+          CHECK_RUN_OUTPUT="Delta coverage check completed successfully\n\n<!-- This is Test Coverage CheckRun -->"
+
+          INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
+
+          curl -X POST \
+            -H "Authorization: token $INSTALLATION_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{
+              "name": "'"$CHECK_RUN_NAME"'",
+              "head_sha": "${{ github.event.pull_request.head.sha }}",
+              "status": "'"$CHECK_RUN_STATUS"'",
+              "external_id": "'"$EXTERNAL_ID"'",
+              "conclusion": "'"$CHECK_RUN_CONCLUSION"'",
+              "output": {
+                "title": "'"$CHECK_RUN_NAME"'",
+                "summary": "'"$CHECK_RUN_OUTPUT"'"
+              }
+            }' \
+            https://api.github.com/repos/${{ github.repository }}/check-runs    
+          
+
+      - name: Create Check Run for Coverage
+        run: |
+          CHECK_RUN_NAME="De coverage"
+          CHECK_RUN_CONCLUSION="failure"
+          CHECK_RUN_STATUS="completed"
+          EXTERNAL_ID="ajax-delta-coverage"
+          CHECK_RUN_OUTPUT="Delta coverage check completed successfully\n\n<!-- This is Test Coverage CheckRun -->"
+
+          INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
+
+          curl -X POST \
+            -H "Authorization: token $INSTALLATION_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{
+              "name": "'"$CHECK_RUN_NAME"'",
+              "head_sha": "${{ github.event.pull_request.head.sha }}",
+              "status": "'"$CHECK_RUN_STATUS"'",
+              "external_id": "'"$EXTERNAL_ID"'",
+              "conclusion": "'"$CHECK_RUN_CONCLUSION"'",
+              "output": {
+                "title": "'"$CHECK_RUN_NAME"'",
+                "summary": "'"$CHECK_RUN_OUTPUT"'"
+              }
+            }' \
+            https://api.github.com/repos/${{ github.repository }}/check-runs    
+          
 
       - name: Run gradle build
         run: ${gradle_cmd} build -x test
@@ -97,5 +155,16 @@ jobs:
       - name: Append Coverage Summary
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/dynamic-label-fetching
+        uses:  ajax-yurkovskyi-t/delta-coverage-action@feature/add-external-id-field
+        with:
+          github-token: ${{ steps.generate-app-token.outputs.token }}
+          external-id: 'ajax-delta-coverage'
 
+#  ajax-ci-gate:
+#    if: always()
+#    uses: ajax-yurkovskyi-t/iot-device-management/.github/workflows/ajax-ci-gate.yaml@feature/delta-coverage-test
+#    secrets: inherit
+#    with:
+#      required-jobs: "${{ toJson(needs) }}"
+#    needs:
+#      - build
