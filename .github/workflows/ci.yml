@@ -117,7 +117,7 @@ jobs:
           CHECK_RUN_CONCLUSION="failure"
           CHECK_RUN_STATUS="completed"
           EXTERNAL_ID="ajax-delta-coverage"
-          CHECK_RUN_OUTPUT="Delta coverage check completed successfully\n\n<!-- This is Test Coverage CheckRun -->"
+          CHECK_RUN_OUTPUT="Delta coverage check completed successfully\n\n<!-- This is Delta Coverage CheckRun -->"
 
           INSTALLATION_TOKEN="${{ steps.generate-app-token.outputs.token }}"
 
